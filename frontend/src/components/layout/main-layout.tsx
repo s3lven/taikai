@@ -1,11 +1,15 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
+import { useDarkModeStore } from "@/stores/dark-mode-store";
 
 const MainLayout = () => {
+	const { isDarkMode } = useDarkModeStore();
+
 	return (
-		<div className="bg-red-500">
-			MainLayout
-			<Outlet />
+		<div className={isDarkMode ? "dark" : ""}>
+			<div className={`w-full h-full flex transition-colors duration-300`}>
+				{/* Navbar Here */}
+				<Outlet />
+			</div>
 		</div>
 	);
 };
