@@ -11,7 +11,7 @@ const DashboardSection = ({
 	status,
 }: DashboardSectionProps) => {
 	return (
-		<>
+		<div className="space-y-4">
 			{/* Header */}
 			<div className="w-full flex justify-between">
 				<h1 className="text-headline text-figma_dark">{status} Tournaments</h1>
@@ -28,7 +28,7 @@ const DashboardSection = ({
 						</div>
 					))}
 			</div>
-		</>
+		</div>
 	);
 };
 

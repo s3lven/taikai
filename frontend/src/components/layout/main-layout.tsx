@@ -7,9 +7,14 @@ const MainLayout = () => {
 
 	return (
 		<div className={isDarkMode ? "dark" : ""}>
-			<div className={`w-screen h-full transition-colors duration-300 font-poppins`}>
+			<div
+				className={`w-screen min-h-screen flex flex-col transition-colors duration-300 font-poppins`}
+			>
 				<Navbar />
-				<Outlet />
+				{/* <div className="flex-1"> */}
+
+					<Outlet />
+				{/* </div> */}
 			</div>
 		</div>
 	);

@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import {
 	NavigationMenu,
@@ -7,6 +6,7 @@ import {
 	NavigationMenuLink,
 	navigationMenuTriggerStyle,
 } from "../ui/navigation-menu";
+import { DarkModeToggle } from "../dark-mode/dark-toggle";
 
 interface NavLinkType {
 	name: string;
@@ -43,7 +43,7 @@ const NavLink = ({ name, to }: NavLinkType) => {
 const Navbar = () => {
 	return (
 		<nav className="bg-figma_dark h-[72px] w-full">
-			<div className="flex h-full items-center justify-between px-[108px] py-2">
+			<div className="flex h-full items-center justify-between w-full py-2 max-w-screen-2xl mx-auto">
 				<Link to="/" className="flex h-full items-center justify-center">
 					<p className="font-poppins text-2xl font-bold leading-6 tracking-[0.15px] text-white">
 						Taikai
@@ -54,6 +54,7 @@ const Navbar = () => {
 						{navlinks.map((link) => (
 							<NavLink key={link.name} name={link.name} to={link.to} />
 						))}
+						<DarkModeToggle />
 					</NavigationMenuList>
 				</NavigationMenu>
 			</div>

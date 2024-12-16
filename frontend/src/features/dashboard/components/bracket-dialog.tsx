@@ -62,7 +62,7 @@ const BracketDialog = ({ tournament }: BracketDialogProps) => {
 				<DialogHeader className="border-b border-white pb-2 space-y-4">
 					<DialogTitle>{tournament.name}</DialogTitle>
 					<DialogDescription className="text-white">
-						Select a tournament below
+						Select a bracket below
 					</DialogDescription>
 				</DialogHeader>
 				<div
