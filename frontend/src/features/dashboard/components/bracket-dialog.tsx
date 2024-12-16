@@ -9,39 +9,38 @@ import {
 } from "@/components/ui/dialog";
 
 import { User } from "lucide-react";
-import { Link } from "react-router-dom";
 
-type BracketDialogItemProps = {
-    bracket: Bracket;
-    tournamentName: string
-  };
+interface BracketDialogItemProps {
+	bracket: Bracket;
+	tournamentName: string;
+}
 
-const BracketDialogItem = ({ bracket, tournament }: BracketDialogItemProps) => {
-    return (
-      <div className="relative group">
-        <div
-          className="rounded-lg bg-neutral-700 flex justify-between px-4 py-4 hover:bg-figma_shade2 shadow-lg transition-transform ease-in-out duration-300 hover:scale-[1.01]"
-        //   to={`/${tournament}/${bracket.bracketCode}`}
-        >
-          <div className="flex flex-col justify-center flex-1">
-            <p className="">{bracket.name}</p>
-            <p className="">{bracket.name}</p>
-          </div>
-          <div className="flex items-center text-right justify-end w-1/4">
-            <p className="w-full">{bracket.status}</p>
-          </div>
-          <div className="flex gap-4 justify-end items-center w-1/4">
-            <div className="flex gap-1 justify-end items-center">
-              <p className="text-right">{bracket.numberOfParticipants}</p>
-              {/* <p>{bracket.slots.length}</p> */}
-              <User />
-            </div>
-          </div>
-        </div>
-        {/* <BracketSettingsPopover name={item.bracketName} /> */}
-      </div>
-    );
-  };
+const BracketDialogItem = ({ bracket }: BracketDialogItemProps) => {
+	return (
+		<div className="relative group">
+			<div
+				className="rounded-lg bg-neutral-700 flex justify-between px-4 py-4 hover:bg-figma_shade2 shadow-lg transition-transform ease-in-out duration-300 hover:scale-[1.01]"
+				//   to={`/${tournament}/${bracket.bracketCode}`}
+			>
+				<div className="flex flex-col justify-center flex-1">
+					<p className="">{bracket.name}</p>
+					<p className="">{bracket.name}</p>
+				</div>
+				<div className="flex items-center text-right justify-end w-1/4">
+					<p className="w-full">{bracket.status}</p>
+				</div>
+				<div className="flex gap-4 justify-end items-center w-1/4">
+					<div className="flex gap-1 justify-end items-center">
+						<p className="text-right">{bracket.numberOfParticipants}</p>
+						{/* <p>{bracket.slots.length}</p> */}
+						<User />
+					</div>
+				</div>
+			</div>
+			{/* <BracketSettingsPopover name={item.bracketName} /> */}
+		</div>
+	);
+};
 
 interface BracketDialogProps {
 	tournament: Tournament;
@@ -58,7 +57,7 @@ const BracketDialog = ({ tournament }: BracketDialogProps) => {
 			>
 				{tournament.name}
 			</DialogTrigger>
-			<DialogContent className="max-w-3xl w-full max-h-[75vh] bg-figma_neutral8 font-poppins text-white  ">
+			<DialogContent className="max-w-3xl w-full max-h-[75vh] bg-figma_neutral8 font-poppins text-white ">
 				<DialogHeader className="border-b border-white pb-2 space-y-4">
 					<DialogTitle>{tournament.name}</DialogTitle>
 					<DialogDescription className="text-white">
@@ -74,8 +73,12 @@ const BracketDialog = ({ tournament }: BracketDialogProps) => {
 							(a, b) => order.indexOf(a.status) - order.indexOf(b.status)
 						)
 						.map((bracket) => (
-                            <BracketDialogItem  bracket={bracket} tournamentName={tournament.name}/>
-                        ))}
+							<BracketDialogItem
+								key={`${bracket.name}-${bracket.status}`}
+								bracket={bracket}
+								tournamentName={tournament.name}
+							/>
+						))}
 				</div>
 			</DialogContent>
 		</Dialog>

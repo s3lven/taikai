@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter } from "react-router";
 
-type AppProviderProps = {
+interface AppProviderProps {
 	children: React.ReactNode;
 };
 

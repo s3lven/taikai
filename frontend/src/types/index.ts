@@ -1,4 +1,5 @@
 interface Tournament {
+    id: number
 	name: string;
 	status: string;
     brackets: Bracket[]
@@ -13,6 +14,7 @@ interface Bracket {
 
 const dummyTournamentData: Tournament[] = [
 	{
+        id: 1,
 		name: "Sac Taikai",
 		status: "Active",
         brackets: [
@@ -29,6 +31,7 @@ const dummyTournamentData: Tournament[] = [
         ]
 	},
 	{
+        id: 2,
 		name: "HSSK Taikai",
 		status: "Active",
         brackets: [

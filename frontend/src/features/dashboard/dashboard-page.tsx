@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import React, { Suspense } from "react";
-import { Link } from "react-router-dom";
+import NewTaikaiDialog from "./components/new-taikai-dialog";
 const LazyDashboardContent = React.lazy(
 	() => import("./components/dashboard-content")
 );
@@ -22,13 +21,11 @@ const DashboardLoading = () => {
 
 const DashboardPage = () => {
 	return (
-		<div className="pb-8 max-w-screen-2xl mx-auto w-full flex-1 flex flex-col ">
+		<div className="pb-8 max-w-screen-2xl px-[60px] mx-auto w-full flex-1 flex flex-col ">
 			<div className="w-full pt-6 pb-2 border-b border-figma_neutral5 flex justify-between items-center">
 				<h1 className="text-figma_dark text-title">Dashboard</h1>
 
-				<Button className="bg-figma_shade2 hover:bg-figma_shade2/90 text-white transition-transform hover:scale-105 duration-300" asChild>
-					<Link to="/new">Create New Taikai</Link>
-				</Button>
+				<NewTaikaiDialog />
 			</div>
 
 			<Suspense fallback={<DashboardLoading />}>

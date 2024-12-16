@@ -11,10 +11,7 @@ const MainLayout = () => {
 				className={`w-screen min-h-screen flex flex-col transition-colors duration-300 font-poppins`}
 			>
 				<Navbar />
-				{/* <div className="flex-1"> */}
-
-					<Outlet />
-				{/* </div> */}
+				<Outlet />
 			</div>
 		</div>
 	);

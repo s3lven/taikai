@@ -43,7 +43,7 @@ const NavLink = ({ name, to }: NavLinkType) => {
 const Navbar = () => {
 	return (
 		<nav className="bg-figma_dark h-[72px] w-full">
-			<div className="flex h-full items-center justify-between w-full py-2 max-w-screen-2xl mx-auto">
+			<div className="flex h-full items-center justify-between w-full py-2 max-w-screen-2xl mx-auto px-[60px]">
 				<Link to="/" className="flex h-full items-center justify-center">
 					<p className="font-poppins text-2xl font-bold leading-6 tracking-[0.15px] text-white">
 						Taikai

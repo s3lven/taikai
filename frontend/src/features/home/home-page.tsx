@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const HomePage = () => {
 	return (
-		<div className="w-screen h-screen flex justify-center items-center py-[120px] gap-16 bg-figma_dark font-poppins">
+		<div className="w-screen flex-1 flex justify-center items-center py-[120px] gap-16 bg-figma_dark font-poppins">
 			<div className="flex flex-col justify-center items-center gap-6">
 				<div className="flex flex-col justify-center items-center gap-4">
 					<div className="flex flex-col gap-2">
