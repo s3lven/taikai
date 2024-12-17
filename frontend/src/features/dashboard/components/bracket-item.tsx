@@ -1,18 +1,19 @@
 import { Bracket } from "@/types";
 import { User } from "lucide-react";
+import BracketSettings from "./bracket-settings";
 
 interface BracketItemProps {
 	bracket: Bracket;
-	tournamentName: string;
 }
 
 const BracketItem = ({ bracket }: BracketItemProps) => {
 	return (
-		<div className="relative group">
-			<div
-				className="rounded-lg bg-neutral-700 flex justify-between px-4 py-4 hover:bg-figma_shade2 shadow-lg transition-transform ease-in-out duration-300 hover:scale-[1.01]"
-				//   to={`/${tournament}/${bracket.bracketCode}`}
-			>
+		<div
+			className="relative group rounded-lg bg-neutral-700 px-4 py-4 shadow-lg
+				hover:bg-figma_shade2  transition-transform ease-in-out duration-300 hover:scale-[1.01]"
+			//   to={`/${tournament}/${bracket.bracketCode}`}
+		>
+			<div className="flex justify-between w-[90%]">
 				<div className="flex flex-col justify-center flex-1">
 					<p className="">{bracket.name}</p>
 					<p className="">{bracket.name}</p>
@@ -27,10 +28,10 @@ const BracketItem = ({ bracket }: BracketItemProps) => {
 						<User />
 					</div>
 				</div>
+				<BracketSettings bracket={bracket} />
 			</div>
-			{/* <BracketSettingsPopover name={item.bracketName} /> */}
 		</div>
 	);
 };
 
-export default BracketItem
+export default BracketItem;

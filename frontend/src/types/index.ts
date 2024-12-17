@@ -9,6 +9,7 @@ interface Tournament {
 }
 
 interface Bracket {
+    id: number
     name: string
     status: string
     numberOfParticipants: number
@@ -25,11 +26,13 @@ const dummyTournamentData: Tournament[] = [
         numberOfParticipants: 36,
         brackets: [
             {
+                id: 1,
                 name: "Kyu",
                 status: "Past",
                 numberOfParticipants: 16
             },
             {
+                id: 2,
                 name: "Dan",
                 status: "Active",
                 numberOfParticipants: 20
@@ -46,11 +49,13 @@ const dummyTournamentData: Tournament[] = [
 
         brackets: [
             {
+                id: 1,
                 name: "Kyu",
                 status: "Active",
                 numberOfParticipants: 18
             },
             {
+                id: 2,
                 name: "Dan",
                 status: "Upcoming",
                 numberOfParticipants: 24

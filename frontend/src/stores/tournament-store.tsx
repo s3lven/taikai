@@ -6,7 +6,7 @@ interface TournamentState {
 	tournaments: Tournament[];
 	editingTournament: Tournament | null;
 	viewingTournament: Tournament | null;
-	isAddingTournament: boolean
+	isAddingTournament: boolean;
 }
 
 interface TournamentActions {
@@ -19,7 +19,9 @@ interface TournamentActions {
 	// For viewing tournament-related details on modals/dialogs
 	setEditingTournament: (tournament: Tournament | null) => void;
 	setViewingTournament: (tournament: Tournament | null) => void;
-	setIsAddingTournament: (isAdding: boolean) => void
+	setIsAddingTournament: (isAdding: boolean) => void;
+
+	removeBracket: (bracketId: number, tournamentId: number) => void;
 }
 
 export type TournamentStore = TournamentState & TournamentActions;
@@ -57,7 +59,18 @@ export const useTournamentStore = create<TournamentStore>()(
 			set({ editingTournament: tournament }),
 		setViewingTournament: (tournament) =>
 			set({ viewingTournament: tournament }),
-		setIsAddingTournament: (isAdding) => 
-			set({ isAddingTournament: isAdding}),
+		setIsAddingTournament: (isAdding) => set({ isAddingTournament: isAdding }),
+
+		removeBracket: (bracketId, tournamentId) =>
+			set((state) => ({
+				tournaments: state.tournaments.map((t) =>
+					t.id === tournamentId
+						? {
+								...t,
+								brackets: t.brackets.filter((b) => b.id !== bracketId),
+						  }
+						: t
+				),
+			})),
 	}))
 );
