@@ -4,6 +4,9 @@ import { immer } from "zustand/middleware/immer";
 
 interface TournamentState {
 	tournaments: Tournament[];
+	editingTournament: Tournament | null;
+	viewingTournament: Tournament | null;
+	isAddingTournament: boolean
 }
 
 interface TournamentActions {
@@ -12,6 +15,11 @@ interface TournamentActions {
 	updateTournament: (id: number, updatedTournament: Tournament) => void;
 
 	setInitialTournaments: (tournaments: Tournament[]) => void;
+
+	// For viewing tournament-related details on modals/dialogs
+	setEditingTournament: (tournament: Tournament | null) => void;
+	setViewingTournament: (tournament: Tournament | null) => void;
+	setIsAddingTournament: (isAdding: boolean) => void
 }
 
 export type TournamentStore = TournamentState & TournamentActions;
@@ -19,6 +27,10 @@ export type TournamentStore = TournamentState & TournamentActions;
 export const useTournamentStore = create<TournamentStore>()(
 	immer((set) => ({
 		tournaments: [],
+		editingTournament: null,
+		viewingTournament: null,
+		isAddingTournament: false,
+
 		setInitialTournaments: (tournaments) =>
 			set(() => ({
 				tournaments: tournaments,
@@ -41,5 +53,11 @@ export const useTournamentStore = create<TournamentStore>()(
 						: tournament
 				),
 			})),
+		setEditingTournament: (tournament) =>
+			set({ editingTournament: tournament }),
+		setViewingTournament: (tournament) =>
+			set({ viewingTournament: tournament }),
+		setIsAddingTournament: (isAdding) => 
+			set({ isAddingTournament: isAdding}),
 	}))
 );

@@ -28,13 +28,14 @@ const NavLink = ({ name, to }: NavLinkType) => {
 	return (
 		<>
 			<NavigationMenuItem>
-				<Link className="flex items-center justify-center" to={to}>
-					<NavigationMenuLink
-						className={`${navigationMenuTriggerStyle()} bg-transparent hover:bg-figma_secondary`}
-					>
+				<NavigationMenuLink
+					className={`${navigationMenuTriggerStyle()} bg-transparent hover:bg-figma_secondary`}
+					asChild
+				>
+					<Link className="flex items-center justify-center" to={to}>
 						<p className="text-article text-white">{name}</p>
-					</NavigationMenuLink>
-				</Link>
+					</Link>
+				</NavigationMenuLink>
 			</NavigationMenuItem>
 		</>
 	);

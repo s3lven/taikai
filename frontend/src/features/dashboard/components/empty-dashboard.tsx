@@ -1,4 +1,4 @@
-import NewTaikaiDialog from "./new-taikai-dialog";
+import NewTaikaiDialog from "./dialogs/tournament-new-dialog";
 
 const EmptyDashboard = () => {
 	return (

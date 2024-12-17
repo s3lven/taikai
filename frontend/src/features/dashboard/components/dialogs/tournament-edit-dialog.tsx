@@ -4,11 +4,7 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
 	Form,
 	FormControl,
@@ -20,7 +16,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTournamentStore } from "@/stores/tournament-store";
 import { Tournament } from "@/types";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const formSchema = z.object({
 	name: z
@@ -29,16 +27,15 @@ const formSchema = z.object({
 		.max(50, { message: "Name must be shorter than 50 characters" }),
 });
 
-const NewTaikaiDialog = () => {
+const TournamentEditDialog = () => {
+	const { updateTournament, editingTournament, setEditingTournament } =
+		useTournamentStore();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		defaultValues: {
-			name: "",
-		},
+		defaultValues: editingTournament
+			? { name: editingTournament.name }
+			: { name: "" },
 	});
-
-	const addTournament = useTournamentStore((state) => state.addTournament);
-	const [open, setOpen] = useState(false);
 
 	const onSubmit = (values: z.infer<typeof formSchema>) => {
 		const newTournament: Tournament = {
@@ -46,24 +43,22 @@ const NewTaikaiDialog = () => {
 			name: values.name,
 			status: "Upcoming",
 			brackets: [],
+			location: "here",
+			date: "2024-02-29",
+			numberOfParticipants: 25,
 		};
-		addTournament(newTournament);
-		setOpen(false);
+		updateTournament(editingTournament!.id, newTournament);
+		setEditingTournament(null);
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button
-					className="bg-figma_shade2 hover:bg-figma_shade2/90 text-white 
-                    transition-transform hover:scale-105 duration-300"
-				>
-					Create New Taikai
-				</Button>
-			</DialogTrigger>
+		<Dialog
+			open={!!editingTournament}
+			onOpenChange={() => setEditingTournament(null)}
+		>
 			<DialogContent className=" max-h-[75vh] bg-figma_neutral8 font-poppins text-white">
 				<DialogHeader className="border-b border-white pb-2 space-y-4">
-					<DialogTitle>New Taikai</DialogTitle>
+					<DialogTitle>Edit {editingTournament!.name}</DialogTitle>
 				</DialogHeader>
 				{/* Form Component */}
 				<Form {...form}>
@@ -102,4 +97,4 @@ const NewTaikaiDialog = () => {
 	);
 };
 
-export default NewTaikaiDialog;
+export default TournamentEditDialog;

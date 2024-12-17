@@ -2,6 +2,9 @@ interface Tournament {
     id: number
 	name: string;
 	status: string;
+    location: string;
+    date: string;
+    numberOfParticipants: number
     brackets: Bracket[]
 }
 
@@ -17,6 +20,9 @@ const dummyTournamentData: Tournament[] = [
         id: 1,
 		name: "Sac Taikai",
 		status: "Active",
+        location: "Sacramento, CA",
+        date: "2024-03-15",
+        numberOfParticipants: 36,
         brackets: [
             {
                 name: "Kyu",
@@ -34,6 +40,10 @@ const dummyTournamentData: Tournament[] = [
         id: 2,
 		name: "HSSK Taikai",
 		status: "Active",
+        location: "Newark, CA",
+        date: "2024-05-12",
+        numberOfParticipants: 42,
+
         brackets: [
             {
                 name: "Kyu",

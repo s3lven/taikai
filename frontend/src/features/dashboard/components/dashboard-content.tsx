@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import DashboardSection from "./dashboard-section";
 import EmptyDashboard from "./empty-dashboard";
 import { dummyTournamentData } from "@/types";
 import { useTournamentStore } from "@/stores/tournament-store";
+import TournamentList from "./tournament-list";
 
 const DashboardContent = () => {
 	const { setInitialTournaments, tournaments } = useTournamentStore();
@@ -14,9 +14,9 @@ const DashboardContent = () => {
 
 	return tournaments.length > 0 ? (
 		<div className="w-full flex flex-col gap-12 pt-6">
-			<DashboardSection status="Active" />
-			<DashboardSection status="Upcoming" />
-			<DashboardSection status="Past" />
+			<TournamentList status="Active" />
+			<TournamentList status="Upcoming" />
+			<TournamentList status="Past" />
 		</div>
 	) : (
 		<EmptyDashboard />
