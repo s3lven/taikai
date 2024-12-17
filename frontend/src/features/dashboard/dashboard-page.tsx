@@ -30,7 +30,6 @@ const DashboardPage = () => {
 		<div className="pb-8 max-w-screen-2xl px-[60px] mx-auto w-full flex-1 flex flex-col ">
 			<div className="w-full pt-6 pb-2 border-b border-figma_neutral5 flex justify-between items-center">
 				<h1 className="text-figma_dark text-title">Dashboard</h1>
-				{/* Put trigger here */}
 				<Button
 					className="bg-figma_shade2 hover:bg-figma_shade2/90 text-white 
                     transition-transform hover:scale-105 duration-300"
