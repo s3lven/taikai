@@ -4,6 +4,7 @@ import { tournaments } from '../database/schema';
 
 export const getAllTournaments = async (req: Request, res: Response) => {
   try {
+    console.log(req.url)
     const data = await db.select().from(tournaments);
     res.status(200).json(data);
   } catch (error) {
