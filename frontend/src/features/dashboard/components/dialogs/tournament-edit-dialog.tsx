@@ -37,7 +37,7 @@ const TournamentEditDialog = () => {
 			: { name: "" },
 	});
 
-	const onSubmit = (values: z.infer<typeof formSchema>) => {
+	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		const newTournament: Tournament = {
 			id: Date.now(),
 			name: values.name,
@@ -47,8 +47,17 @@ const TournamentEditDialog = () => {
 			date: "2024-02-29",
 			numberOfParticipants: 25,
 		};
-		updateTournament(editingTournament!.id, newTournament);
-		setEditingTournament(null);
+		try {
+			await updateTournament(editingTournament!.id, newTournament);
+			setEditingTournament(null);
+		} catch (error) {
+			if(error instanceof Error) {
+				console.error(error.message)
+			} else {
+				console.error("Error when editting tournament")
+			}
+		}
+		
 	};
 
 	return (

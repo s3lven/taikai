@@ -8,6 +8,8 @@ interface Tournament {
     brackets: Bracket[]
 }
 
+type CreateTournament = Omit<Tournament, "brackets" | "id">
+
 interface Bracket {
     id: number
     name: string
@@ -64,5 +66,5 @@ const dummyTournamentData: Tournament[] = [
 	},
 ];
 
-export type { Tournament, Bracket };
+export type { Tournament, CreateTournament, Bracket };
 export { dummyTournamentData };

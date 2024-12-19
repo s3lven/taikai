@@ -1,9 +1,15 @@
 import express from 'express';
-import { getAllTournaments } from '../controllers/tournamentController';
-import { delayResponse } from '../middleware/delayResponse';
+import { createTournament, deleteTournament, getAllTournaments, updateTournament } from '../controllers/tournamentController';
 
 const router = express.Router();
 
-router.get('/', delayResponse, getAllTournaments);
+router.get('/', getAllTournaments)
+
+router.post('/', createTournament);
+
+router.delete('/:id', deleteTournament)
+
+router.patch('/:id', updateTournament)
+
 
 export default router;

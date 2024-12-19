@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTournamentStore } from "@/stores/tournament-store";
-import { Tournament } from "@/types";
+import { CreateTournament } from "@/types";
 
 const formSchema = z.object({
 	name: z
@@ -39,16 +39,17 @@ const TournamentNewDialog = () => {
 		useTournamentStore();
 
 	const onSubmit = (values: z.infer<typeof formSchema>) => {
-		const newTournament: Tournament = {
-			id: Date.now(),
+		// TODO: Expand dialog to add more fields
+		const newTournament: CreateTournament = {
 			name: values.name,
 			status: "Upcoming",
-			brackets: [],
 			location: "here",
-			date: "2024-02-29",
+			date: new Date().toLocaleDateString(),
 			numberOfParticipants: 25,
 		};
-		addTournament(newTournament);
+		
+		// TODO: Wrap in try-catch? Yeah put one here
+		void addTournament(newTournament);
 		setIsAddingTournament(false);
 	};
 

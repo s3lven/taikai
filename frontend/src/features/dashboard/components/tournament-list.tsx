@@ -30,7 +30,7 @@ const TournamentList = ({ status }: TournamentListProps) => {
 					</h1>
 				</div>
 				{/* List */}
-				<div className="w-full flex gap-6">
+				<div className="w-full flex flex-wrap gap-6">
 					{filteredTournamentData.map((tournament) => (
 						<Card
 							className="w-full max-w-md shadow-md cursor-pointer font-poppins 
@@ -52,7 +52,11 @@ const TournamentList = ({ status }: TournamentListProps) => {
 									<CardDescription className="text-sm text-gray-500 flex items-center gap-1">
 										<span className="flex items-center h-full">
 											{tournament.location} •{" "}
-											{new Date(tournament.date).toLocaleDateString()} •
+											{/* Long formatting needed here because toLocaleDateString returns -1 day due to local timezones */}
+											{new Date(tournament.date).toLocaleDateString("en-US", {
+												timeZone: "UTC",
+											})}{" "}
+											•
 										</span>
 										<span className="flex items-center h-full">
 											<User size={14} />{" "}
