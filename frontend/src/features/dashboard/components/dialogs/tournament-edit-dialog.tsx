@@ -65,9 +65,9 @@ const TournamentEditDialog = () => {
 			open={!!editingTournament}
 			onOpenChange={() => setEditingTournament(null)}
 		>
-			<DialogContent className=" max-h-[75vh] bg-figma_neutral8 font-poppins text-white">
-				<DialogHeader className="border-b border-white pb-2 space-y-4">
-					<DialogTitle>Edit {editingTournament!.name}</DialogTitle>
+			<DialogContent className=" max-h-[75vh] bg-figma_neutral8 font-poppins text-white" aria-describedby={undefined}>
+				<DialogHeader className="border-b border-white pb-2 space-y-4" >
+					<DialogTitle>Edit {editingTournament?.name}</DialogTitle>
 				</DialogHeader>
 				{/* Form Component */}
 				<Form {...form}>

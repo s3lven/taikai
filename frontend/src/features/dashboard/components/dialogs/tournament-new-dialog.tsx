@@ -55,7 +55,7 @@ const TournamentNewDialog = () => {
 
 	return (
 		<Dialog open={isAddingTournament} onOpenChange={setIsAddingTournament}>
-			<DialogContent className=" max-h-[75vh] bg-figma_neutral8 font-poppins text-white">
+			<DialogContent className=" max-h-[75vh] bg-figma_neutral8 font-poppins text-white" aria-describedby={undefined}>
 				<DialogHeader className="border-b border-white pb-2 space-y-4">
 					<DialogTitle>New Taikai</DialogTitle>
 				</DialogHeader>

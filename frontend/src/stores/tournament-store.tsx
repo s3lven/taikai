@@ -136,8 +136,11 @@ export const useTournamentStore = create<TournamentStore>()(
 				if (!response.ok) {
 					throw new Error("Failed to update the tournament");
 				}
-				const data: {message: string, result: Tournament[]} =
-					(await response.json()) as unknown as {message: string, result: Tournament[]};
+				const data: { message: string; result: Tournament[] } =
+					(await response.json()) as unknown as {
+						message: string;
+						result: Tournament[];
+					};
 				set((state) => ({
 					tournaments: state.tournaments.map((tournament) =>
 						tournament.id === id

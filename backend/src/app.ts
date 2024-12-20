@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json())
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'http://127.0.0.1:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 }));
 
@@ -22,5 +22,5 @@ app.get('/', (_req: Request, res: Response) => {
 app.use('/api/tournaments', tournamentRoutes);
 
 app.listen(port, () => {
-  console.log(`[SERVER]: Server is running at http://localhost:${port}`);
+  console.log(`[SERVER]: Server is running at http://127.0.0.1:${port}`);
 });
