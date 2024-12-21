@@ -1,35 +1,37 @@
-type TournamentStatusType = "Active" | "Upcoming" | "Past";
+export type TournamentStatusType = "Active" | "Upcoming" | "Past";
 
 interface Tournament {
-    id: number
+	id: number;
 	name: string;
 	status: TournamentStatusType;
-    location: string;
-    date: string;
-    numberOfParticipants: number
-    brackets: Bracket[]
+	location: string;
+	date: string;
+	numberOfParticipants: number;
+	brackets: Bracket[];
 }
-type CreateTournament = Omit<Tournament, "brackets" | "id">
+export type CreateTournament = Omit<Tournament, "brackets" | "id">;
 
-type BracketStatusType = "Editing" | "In Progress" | "Completed";
-interface Bracket {
-    id: number
-    name: string
-    status: BracketStatusType
-    numberOfParticipants: number
-    type: string
-    progress: number
-    // participants: Participant[]
-}
-
-type BracketData = Omit<Bracket, "numberOfParticipants"> & { tournamentName: string, participantCount: number } 
-
-interface Participant {
-    id: number
-    sequence: number
-    name: string
+export type BracketStatusType = "Editing" | "In Progress" | "Completed";
+export interface Bracket {
+	id: number;
+	name: string;
+	status: BracketStatusType;
+	numberOfParticipants: number;
+	type: string;
+	progress: number;
+	// participants: Participant[]
 }
 
+export type BracketData = Omit<Bracket, "numberOfParticipants"> & {
+	tournamentName: string;
+	participantCount: number;
+};
+
+export interface Participant {
+	id: number;
+	sequence: number;
+	name: string;
+}
 
 // const dummyTournamentData: Tournament[] = [
 // 	{
@@ -82,6 +84,3 @@ interface Participant {
 //         ]
 // 	},
 // ];
-
-export type { Tournament, CreateTournament, Bracket, BracketData, Participant };
-// export { dummyTournamentData };

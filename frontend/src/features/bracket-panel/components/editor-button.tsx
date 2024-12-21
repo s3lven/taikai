@@ -6,6 +6,7 @@ interface EditorButtonProps {
   onClickHandler?: MouseEventHandler<HTMLButtonElement> | undefined;
   variant?: string
   className?: string
+  disabled?: boolean
 }
 
 const buttonVariants: Record<string, string> = {
@@ -13,13 +14,14 @@ const buttonVariants: Record<string, string> = {
     "no-outline": "hover:bg-figma_neutral7"
 }
 
-const EditorButton = ({ text, onClickHandler, variant="DEFAULT", className }: EditorButtonProps) => {
+const EditorButton = ({ text, onClickHandler, variant="DEFAULT", className, disabled=false }: EditorButtonProps) => {
   return (
     <Button
       className={`flex justify-center items-center px-5 py-1.5 text-white text-label uppercase rounded
-        transtion-colors ease-in-out duration-150 ${className} outline-none
+        transtion-colors ease-in-out duration-150 ${className} outline-none disabled:opacity-50
         ${buttonVariants[variant]}`}
       onClick={onClickHandler}
+      disabled={disabled}
     >
       {text}
     </Button>

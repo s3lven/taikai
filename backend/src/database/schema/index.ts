@@ -18,6 +18,7 @@ export const brackets = pgTable(
     participantCount: smallint('participant_count').default(0).notNull(),
     tournamentId: integer('tournament_id').notNull(),
     progress: smallint().default(0).notNull(),
+    type: varchar({ length: 50 }).default('Single Elimination').notNull(),
   },
   (table) => [
     foreignKey({

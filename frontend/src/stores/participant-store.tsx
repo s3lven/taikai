@@ -3,6 +3,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 // import _ from "lodash";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+// import { useChangeTrackingStore } from "./change-tracking-store";
 
 interface ParticipantState {
 	participants: Participant[];
@@ -31,25 +32,32 @@ export const useParticipantStore = create<ParticipantStore>()(
 			{ name: "Jane Johnson", id: 6, sequence: 6 },
 		],
 		addParticipant: () => {
-			
 			set((state) => {
 				const newId = state.participants.length
-                ? Math.max(...state.participants.map(p => p.id)) + 1
-                : 1;
+					? Math.max(...state.participants.map((p) => p.id)) + 1
+					: 1;
 
 				if (state.participants.length < 32) {
-					state.participants = [
-						...state.participants,
-						{
-							id: newId,
-							sequence: state.participants.length + 1,
-							name: "",
-						},
-					];
+					const newParticipant = {
+						id: newId,
+						sequence: state.participants.length + 1,
+						name: "",
+					};
+					state.participants = [...state.participants, newParticipant];
+
+					// useChangeTrackingStore.getState().addChange({
+					// 	entityType: "participants",
+					// 	changeType: "create",
+					// 	entityId: newId,
+					// 	payload: newParticipant,
+					// });
 				}
 			});
 		},
-		removeParticipant: (id) =>
+		removeParticipant: (id) => {
+			// const participant = useParticipantStore.getState().participants.find(
+			// 	(participant) => participant.id === id
+			// );
 			set((state) => {
 				state.participants = state.participants
 					.filter((participant) => participant.id !== id)
@@ -57,7 +65,14 @@ export const useParticipantStore = create<ParticipantStore>()(
 						...participant,
 						sequence: index + 1,
 					}));
-			}),
+			});
+			// useChangeTrackingStore.getState().addChange({
+			// 	entityType: "participants",
+			// 	changeType: "delete",
+			// 	entityId: id,
+			// 	payload: participant,
+			// });
+		},
 		updateParticipant: (id, name) =>
 			set((state) => {
 				const participant = state.participants.find(
@@ -65,6 +80,13 @@ export const useParticipantStore = create<ParticipantStore>()(
 				);
 				if (participant) {
 					participant.name = name;
+
+					// useChangeTrackingStore.getState().addChange({
+					// 	entityType: "participants",
+					// 	changeType: "update",
+					// 	entityId: id,
+					// 	payload: { name },
+					// });
 				}
 			}),
 		moveParticipant: (oldIndex, newIndex) =>
@@ -73,6 +95,13 @@ export const useParticipantStore = create<ParticipantStore>()(
 					(participant, index) => ({ ...participant, sequence: index + 1 })
 				);
 				state.participants = updated;
+
+				// useChangeTrackingStore.getState().addChange({
+				// 	entityType: "participants",
+				// 	changeType: "move",
+				// 	entityId: updated[newIndex].id,
+				// 	payload: state.participants,
+				// });
 			}),
 		shuffleParticipants: () => {
 			set((state) => {

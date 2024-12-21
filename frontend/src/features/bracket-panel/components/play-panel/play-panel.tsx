@@ -1,5 +1,6 @@
 import EditorButton from "../editor-button";
 import PlayProgress from "./play-progress";
+import SaveChangeButton from "../save-changes-button";
 
 const PlayPanel = () => {
 	return (
@@ -24,7 +25,7 @@ const PlayPanel = () => {
 					Save your changes to make sure your work doesn&apos;t disappear!
 				</p>
 				<div className="flex justify-center items-center">
-					<EditorButton text="save changes" />
+					<SaveChangeButton />
 				</div>
 			</div>
 
