@@ -10,6 +10,7 @@ import { useTournamentStore } from "@/stores/tournament-store";
 import { Bracket } from "@/types";
 
 import { MoreVertical } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
 
 interface BracketSettingsProps {
 	bracket: Bracket;
@@ -17,7 +18,25 @@ interface BracketSettingsProps {
 
 const BracketSettings = ({ bracket }: BracketSettingsProps) => {
 	const { viewingTournament, setViewingTournament, removeBracket } =
-		useTournamentStore();
+		useTournamentStore(
+			useShallow((state) => ({
+				viewingTournament: state.viewingTournament,
+				setViewingTournament: state.setViewingTournament,
+				removeBracket: state.removeBracket,
+			}))
+		);
+
+	const handleDelete = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		if (viewingTournament) {
+			void removeBracket(bracket.id);
+			setViewingTournament({
+				...viewingTournament,
+				brackets: viewingTournament.brackets.filter((b) => b.id !== bracket.id),
+			});
+		}
+	};
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger
@@ -31,20 +50,7 @@ const BracketSettings = ({ bracket }: BracketSettingsProps) => {
 			<DropdownMenuContent className="font-poppins">
 				<DropdownMenuLabel>{bracket.name}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem
-					className="text-figma_error"
-					onClick={() => {
-						if (viewingTournament) {
-							removeBracket(bracket.id, viewingTournament.id);
-							setViewingTournament({
-								...viewingTournament,
-								brackets: viewingTournament.brackets.filter(
-									(b) => b.id !== bracket.id
-								),
-							});
-						}
-					}}
-				>
+				<DropdownMenuItem className="text-figma_error" onClick={handleDelete}>
 					Delete
 				</DropdownMenuItem>
 			</DropdownMenuContent>

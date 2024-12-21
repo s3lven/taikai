@@ -1,18 +1,29 @@
 import { Button } from "@/components/ui/button";
+import { useTournamentStore } from "@/stores/tournament-store";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useShallow } from "zustand/react/shallow";
 
 const BracketAddButton = () => {
-    const navigate = useNavigate()
-    
-	const handleAddBracket = () => {
-		console.log("Add Bracket");
-        
-        // Create a new bracket in the backend
-        const bracketId = 1;
+	const navigate = useNavigate();
+	const { viewingTournament, addBracket } = useTournamentStore(
+		useShallow((state) => ({
+			viewingTournament: state.viewingTournament,
+			addBracket: state.addBracket,
+		}))
+	);
 
-        // Navigate to the new bracket using .navigate()
-        void navigate(`/bracket/${bracketId}`);
+	const handleAddBracket = () => {
+		if (!viewingTournament) return;
+
+		void (async () => {
+			try {
+				const bracketId = await addBracket(viewingTournament.id);
+				await navigate(`/bracket/${bracketId}`);
+			} catch (error) {
+				console.error("Failed to delete tournament:", error);
+			}
+		})();
 	};
 
 	return (

@@ -27,7 +27,7 @@ export const useBracketStore = create<BracketStore>((set) => ({
     // setBracket: (bracket: Bracket) => set({ bracket }),
     fetchBracketData: async (bracketId: number) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/brackets/${bracketId}`);
+            const response = await fetch(`http://localhost:3001/api/brackets/${bracketId}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch bracket data");
             }

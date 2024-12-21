@@ -27,7 +27,6 @@ const BracketItem = ({ bracket }: BracketItemProps) => {
 				<div className="flex gap-4 justify-end items-center w-1/4">
 					<div className="flex gap-1 justify-end items-center">
 						<p className="text-right">{bracket.numberOfParticipants}</p>
-						{/* <p>{bracket.slots.length}</p> */}
 						<User />
 					</div>
 				</div>

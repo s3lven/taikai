@@ -10,6 +10,7 @@ import { useTournamentStore } from "@/stores/tournament-store";
 import { Tournament } from "@/types";
 
 import { MoreVertical } from "lucide-react";
+import { useState } from "react";
 
 interface TournamentSettingsProps {
 	tournament: Tournament;
@@ -17,6 +18,17 @@ interface TournamentSettingsProps {
 
 const TournamentSettings = ({ tournament }: TournamentSettingsProps) => {
 	const { setEditingTournament, removeTournament } = useTournamentStore();
+	const [isDeleting, setIsDeleting] = useState(false);
+
+	const handleDelete = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		setIsDeleting(true);
+
+		void removeTournament(tournament.id);
+
+		setIsDeleting(false);
+	};
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger
@@ -40,12 +52,10 @@ const TournamentSettings = ({ tournament }: TournamentSettingsProps) => {
 				<DropdownMenuSeparator />
 				<DropdownMenuItem
 					className="text-figma_error"
-					onClick={(e) => {
-						e.stopPropagation();
-						removeTournament(tournament.id);
-					}}
+					onClick={handleDelete}
+					disabled={isDeleting}
 				>
-					Delete
+					{isDeleting ? "Deleting..." : "Delete"}
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

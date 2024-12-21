@@ -1,8 +1,12 @@
 import express from 'express';
-import { getBracket } from '../controllers/bracketController';
+import { getBracket, deleteBracket, addBracket } from '../controllers/bracketController';
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/:id', getBracket)
+router.get('/:id', getBracket);
 
-export default router
+router.delete('/:id', deleteBracket);
+
+router.post('/', addBracket);
+
+export default router;
