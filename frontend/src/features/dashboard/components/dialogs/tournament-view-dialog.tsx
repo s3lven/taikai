@@ -8,6 +8,7 @@ import {
 
 import BracketItem from "../bracket-item";
 import { useTournamentStore } from "@/stores/tournament-store";
+import BracketAddButton from "../bracket-add-button";
 
 const TournamentViewDialog = () => {
 	const order = ["Active", "Upcoming", "Past"];
@@ -29,6 +30,8 @@ const TournamentViewDialog = () => {
 					className="w-full h-full flex-grow flex flex-col justify-start gap-2 px-2 py-4
                   text-desc text-white focus:outline-none overflow-y-auto no-scrollbar"
 				>
+					{/* Add Button */}
+					<BracketAddButton />
 					{viewingTournament?.brackets
 						.toSorted(
 							(a, b) => order.indexOf(a.status) - order.indexOf(b.status)
