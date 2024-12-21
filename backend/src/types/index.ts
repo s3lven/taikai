@@ -13,6 +13,8 @@ interface Bracket {
   status: string;
   participantCount: number;
   tournamentId: number;
+  progress: number
+
 }
 
 interface TournamentWithBrackets {

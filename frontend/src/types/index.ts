@@ -1,21 +1,24 @@
+type TournamentStatusType = "Active" | "Upcoming" | "Past";
+
 interface Tournament {
     id: number
 	name: string;
-	status: string;
+	status: TournamentStatusType;
     location: string;
     date: string;
     numberOfParticipants: number
     brackets: Bracket[]
 }
-
 type CreateTournament = Omit<Tournament, "brackets" | "id">
 
+type BracketStatusType = "Editing" | "In Progress" | "Completed";
 interface Bracket {
     id: number
     name: string
-    status: string
+    status: BracketStatusType
     numberOfParticipants: number
     type: string
+    progress: number
     // participants: Participant[]
 }
 

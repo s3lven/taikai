@@ -14,9 +14,10 @@ export const brackets = pgTable(
   {
     id: serial().primaryKey().notNull(),
     name: varchar({ length: 50 }).notNull(),
-    status: varchar({ length: 50 }).notNull(),
-    participantCount: smallint('participant_count').notNull(),
+    status: varchar({ length: 50 }).default('Editing').notNull(),
+    participantCount: smallint('participant_count').default(0).notNull(),
     tournamentId: integer('tournament_id').notNull(),
+    progress: smallint().default(0).notNull(),
   },
   (table) => [
     foreignKey({
@@ -27,7 +28,4 @@ export const brackets = pgTable(
   ],
 );
 
-export const schema = {
-  tournaments,
-  brackets,
-};
+export const schema = { tournaments, brackets };
