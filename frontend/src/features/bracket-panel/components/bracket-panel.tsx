@@ -1,8 +1,8 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { Info, Play, Users } from "lucide-react";
-import InformationPanel from "./information-panel";
-import ParticipantsPanel from "./participants-panel";
-import PlayPanel from "./play-panel";
+import InformationPanel from "./info-panel/information-panel";
+import ParticipantsPanel from "./participants-panel/participants-panel";
+import PlayPanel from "./play-panel/play-panel";
 
 interface NavItemType {
 	value: string;

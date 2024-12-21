@@ -1,18 +1,26 @@
 import { useBracketStore } from "@/stores/bracket-store";
-import EditorButton from "./editor-button";
+import EditorButton from "../editor-button";
 import { useShallow } from "zustand/react/shallow";
 import { Progress } from "@/components/ui/progress";
 
 const PlayProgress = () => {
-	const [bracketStatus, runBracket, progress, completeBracket, reopenBracket, resetBracket, testBracket] = useBracketStore(
+	const [
+		bracketStatus,
+		runBracket,
+		progress,
+		completeBracket,
+		reopenBracket,
+		resetBracket,
+		// testBracket,
+	] = useBracketStore(
 		useShallow((state) => [
 			state.bracket.status,
 			state.runBracket,
 			state.bracket.progress,
-      state.completeBracket,
-      state.reopenBracket,
-      state.resetBracket,
-      state.testBracket
+			state.completeBracket,
+			state.reopenBracket,
+			state.resetBracket,
+			// state.testBracket,
 		])
 	);
 
@@ -56,12 +64,12 @@ const PlayProgress = () => {
 						/>
 					</>
 				)}
-				{/* Button to test the progress bar */}
+				{/* Button to test the progress bar
 				<EditorButton
-          variant="no-outline"
-          text="add half"
-          onClickHandler={testBracket}
-        />
+					variant="no-outline"
+					text="add half"
+					onClickHandler={testBracket}
+				/> */}
 			</div>
 		</>
 	);
