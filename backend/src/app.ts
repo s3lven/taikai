@@ -3,6 +3,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import tournamentRoutes from './routes/tournamentRoutes';
+import bracketRoutes from './routes/bracketRoutes';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 app.use('/api/tournaments', tournamentRoutes);
+app.use('/api/brackets', bracketRoutes);
 
 app.listen(port, () => {
   console.log(`[SERVER]: Server is running at http://127.0.0.1:${port}`);

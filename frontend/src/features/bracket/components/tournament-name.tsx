@@ -4,9 +4,11 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useBracketStore } from "@/stores/bracket-store";
+import { useShallow } from "zustand/react/shallow";
 
 const TournamentName = () => {
-	const tournamentName = "Tournament Name";
+	const [tournamentName] = useBracketStore(useShallow((state) => [state.bracket.tournamentName]));
 	return (
 		<div className="w-full h-full flex flex-col gap-1">
 			<p className="text-grey text-desc">Taikai Name</p>

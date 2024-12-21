@@ -2,7 +2,6 @@ import { Bracket, BracketData } from "@/types";
 import { create } from "zustand";
 
 
-
 interface BracketState {
     bracket: Bracket & { tournamentName: string };
 }
@@ -10,6 +9,8 @@ interface BracketState {
 interface BracketActions {
     // setBracket: (bracket: Bracket) => void;
     fetchBracketData: (bracketId: number) => Promise<void>;
+    setBracketName: (name: string) => void;
+    setBracketType: (type: string) => void;
 }
 
 export type BracketStore = BracketState & BracketActions;
@@ -31,10 +32,19 @@ export const useBracketStore = create<BracketStore>((set) => ({
                 throw new Error("Failed to fetch bracket data");
             }
             const data: BracketData = (await response.json()) as unknown as BracketData;
-            console.log(data)
-            set({ bracket: data });
+            const newBracket: Bracket & {tournamentName: string} = {
+                id: data.id,
+                name: data.name,
+                status: data.status,
+                numberOfParticipants: data.participantCount,
+                type: data.type,
+                tournamentName: data.tournamentName
+            }
+            set({ bracket: newBracket });
         } catch (error) {
             console.error(error);
         }
-    }
+    },
+    setBracketName: (name: string) => set((state) => ({ bracket: { ...state.bracket, name } })),
+    setBracketType: (type: string) => set((state) => ({ bracket: { ...state.bracket, type } })),
 }))

@@ -19,7 +19,7 @@ interface Bracket {
     // participants: Participant[]
 }
 
-type BracketData = Bracket & { tournamentName: string }
+type BracketData = Omit<Bracket, "numberOfParticipants"> & { tournamentName: string, participantCount: number } 
 
 // interface Participant {
 //     id: number

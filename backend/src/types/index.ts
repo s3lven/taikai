@@ -24,5 +24,6 @@ interface TournamentAccumulator {
 }
 
 type TournamentUpdateData = Omit<Tournament, "id">
+type BracketWithTournamentName = Bracket & {tournamentName: string}
 
-export {Tournament, Bracket, TournamentWithBrackets, TournamentAccumulator, TournamentUpdateData}
+export {Tournament, Bracket, TournamentWithBrackets, TournamentAccumulator, TournamentUpdateData, BracketWithTournamentName}
