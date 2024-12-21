@@ -1,6 +1,7 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { Info, Play, Users } from "lucide-react";
 import InformationPanel from "./information-panel";
+import ParticipantsPanel from "./participants-panel";
 
 interface NavItemType {
 	value: string;
@@ -61,7 +62,7 @@ const BracketPanel = () => {
 				value="bracketParticipants"
 				className="w-full h-full overflow-y-scroll no-scrollbar"
 			>
-				Participants Panel
+				<ParticipantsPanel />
 			</Tabs.Content>
 			<Tabs.Content
 				value="bracketPlay"

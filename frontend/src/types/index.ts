@@ -21,10 +21,11 @@ interface Bracket {
 
 type BracketData = Omit<Bracket, "numberOfParticipants"> & { tournamentName: string, participantCount: number } 
 
-// interface Participant {
-//     id: number
-//     name: string
-// }
+interface Participant {
+    id: number
+    sequence: number
+    name: string
+}
 
 
 // const dummyTournamentData: Tournament[] = [
@@ -79,5 +80,5 @@ type BracketData = Omit<Bracket, "numberOfParticipants"> & { tournamentName: str
 // 	},
 // ];
 
-export type { Tournament, CreateTournament, Bracket, BracketData };
+export type { Tournament, CreateTournament, Bracket, BracketData, Participant };
 // export { dummyTournamentData };

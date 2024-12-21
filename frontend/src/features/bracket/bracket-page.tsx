@@ -2,9 +2,10 @@ import { useParams } from "react-router-dom";
 import BracketPanel from "./components/bracket-panel";
 import { useEffect } from "react";
 import { useBracketStore } from "@/stores/bracket-store";
+import { useShallow } from "zustand/react/shallow";
 
 const BracketPage = () => {
-	const fetchBracketData = useBracketStore((state) => state.fetchBracketData);
+	const fetchBracketData = useBracketStore(useShallow((state) => state.fetchBracketData));
 
 	// Extract the bracket id from the URL and check if it exists
 	const params = useParams();
