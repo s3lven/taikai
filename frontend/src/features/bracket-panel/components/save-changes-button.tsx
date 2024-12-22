@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import EditorButton from "./editor-button";
 
-const saveChangesToBackend = (changes: Change[]) => {
+const saveChangesToBackend = async (changes: Change[]) => {
 	console.log("Received changes: ", changes);
 	const plainChanges = changes.map((change) => ({
 		...change,
@@ -13,23 +13,18 @@ const saveChangesToBackend = (changes: Change[]) => {
 	}));
 	console.log("Plain changes: ", plainChanges);
 
-	// try {
-	//     // Type the response
-	// 	const response = await fetch(`http://localhost:3001/api/changes`, {
-	// 		method: "POST",
-	// 		headers: {
-	// 			"Content-Type": "application/json",
-	// 		},
-	// 		body: JSON.stringify({ changes: plainChanges }),
-	// 	});
-	// 	if (!response.ok) {
-	// 		throw new Error("Failed to save changes");
-	// 	}
-	// 	return await response.json();
-	// } catch (error) {
-	// 	console.error(error);
-	// 	throw error;
-	// }
+	// Type the response
+	const response = await fetch(`http://localhost:3001/api/brackets/changes`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ changes: plainChanges }),
+	});
+	if (!response.ok) {
+		throw new Error("Failed to save changes");
+	}
+	console.log("Changes saved successfully");
 };
 
 const SaveChangeButton = () => {
@@ -43,14 +38,14 @@ const SaveChangeButton = () => {
 		);
 	const [isSaving, setIsSaving] = useState(false);
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		if (!hasUnsavedChanges || isSaving) return;
 		setIsSaving(true);
 
 		try {
 			// Get consolidated changes before saving
 			const consolidatedChanges = getConsolidatedChanges();
-			saveChangesToBackend(consolidatedChanges);
+			await saveChangesToBackend(consolidatedChanges);
 			clearChanges();
 		} catch (error) {
 			console.error("Failed to save changes", error);

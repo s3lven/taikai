@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, date, smallint, foreignKey, integer } from "drizzle-orm/pg-core"
+import { pgTable, serial, varchar, date, smallint, foreignKey, integer, primaryKey } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -26,4 +26,27 @@ export const brackets = pgTable("brackets", {
 			foreignColumns: [tournaments.id],
 			name: "brackets_tournament_id_fkey"
 		}).onDelete("cascade"),
+]);
+
+export const participants = pgTable("participants", {
+	id: serial().primaryKey().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	sequence: smallint().notNull(),
+});
+
+export const participantsBracket = pgTable("participants_bracket", {
+	participantId: integer("participant_id").notNull(),
+	bracketId: integer("bracket_id").notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.participantId],
+			foreignColumns: [participants.id],
+			name: "participants_bracket_participant_id_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.bracketId],
+			foreignColumns: [brackets.id],
+			name: "participants_bracket_bracket_id_fkey"
+		}).onDelete("cascade"),
+	primaryKey({ columns: [table.participantId, table.bracketId], name: "participants_bracket_pkey"}),
 ]);

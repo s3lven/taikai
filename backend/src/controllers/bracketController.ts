@@ -3,6 +3,7 @@ import { db } from '../database';
 import { tournaments, brackets } from '../database/schema';
 import { eq } from 'drizzle-orm';
 import { BracketWithTournamentName } from '../types';
+import { Change } from '../types/changes';
 
 export const getBracket = async (req: Request, res: Response) => {
   console.info('[INFO]: Fetching bracket');
@@ -50,7 +51,7 @@ export const addBracket = async (req: Request, res: Response) => {
     const [newBracket] = await db
       .insert(brackets)
       .values({ name, status: 'Pending', participantCount: 0, tournamentId })
-      .returning({ id: brackets.id })
+      .returning({ id: brackets.id });
 
     res.status(201).json({ id: newBracket.id });
   } catch (error) {
@@ -84,4 +85,62 @@ export const deleteBracket = async (req: Request, res: Response) => {
     return;
   }
   console.info('[INFO]: Finished deleting bracket');
+};
+
+const processBracketChange = async (
+  changeType: string,
+  bracketId: number,
+  payload: any,
+  trx: any,
+) => {
+  switch (changeType) {
+    case 'update':
+      await trx.update(brackets).set(payload).where(eq(brackets.id, bracketId));
+      break;
+    default:
+      throw new Error(`Unsupported change type for bracket: ${changeType}`);
+  }
+};
+
+const processChange = async (change: Change, trx: any) => {
+  const { entityType, changeType, entityId, payload } = change;
+
+  switch (entityType) {
+    case 'bracket':
+      await processBracketChange(changeType, entityId, payload, trx);
+      break;
+    // case 'participants':
+    //   await processParticipantsChange(changeType, entityId, payload, trx);
+    //   break
+    default:
+      throw new Error(`Unsupported entity type: ${entityType}`);
+  }
+};
+
+export const batchUpdateBracket = async (req: Request, res: Response) => {
+  console.info('[INFO]: Updating brackets');
+  try {
+    const { changes } = req.body;
+
+    // Sort changes by timestamp to ensure correct order of operations
+    const sortedChanges = changes.sort((a: Change, b: Change) => a.timestamp - b.timestamp);
+
+    // Process changes in a transactions
+    await db.transaction(async (trx) => {
+      for (const change of sortedChanges) {
+        await processChange(change, trx);
+      }
+    });
+
+    res.status(200).json({ message: 'Brackets updated successfully' });
+  } catch (error) {
+    console.error('Error updating brackets:', error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'Failed to update brackets' });
+    }
+    return;
+  }
+  console.info('[INFO]: Finished updating brackets');
 };
