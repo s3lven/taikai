@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
-import BracketPanel from "./bracket-panel/components/bracket-panel";
+import BracketPanel from "./bracket-panel/bracket-panel";
 import { useEffect } from "react";
 import { useBracketStore } from "@/stores/bracket-store";
 import { useShallow } from "zustand/react/shallow";
+import BracketView from "./bracket-view/bracket-view";
 
 const BracketPage = () => {
 	const fetchBracketData = useBracketStore(
@@ -24,6 +25,7 @@ const BracketPage = () => {
 	return (
 		<div className="w-full flex-1 flex gap-5 bg-figma_shade2">
 			<BracketPanel />
+			<BracketView />
 		</div>
 	);
 };

@@ -1,6 +1,12 @@
 export type TournamentStatusType = "Active" | "Upcoming" | "Past";
+export type BracketRoundType =
+	| `Round ${number}`
+	| "Quarter-Finals"
+	| "Semi-Finals"
+	| "Finals";
+type IpponType = "Men" | "Kote" | "Do" | "Tsuki" | "Hantei" | "Hansoku" | "";
 
-interface Tournament {
+export interface Tournament {
 	id: number;
 	name: string;
 	status: TournamentStatusType;
@@ -26,6 +32,15 @@ export type BracketData = Omit<Bracket, "numberOfParticipants"> & {
 	tournamentName: string;
 	participantCount: number;
 };
+
+export interface Match {
+	id?: number;
+	player1: Participant | null;
+	player2: Participant | null;
+	player1Score: IpponType[];
+	player2Score: IpponType[];
+	winner: Participant | null
+}
 
 export interface Participant {
 	id: number;
