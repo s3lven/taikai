@@ -1,4 +1,4 @@
-import EditorButton from "../editor-button";
+import EditorButton from "../../../components/editor-button";
 import PlayProgress from "./play-progress";
 import SaveChangeButton from "../save-changes-button";
 

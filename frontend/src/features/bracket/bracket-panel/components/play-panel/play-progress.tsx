@@ -1,5 +1,5 @@
 import { useBracketStore } from "@/stores/bracket-store";
-import EditorButton from "../editor-button";
+import EditorButton from "../../../components/editor-button";
 import { useShallow } from "zustand/react/shallow";
 import { Progress } from "@/components/ui/progress";
 

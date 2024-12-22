@@ -91,7 +91,7 @@ const processBracketChange = async (
   changeType: string,
   bracketId: number,
   payload: any,
-  trx: any,
+  trx: Parameters<Parameters<typeof db.transaction>[0]>[0],
 ) => {
   switch (changeType) {
     case 'update':
@@ -102,7 +102,7 @@ const processBracketChange = async (
   }
 };
 
-const processChange = async (change: Change, trx: any) => {
+const processChange = async (change: Change, trx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => {
   const { entityType, changeType, entityId, payload } = change;
 
   switch (entityType) {

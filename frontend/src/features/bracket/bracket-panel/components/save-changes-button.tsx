@@ -2,7 +2,7 @@ import { useChangeTrackingStore } from "@/stores/change-tracking-store";
 import { Change } from "@/types/changes";
 import { useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-import EditorButton from "./editor-button";
+import EditorButton from "../../components/editor-button";
 
 const saveChangesToBackend = async (changes: Change[]) => {
 	console.log("Received changes: ", changes);
@@ -56,6 +56,7 @@ const SaveChangeButton = () => {
 	return (
 		<EditorButton
 			text={isSaving ? "Saving" : "Save Changes"}
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			onClickHandler={handleSave}
 			disabled={!hasUnsavedChanges || isSaving}
 		/>
