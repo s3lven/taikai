@@ -57,7 +57,7 @@ const BracketStructure = () => {
 	const PADDING = 0;
 	const VERTICAL_SPACING = 24;
 	const MIN_WIDTH = MATCH_WIDTH + PADDING * 2; // Minimum width to show one match
-	const MIN_HEIGHT = MATCH_HEIGHT + PADDING * 2; // Minimum height to show one match
+	const MIN_HEIGHT = MATCH_HEIGHT + PADDING * 2 + 115; // Minimum height to show one match
 
 	const calculateRequiredDimensions = () => {
 		const numRounds = matches.length;
@@ -100,6 +100,7 @@ const BracketStructure = () => {
 	};
 
 	const { width: svgWidth, height: svgHeight } = calculateRequiredDimensions();
+	// console.log(svgHeight)
 
 	return (
 		<div ref={containerRef} className="w-full h-full relative overflow-auto">
