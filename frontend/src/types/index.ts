@@ -4,7 +4,7 @@ export type BracketRoundType =
 	| "Quarter-Finals"
 	| "Semi-Finals"
 	| "Finals";
-type IpponType = "Men" | "Kote" | "Do" | "Tsuki" | "Hantei" | "Hansoku" | "";
+export type IpponType = "Men" | "Kote" | "Do" | "Tsuki" | "Hantei" | "Hansoku" | "";
 
 export interface Tournament {
 	id: number;
@@ -42,6 +42,7 @@ export interface Match {
 	winner: Participant | null
 }
 
+export type PlayerColorType = "Red" | "White"
 export interface Participant {
 	id: number;
 	sequence: number;

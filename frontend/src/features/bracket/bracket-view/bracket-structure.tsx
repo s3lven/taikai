@@ -1,50 +1,6 @@
 import useTournamentBracket from "./hooks/useTournamentBracket";
-import { Match } from "@/types";
 import { useRef } from "react";
-
-interface MatchNodeProps {
-	match: Match;
-	style: React.CSSProperties;
-	onClick?: (match: Match) => void;
-	onHover?: (match: Match) => void;
-}
-
-const MatchNode = ({ match, style, onClick, onHover }: MatchNodeProps) => {
-	return (
-		<div
-			className="absolute w-[220px] h-14 flex flex-col justify-between bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-			style={style}
-			onClick={() => onClick?.(match)}
-			onMouseEnter={() => onHover?.(match)}
-		>
-			<div
-				className={`flex justify-between items-center p-1 ${
-					match.winner?.id === match.player1?.id
-						? "font-bold text-blue-600"
-						: ""
-				}`}
-			>
-				<span className="text-sm">{match.player1?.name ?? "TBD"}</span>
-				<span className="text-xs bg-slate-100 rounded px-1">
-					{match.player1Score.length}
-				</span>
-			</div>
-			<div className="h-px bg-slate-200" />
-			<div
-				className={`flex justify-between items-center p-1 ${
-					match.winner?.id === match.player2?.id
-						? "font-bold text-blue-600"
-						: ""
-				}`}
-			>
-				<span className="text-sm">{match.player2?.name ?? "TBD"}</span>
-				<span className="text-xs bg-slate-100 rounded px-1">
-					{match.player2Score.length}
-				</span>
-			</div>
-		</div>
-	);
-};
+import BracketMatch from "./bracket-match";
 
 const BracketStructure = () => {
 	const { matches } = useTournamentBracket();
@@ -55,7 +11,7 @@ const BracketStructure = () => {
 	const MATCH_HEIGHT = 56;
 	const LEVEL_SPACING = 14;
 	const PADDING = 0;
-	const VERTICAL_SPACING = 24;
+	const VERTICAL_SPACING = 60;
 	const MIN_WIDTH = MATCH_WIDTH + PADDING * 2; // Minimum width to show one match
 	const MIN_HEIGHT = MATCH_HEIGHT + PADDING * 2 + 115; // Minimum height to show one match
 
@@ -162,7 +118,7 @@ const BracketStructure = () => {
 						);
 
 						return (
-							<MatchNode
+							<BracketMatch
 								key={match.id}
 								match={match}
 								style={{
