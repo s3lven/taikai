@@ -21,11 +21,16 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	const bracketStatus = useBracketStore(
 		useShallow((state) => state.bracket.status)
 	);
-	const matchFromStore = useMatchesStore(
-		useShallow((state) =>
-			state.rounds.flat().find((m: Match) => m.id === match.id)
-		)
+	const [matchFromStore, submitScore] = useMatchesStore(
+		useShallow((state) => [
+			state.rounds.flat().find((m: Match) => m.id === match.id),
+			state.submitScore,
+		])
 	);
+
+	const handleSubmitScore = () => {
+		submitScore(match.id, winner);
+	};
 
 	const [winner, setWinner] = useState<Participant | null>(null);
 	const handleWinner = (player: Participant | null) =>
@@ -70,7 +75,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 				<div className="flex justify-center items-center">
 					<EditorButton
 						text={"submit scores"}
-						// onClickHandler={handleSubmitScore}
+						onClickHandler={handleSubmitScore}
 					/>
 				</div>
 			</Dialog.Close>

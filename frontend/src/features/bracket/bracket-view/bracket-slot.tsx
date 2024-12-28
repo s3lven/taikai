@@ -38,10 +38,10 @@ const BracketSlot = ({
 			>
 				<div className="w-full h-full flex items-center flex-1">
 					<p
-						className={`w-[128px] text-desc text-white truncate ${
-							sequence == -1 && "opacity-0"
-						}
-              ${isWinner ? "text-figma_green" : "text-white"}`}
+						className={`w-[128px] text-desc truncate
+							${sequence == -1 && "opacity-0"}
+              				${isWinner ? "text-figma_green" : "text-white"}
+						`}
 					>
 						{name}
 					</p>
