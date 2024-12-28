@@ -4,7 +4,16 @@ export type BracketRoundType =
 	| "Quarter-Finals"
 	| "Semi-Finals"
 	| "Finals";
-export type IpponType = "Men" | "Kote" | "Do" | "Tsuki" | "Hantei" | "Hansoku" | "";
+export type IpponType = "Men" | "Kote" | "Do" | "Tsuki" | "Hantei" | "Hansoku" | "None";
+export const hitMap: Record<IpponType, string> = {
+	Men: "M",
+	Kote: "K",
+	Do: "D",
+	Tsuki: "T",
+	Hantei: "HT",
+	Hansoku: "HS",
+	None: "",
+};
 
 export interface Tournament {
 	id: number;

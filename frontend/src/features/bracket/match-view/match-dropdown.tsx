@@ -1,18 +1,9 @@
 import { useMatchesStore } from "@/stores/matches-store";
-import { IpponType } from "@/types";
+import { hitMap, IpponType } from "@/types";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useShallow } from "zustand/react/shallow";
-const hitMap: Record<string, string> = {
-	Men: "M",
-	Kote: "K",
-	Do: "D",
-	Tsuki: "T",
-	Hantei: "HT",
-	Hansoku: "HS",
-	None: "",
-};
 
 interface MatchDropdownType {
 	index: number;
@@ -29,12 +20,9 @@ const MatchDropdown = ({
 	initialValue,
 	disabled,
 }: MatchDropdownType) => {
-	const [value, setValue] = useState("");
+	const [value, setValue] = useState(initialValue);
 	const setScore = useMatchesStore(useShallow((state) => state.setScore));
 
-	useEffect(() => {
-		setValue(initialValue || "");
-	}, [initialValue]);
 
 	const handleSetValue = (valueChange: IpponType) => {
 		setValue(valueChange);
@@ -49,7 +37,7 @@ const MatchDropdown = ({
 		>
 			<Select.Trigger className="h-full w-12 px-3 py-4 border border-figma_grey rounded-lg text-white hover:bg-figma_neutral8 disabled:hover:bg-transparent disabled:border-none">
 				<Select.Value aria-label={value} className="">
-					{value != "None" && hitMap[value]}
+					{hitMap[value]}
 				</Select.Value>
 				<Select.Icon
 					className={`${value && value !== "None" ? "hidden" : "block"} ${

@@ -56,7 +56,6 @@ const BracketStructure = () => {
 	};
 
 	const { width: svgWidth, height: svgHeight } = calculateRequiredDimensions();
-	// console.log(svgHeight)
 
 	return (
 		<div ref={containerRef} className="w-full h-full relative overflow-auto">

@@ -28,22 +28,8 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	);
 
 	const [winner, setWinner] = useState<Participant | null>(null);
-	const handleWinner = (player: Participant | null) => {
-		if (player === redPlayer) {
-			if (winner === redPlayer) {
-				setWinner(null);
-			} else {
-				setWinner(redPlayer);
-			}
-		}
-		if (player === whitePlayer) {
-			if (winner === whitePlayer) {
-				setWinner(null);
-			} else {
-				setWinner(whitePlayer);
-			}
-		}
-	};
+	const handleWinner = (player: Participant | null) =>
+		winner === player ? setWinner(null) : setWinner(player);
 
 	const InProgressMatchView = () => (
 		<div
@@ -167,14 +153,14 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 						variant="Red"
 						name={redPlayer?.name}
 						sequence={redPlayer?.sequence}
-						// isWinner={winner === redPlayer}
+						isWinner={winner === redPlayer}
 						scores={matchFromStore?.player1Score ?? []}
 					/>
 					<BracketSlot
 						variant="White"
 						name={whitePlayer?.name}
 						sequence={whitePlayer?.sequence}
-						// isWinner={winner === whitePlayer}
+						isWinner={winner === whitePlayer}
 						scores={matchFromStore?.player2Score ?? []}
 					/>
 				</div>

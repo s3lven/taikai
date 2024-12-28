@@ -1,6 +1,7 @@
 import { IpponType, Participant, PlayerColorType } from "@/types";
 import { Check } from "lucide-react";
 import MatchDropdown from "./match-dropdown";
+import { Button } from "@headlessui/react";
 
 interface SlotProps {
     player: Participant | null;
@@ -51,8 +52,8 @@ const SlotView = ({
 				</div>
 				{!isPending && (
 					<div className="flex items-center gap-8">
-						<button
-							// onClick={() => handleWinner(player)}
+						<Button
+							onClick={() => handleWinner(player)}
 							className={`outline-none hover:bg-figma_neutral8 rounded disabled:hover:bg-transparent ${
 								disabled && winner !== player && "opacity-0"
 							}`}
@@ -63,7 +64,7 @@ const SlotView = ({
 								color={`${winner === player ? "#2ECC71" : "white"}`}
 								className="transition-colors ease-in-out"
 							/>
-						</button>
+						</Button>
 						<div className="flex items-center gap-1">
 							<MatchDropdown
 								index={0}

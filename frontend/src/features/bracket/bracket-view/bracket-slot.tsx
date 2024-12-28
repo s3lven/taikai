@@ -1,10 +1,10 @@
-import { IpponType, PlayerColorType } from "@/types";
+import { hitMap, IpponType, PlayerColorType } from "@/types";
 
 interface BracketSlotProps {
 	variant: PlayerColorType;
 	sequence?: number | string;
 	name?: string;
-	isWinner?: boolean;
+	isWinner: boolean;
 	scores: IpponType[];
 }
 
@@ -15,15 +15,6 @@ const BracketSlot = ({
 	isWinner,
 	scores,
 }: BracketSlotProps) => {
-	const hitMap: Record<IpponType, string> = {
-		Men: "M",
-		Kote: "K",
-		Do: "D",
-		Tsuki: "T",
-		Hantei: "HT",
-		Hansoku: "HS",
-		"": "-",
-	};
 	return (
 		<div className="w-[220px] h-[27px] flex items-center font-poppins">
 			<div
@@ -42,7 +33,7 @@ const BracketSlot = ({
 				</p>
 			</div>
 			<div
-				className={`w-full max-h-[27px] h-full flex items-center justify-center px-1 bg-figma_neutral8
+				className={`w-full h-[27px] flex items-center justify-center px-1 bg-figma_neutral8
               ${variant === "Red" ? "rounded-tr " : "rounded-br"}`}
 			>
 				<div className="w-full h-full flex items-center flex-1">
