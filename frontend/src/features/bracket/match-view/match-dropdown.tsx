@@ -35,7 +35,7 @@ const MatchDropdown = ({
 			onValueChange={handleSetValue}
 			disabled={disabled}
 		>
-			<Select.Trigger className="h-full w-12 px-3 py-4 border border-figma_grey rounded-lg text-white hover:bg-figma_neutral8 disabled:hover:bg-transparent disabled:border-none">
+			<Select.Trigger className="h-full w-12 px-3 py-4 border border-figma_grey text-article-2 rounded-lg text-white hover:bg-figma_neutral8 disabled:hover:bg-transparent disabled:border-none">
 				<Select.Value aria-label={value} className="">
 					{hitMap[value]}
 				</Select.Value>

@@ -17,6 +17,7 @@ interface MatchesActions {
 		value: IpponType
 	) => void;
 	submitScore: (matchId: string, winner: Participant | null) => void;
+	resetBracket: () => void
 }
 
 type MatchesStore = MatchesState & MatchesActions;
@@ -81,5 +82,12 @@ export const useMatchesStore = create<MatchesStore>()(
 				const progress = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0
 				useBracketStore.getState().updateProgress(progress)
 			}),
+
+		resetBracket: () => {
+			set((state) => {
+				if (state.initialRounds) state.rounds = state.initialRounds
+				else throw new Error("There is no initial bracket!")
+			})
+		}
 	}))
 );

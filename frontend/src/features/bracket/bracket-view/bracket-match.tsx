@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import { useMatchesStore } from "@/stores/matches-store";
 import { useShallow } from "zustand/react/shallow";
 import { useBracketStore } from "@/stores/bracket-store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditorButton from "../components/editor-button";
 import BracketSlot from "./bracket-slot";
 import SlotView from "../match-view/slot-view";
@@ -29,12 +29,20 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	);
 
 	const handleSubmitScore = () => {
+		console.log(`Submitting winner for match`, match.id);
 		submitScore(match.id, winner);
 	};
 
 	const [winner, setWinner] = useState<Participant | null>(null);
 	const handleWinner = (player: Participant | null) =>
 		winner === player ? setWinner(null) : setWinner(player);
+
+	// Used to reset the winner state and styles when clicking on reset bracket
+	useEffect(() => {
+		if (matchFromStore) {
+			setWinner(matchFromStore.winner);
+		}
+	}, [matchFromStore]);
 
 	const InProgressMatchView = () => (
 		<div
@@ -110,42 +118,42 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 		</div>
 	);
 
-	// const CompletedView = () => (
-	// 	<div className={`w-full h-full flex flex-col items-center justify-center`}>
-	// 		{/* Display */}
-	// 		<div className="flex flex-col w-full">
-	// 			{/* Match Labels */}
-	// 			<div className="w-full flex justify-end items-center gap-[36px] px-[25.5px] ">
-	// 				<div className="flex items-center justify-center">
-	// 					<p className="text-label uppercase text-white">winner</p>
-	// 				</div>
-	// 				<div className="flex items-center justify-center">
-	// 					<p className="text-label uppercase text-white">score</p>
-	// 				</div>
-	// 			</div>
-	// 			<div className="w-full flex flex-col gap-[2px] justify-center">
-	// 				<SlotView
-	// 					player={redPlayer}
-	// 					color={"Red"}
-	// 					handleWinner={handleWinner}
-	// 					winner={winner}
-	// 					matchId={match.id!}
-	// 					scores={match.player1Score}
-	// 					disabled
-	// 				/>
-	// 				<SlotView
-	// 					player={whitePlayer}
-	// 					color={"White"}
-	// 					handleWinner={handleWinner}
-	// 					winner={winner}
-	// 					matchId={match.id!}
-	// 					scores={match.player2Score}
-	// 					disabled
-	// 				/>
-	// 			</div>
-	// 		</div>
-	// 	</div>
-	// );
+	const CompletedView = () => (
+		<div className={`w-full h-full flex flex-col items-center justify-center`}>
+			{/* Display */}
+			<div className="flex flex-col w-full">
+				{/* Match Labels */}
+				<div className="w-full flex justify-end items-center gap-[36px] px-[25.5px] ">
+					<div className="flex items-center justify-center">
+						<p className="text-label uppercase text-white">winner</p>
+					</div>
+					<div className="flex items-center justify-center">
+						<p className="text-label uppercase text-white">score</p>
+					</div>
+				</div>
+				<div className="w-full flex flex-col gap-[2px] justify-center">
+					<SlotView
+						player={redPlayer}
+						color={"Red"}
+						handleWinner={handleWinner}
+						winner={winner}
+						matchId={match.id}
+						scores={match.player1Score}
+						disabled
+					/>
+					<SlotView
+						player={whitePlayer}
+						color={"White"}
+						handleWinner={handleWinner}
+						winner={winner}
+						matchId={match.id}
+						scores={match.player2Score}
+						disabled
+					/>
+				</div>
+			</div>
+		</div>
+	);
 
 	return (
 		<Dialog.Root>
@@ -189,12 +197,13 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 						<InProgressMatchView />
 					)}
 					{/* If we are in progress, but the match isnt ready to score because there aren't enough players */}
-					{/* {bracketStatus === "In Progress" && (!redPlayer || !whitePlayer) && (
-            <EditMatchView />
-          )} */}
+					{bracketStatus === "In Progress" && (!redPlayer || !whitePlayer) && (
+						<EditMatchView />
+					)}
 					{/* If we are editting the details/participants list, we should not be able to edit match status */}
 					{bracketStatus === "Editing" && <EditMatchView />}
-					{/* {bracketStatus === "Completed" && <CompletedView />} */}
+					{/* If we completed the tournament, we should see the current scores and not be able to edit */}
+					{bracketStatus === "Completed" && <CompletedView />}
 					<Dialog.Close className="absolute top-4 right-4">
 						<X
 							size={"1.5rem"}

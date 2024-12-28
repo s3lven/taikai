@@ -2,6 +2,7 @@ import { Bracket, BracketData, BracketStatusType } from "@/types";
 import { create } from "zustand";
 import { useChangeTrackingStore } from "./change-tracking-store";
 import { immer } from "zustand/middleware/immer";
+import { useMatchesStore } from "./matches-store";
 
 interface BracketState {
 	bracket: Bracket & { tournamentName: string };
@@ -88,6 +89,7 @@ export const useBracketStore = create<BracketStore>()(
 					entityId: state.bracket.id,
 					payload: { status: "Editing" },
 				});
+				useMatchesStore.getState().resetBracket()
 				return newState;
 			}),
 		completeBracket: () =>
