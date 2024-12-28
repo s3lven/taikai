@@ -34,7 +34,7 @@ export type BracketData = Omit<Bracket, "numberOfParticipants"> & {
 };
 
 export interface Match {
-	id?: number;
+	id: string;
 	player1: Participant | null;
 	player2: Participant | null;
 	player1Score: IpponType[];

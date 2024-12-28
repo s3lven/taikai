@@ -1,126 +1,177 @@
-import { useMatchesStore } from "@/stores/matches-store";
-import { useParticipantStore } from "@/stores/participant-store";
-import { Match, Participant } from "@/types";
-import { useEffect } from "react";
-import { useShallow } from "zustand/react/shallow";
+import useTournamentBracket from "./hooks/useTournamentBracket";
+import { Match } from "@/types";
+import { useRef } from "react";
+
+interface MatchNodeProps {
+	match: Match;
+	style: React.CSSProperties;
+	onClick?: (match: Match) => void;
+	onHover?: (match: Match) => void;
+}
+
+const MatchNode = ({ match, style, onClick, onHover }: MatchNodeProps) => {
+	return (
+		<div
+			className="absolute w-[220px] h-14 flex flex-col justify-between bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+			style={style}
+			onClick={() => onClick?.(match)}
+			onMouseEnter={() => onHover?.(match)}
+		>
+			<div
+				className={`flex justify-between items-center p-1 ${
+					match.winner?.id === match.player1?.id
+						? "font-bold text-blue-600"
+						: ""
+				}`}
+			>
+				<span className="text-sm">{match.player1?.name ?? "TBD"}</span>
+				<span className="text-xs bg-slate-100 rounded px-1">
+					{match.player1Score.length}
+				</span>
+			</div>
+			<div className="h-px bg-slate-200" />
+			<div
+				className={`flex justify-between items-center p-1 ${
+					match.winner?.id === match.player2?.id
+						? "font-bold text-blue-600"
+						: ""
+				}`}
+			>
+				<span className="text-sm">{match.player2?.name ?? "TBD"}</span>
+				<span className="text-xs bg-slate-100 rounded px-1">
+					{match.player2Score.length}
+				</span>
+			</div>
+		</div>
+	);
+};
 
 const BracketStructure = () => {
-	const [participants] = useParticipantStore(
-		useShallow((state) => [state.participants])
-	);
-	const participantCount = participants.length;
-	const rounds = Math.ceil(Math.log2(participantCount));
+	const { matches } = useTournamentBracket();
+	const containerRef = useRef<HTMLDivElement>(null);
 
-	const [matches, setMatches] = useMatchesStore(
-		useShallow((state) => [state.rounds, state.setMatches])
-	);
+	// Constants for layout
+	const MATCH_WIDTH = 220;
+	const MATCH_HEIGHT = 56;
+	const LEVEL_SPACING = 14;
+	const PADDING = 0;
+	const VERTICAL_SPACING = 24;
+	const MIN_WIDTH = MATCH_WIDTH + PADDING * 2; // Minimum width to show one match
+	const MIN_HEIGHT = MATCH_HEIGHT + PADDING * 2; // Minimum height to show one match
 
-	useEffect(() => {
-		// Helper function to mark BYE rounds in the Slots mapping
-		const changeIntoBye = (seed: number) => {
-			return seed <= participantCount
-				? participants.find((player) => player.sequence === seed)!
-				: null;
-		};
+	const calculateRequiredDimensions = () => {
+		const numRounds = matches.length;
+		const maxMatchesInRound = Math.max(...matches.map((round) => round.length));
 
-		const createMapping = () => {
-			// If there isn't enough players, then return nothing
-			if (participantCount < 2) return [];
+		const requiredWidth = Math.max(
+			numRounds * (MATCH_WIDTH + LEVEL_SPACING) - LEVEL_SPACING + PADDING * 2,
+			MIN_WIDTH
+		);
+		const requiredHeight = Math.max(
+			maxMatchesInRound * (MATCH_HEIGHT + VERTICAL_SPACING) -
+				VERTICAL_SPACING +
+				PADDING * 2,
+			MIN_HEIGHT
+		);
 
-			let matches: (Participant | null)[][] = [
-				[
-					participants.find((player) => player.sequence === 1)!,
-					participants.find((player) => player.sequence === 2)!,
-				],
-			];
+		return {height: requiredHeight, width: requiredWidth}
+	};
 
-			for (let currRound = 1; currRound < rounds; currRound++) {
-				const roundMatches = [];
-				const sum = Math.pow(2, currRound + 1) + 1;
+	const calculateNodePosition = (
+		roundIndex: number,
+		matchIndex: number,
+		roundMatches: number
+	) => {
+		const x = PADDING + roundIndex * (MATCH_WIDTH + LEVEL_SPACING);
+		const totalHeight = calculateRequiredDimensions().height - PADDING * 2;
+		const spacing = totalHeight / (roundMatches + 1);
+		const y = PADDING + spacing * (matchIndex + 1) - MATCH_HEIGHT / 2;
+		return { x, y };
+	};
 
-				for (const match of matches) {
-					let player1 = changeIntoBye(match[0]!.sequence);
-					let player2 = changeIntoBye(sum - match[0]!.sequence);
-					roundMatches.push([player1, player2]);
-					player1 = changeIntoBye(sum - match[1]!.sequence);
-					player2 = changeIntoBye(match[1]!.sequence);
-					roundMatches.push([player1, player2]);
-				}
-				matches = roundMatches;
-			}
+	const createConnectorPath = (
+		sourceX: number,
+		sourceY: number,
+		targetX: number,
+		targetY: number
+	) => {
+		const midX = sourceX + (targetX - sourceX) / 2;
+		return `M ${sourceX} ${sourceY} H ${midX} V ${targetY} H ${targetX}`;
+	};
 
-			const bracket = matches.map((match) => ({
-				player1: match[0],
-				player2: match[1],
-				player1Score: [],
-				player2Score: [],
-				winner: null,
-				submitted: false,
-			}));
-
-			return bracket;
-		};
-
-		const createInitialMatches = () => {
-			const initialBracket: Match[][] = [];
-			const initialMatches = createMapping().length;
-
-			// Push the initla bracket
-			initialBracket.push(createMapping());
-
-			// Fill the rest of the rounds
-			for (let i = 1; i < rounds; i++) {
-				initialBracket.push(
-					new Array<Match>(initialMatches / Math.pow(2, i)).fill({
-						player1: null,
-						player2: null,
-						player1Score: [],
-						player2Score: [],
-						winner: null,
-					})
-				);
-			}
-
-			// Detect bye rounds and move competitors up
-			initialBracket[0].forEach((match, index) => {
-				const nextRoundMatch = Math.floor(index / 2);
-				if (match?.player1 === null) {
-					initialBracket[1][nextRoundMatch].player2 = match.player2;
-					match.id = -1;
-				} else if (match?.player2 === null) {
-					initialBracket[1][nextRoundMatch].player1 = match.player1;
-					match.id = -1;
-				}
-			});
-
-			return initialBracket;
-		};
-
-		setMatches(createInitialMatches());
-	}, [participantCount, participants, rounds, setMatches]);
+	const { width: svgWidth, height: svgHeight } = calculateRequiredDimensions();
 
 	return (
-		<div className="w-full flex gap-8">
-			{matches.map((round, roundIndex) => (
-				<div key={roundIndex} className="flex flex-col gap-4 relative">
-					{round.map((match) => (
-						<div
-							key={match.id}
-							className="w-48 p-4 border rounded-md shadow bg-white text-center relative"
-						>
-							<div>{match.player1?.name ?? "Bye"}</div>
-							<div className="text-sm text-gray-500">vs</div>
-							<div>{match.player2?.name ?? "Bye"}</div>
-							<div className="mt-2 font-bold text-blue-500">
-								Winner: {match.winner?.name ?? "TBD"}
-							</div>
-						</div>
-					))}
+		<div ref={containerRef} className="w-full h-full relative overflow-auto">
+			{/* SVG layer for connectors */}
+			<svg
+				className="absolute top-0 left-0 w-full h-full pointer-events-none"
+				viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+				preserveAspectRatio="xMinYMin meet"
+			>
+				<g>
+					{matches.map((round, roundIndex) =>
+						round.map((match, matchIndex) => {
+							if (roundIndex < matches.length - 1) {
+								const nextRoundIndex = roundIndex + 1;
+								const nextMatchIndex = Math.floor(matchIndex / 2);
 
-					{/* SVG Connectors */}
-					
-				</div>
-			))}
+								if (matches[nextRoundIndex]?.[nextMatchIndex]) {
+									const pos = calculateNodePosition(
+										roundIndex,
+										matchIndex,
+										round.length
+									);
+									const nextPos = calculateNodePosition(
+										nextRoundIndex,
+										nextMatchIndex,
+										matches[nextRoundIndex].length
+									);
+
+									return (
+										<path
+											key={`connector-${match.id}`}
+											d={createConnectorPath(
+												pos.x + MATCH_WIDTH,
+												pos.y + MATCH_HEIGHT / 2,
+												nextPos.x,
+												nextPos.y + MATCH_HEIGHT / 2
+											)}
+											stroke="#94a3b8"
+											strokeWidth={2}
+											fill="none"
+										/>
+									);
+								}
+							}
+							return null;
+						})
+					)}
+				</g>
+			</svg>
+
+			{/* Match nodes layer */}
+			<div className="relative" style={{ width: svgWidth, height: svgHeight }}>
+				{matches.map((round, roundIndex) =>
+					round.map((match, matchIndex) => {
+						const pos = calculateNodePosition(
+							roundIndex,
+							matchIndex,
+							round.length
+						);
+
+						return (
+							<MatchNode
+								key={match.id}
+								match={match}
+								style={{
+									transform: `translate(${pos.x}px, ${pos.y}px)`,
+								}}
+							/>
+						);
+					})
+				)}
+			</div>
 		</div>
 	);
 };
