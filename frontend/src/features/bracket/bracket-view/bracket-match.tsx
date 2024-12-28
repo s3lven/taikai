@@ -1,7 +1,13 @@
-import { Match } from "@/types";
+import { Match, Participant } from "@/types";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
+import { useMatchesStore } from "@/stores/matches-store";
+import { useShallow } from "zustand/react/shallow";
+import { useBracketStore } from "@/stores/bracket-store";
+import { useState } from "react";
+import EditorButton from "../components/editor-button";
 import BracketSlot from "./bracket-slot";
+import SlotView from "../match-view/slot-view";
 
 interface BracketMatchProps {
 	match: Match;
@@ -11,6 +17,144 @@ interface BracketMatchProps {
 const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	const redPlayer = match.player1;
 	const whitePlayer = match.player2;
+
+	const bracketStatus = useBracketStore(
+		useShallow((state) => state.bracket.status)
+	);
+	const matchFromStore = useMatchesStore(
+		useShallow((state) =>
+			state.rounds.flat().find((m: Match) => m.id === match.id)
+		)
+	);
+
+	const [winner, setWinner] = useState<Participant | null>(null);
+	const handleWinner = (player: Participant | null) => {
+		if (player === redPlayer) {
+			if (winner === redPlayer) {
+				setWinner(null);
+			} else {
+				setWinner(redPlayer);
+			}
+		}
+		if (player === whitePlayer) {
+			if (winner === whitePlayer) {
+				setWinner(null);
+			} else {
+				setWinner(whitePlayer);
+			}
+		}
+	};
+
+	const InProgressMatchView = () => (
+		<div
+			className={`w-full h-full flex flex-col items-center pt-9 justify-between`}
+		>
+			{/* Display */}
+			<div className="flex flex-col w-full">
+				{/* Match Labels */}
+				<div className="w-full flex justify-end items-center gap-[28px] px-[22px] ">
+					<div className="flex items-center justify-center">
+						<p className="text-label uppercase text-white">winner</p>
+					</div>
+					<div className="flex items-center justify-center">
+						<p className="text-label uppercase text-white">score</p>
+					</div>
+				</div>
+				<div className="w-full flex flex-col gap-[2px] justify-center">
+					<SlotView
+						player={redPlayer}
+						color={"Red"}
+						handleWinner={handleWinner}
+						winner={winner}
+						matchId={match.id}
+						scores={match.player1Score}
+					/>
+					<SlotView
+						player={whitePlayer}
+						color={"White"}
+						handleWinner={handleWinner}
+						winner={winner}
+						matchId={match.id}
+						scores={match.player2Score}
+					/>
+				</div>
+			</div>
+			{/* Button */}
+			<Dialog.Close asChild>
+				<div className="flex justify-center items-center">
+					<EditorButton
+						text={"submit scores"}
+						// onClickHandler={handleSubmitScore}
+					/>
+				</div>
+			</Dialog.Close>
+		</div>
+	);
+
+	const EditMatchView = () => (
+		<div className={`w-full h-full flex flex-col items-center justify-center`}>
+			{/* Display */}
+			<div className="flex flex-col w-full">
+				<div className="w-full flex flex-col gap-[2px] justify-center">
+					<SlotView
+						player={redPlayer}
+						color={"Red"}
+						isPending
+						handleWinner={handleWinner}
+						winner={winner}
+						matchId={match.id}
+						scores={match.player1Score}
+					/>
+					<SlotView
+						player={whitePlayer}
+						color={"White"}
+						isPending
+						handleWinner={handleWinner}
+						winner={winner}
+						matchId={match.id}
+						scores={match.player2Score}
+					/>
+				</div>
+			</div>
+		</div>
+	);
+
+	// const CompletedView = () => (
+	// 	<div className={`w-full h-full flex flex-col items-center justify-center`}>
+	// 		{/* Display */}
+	// 		<div className="flex flex-col w-full">
+	// 			{/* Match Labels */}
+	// 			<div className="w-full flex justify-end items-center gap-[36px] px-[25.5px] ">
+	// 				<div className="flex items-center justify-center">
+	// 					<p className="text-label uppercase text-white">winner</p>
+	// 				</div>
+	// 				<div className="flex items-center justify-center">
+	// 					<p className="text-label uppercase text-white">score</p>
+	// 				</div>
+	// 			</div>
+	// 			<div className="w-full flex flex-col gap-[2px] justify-center">
+	// 				<SlotView
+	// 					player={redPlayer}
+	// 					color={"Red"}
+	// 					handleWinner={handleWinner}
+	// 					winner={winner}
+	// 					matchId={match.id!}
+	// 					scores={match.player1Score}
+	// 					disabled
+	// 				/>
+	// 				<SlotView
+	// 					player={whitePlayer}
+	// 					color={"White"}
+	// 					handleWinner={handleWinner}
+	// 					winner={winner}
+	// 					matchId={match.id!}
+	// 					scores={match.player2Score}
+	// 					disabled
+	// 				/>
+	// 			</div>
+	// 		</div>
+	// 	</div>
+	// );
 
 	return (
 		<Dialog.Root>
@@ -24,14 +168,14 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 						name={redPlayer?.name}
 						sequence={redPlayer?.sequence}
 						// isWinner={winner === redPlayer}
-						// scores={matchFromStore?.player1Score || []}
+						scores={matchFromStore?.player1Score ?? []}
 					/>
 					<BracketSlot
 						variant="White"
 						name={whitePlayer?.name}
 						sequence={whitePlayer?.sequence}
 						// isWinner={winner === whitePlayer}
-						// scores={matchFromStore?.player2Score || []}
+						scores={matchFromStore?.player2Score ?? []}
 					/>
 				</div>
 			</Dialog.Trigger>
@@ -48,24 +192,22 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 							<p className="text-lead text-white">Report Scores</p>
 						</div>
 					</Dialog.Title>
-					{/* Overlay Content */}
-					{/* Render based on different scenarios */}
+					{/* Overlay Content -- Render based on different scenarios */}
 					{/* If we are in progress and both players are present */}
-					{/* {bracketStatus === "In Progress" && redPlayer && whitePlayer && (
-            <InProgressMatchView />
-          )} */}
+					{bracketStatus === "In Progress" && redPlayer && whitePlayer && (
+						<InProgressMatchView />
+					)}
 					{/* If we are in progress, but the match isnt ready to score because there aren't enough players */}
 					{/* {bracketStatus === "In Progress" && (!redPlayer || !whitePlayer) && (
             <EditMatchView />
           )} */}
 					{/* If we are editting the details/participants list, we should not be able to edit match status */}
-					{/* {bracketStatus === "Editing" && <EditMatchView />}
-          {bracketStatus === "Completed" && <CompletedView />} */}
+					{bracketStatus === "Editing" && <EditMatchView />}
+					{/* {bracketStatus === "Completed" && <CompletedView />} */}
 					<Dialog.Close className="absolute top-4 right-4">
 						<X
 							size={"1.5rem"}
-							color="#717171"
-							className="hover:bg-figma_shade2_30 rounded-full"
+							className="hover:bg-figma_shade2_30 rounded-full text-figma_shade1"
 						/>
 					</Dialog.Close>
 				</Dialog.Content>

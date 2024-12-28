@@ -97,10 +97,10 @@ const useTournamentBracket = () => {
 				const nextRoundMatch = Math.floor(index / 2);
 				if (match?.player1 === null) {
 					filledBracket[1][nextRoundMatch].player2 = match.player2;
-					// match.id = 'BYE';
+					match.id = 'BYE';
 				} else if (match?.player2 === null) {
 					filledBracket[1][nextRoundMatch].player1 = match.player1;
-					// match.id = 'BYE';
+					match.id = 'BYE';
 				}
 			});
 

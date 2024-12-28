@@ -30,7 +30,7 @@ const BracketStructure = () => {
 			MIN_HEIGHT
 		);
 
-		return {height: requiredHeight, width: requiredWidth}
+		return { height: requiredHeight, width: requiredWidth };
 	};
 
 	const calculateNodePosition = (
@@ -86,18 +86,21 @@ const BracketStructure = () => {
 									);
 
 									return (
-										<path
-											key={`connector-${match.id}`}
-											d={createConnectorPath(
-												pos.x + MATCH_WIDTH,
-												pos.y + MATCH_HEIGHT / 2,
-												nextPos.x,
-												nextPos.y + MATCH_HEIGHT / 2
-											)}
-											stroke="#94a3b8"
-											strokeWidth={2}
-											fill="none"
-										/>
+										// If one of the players is null (a bye scenario) then don't render
+										match.id !== "BYE" && (
+											<path
+												key={`connector-R${roundIndex}-M${matchIndex}`}
+												d={createConnectorPath(
+													pos.x + MATCH_WIDTH,
+													pos.y + MATCH_HEIGHT / 2,
+													nextPos.x,
+													nextPos.y + MATCH_HEIGHT / 2
+												)}
+												stroke="#94a3b8"
+												strokeWidth={2}
+												fill="none"
+											/>
+										)
 									);
 								}
 							}
@@ -118,13 +121,16 @@ const BracketStructure = () => {
 						);
 
 						return (
-							<BracketMatch
-								key={match.id}
-								match={match}
-								style={{
-									transform: `translate(${pos.x}px, ${pos.y}px)`,
-								}}
-							/>
+							// If one of the players is null (a bye scenario) then don't render
+							match.id !== "BYE" && (
+								<BracketMatch
+									key={`R${roundIndex}-M${matchIndex}`}
+									match={match}
+									style={{
+										transform: `translate(${pos.x}px, ${pos.y}px)`,
+									}}
+								/>
+							)
 						);
 					})
 				)}

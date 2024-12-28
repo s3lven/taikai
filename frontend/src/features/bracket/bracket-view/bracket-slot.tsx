@@ -5,7 +5,7 @@ interface BracketSlotProps {
 	sequence?: number | string;
 	name?: string;
 	isWinner?: boolean;
-	scores?: IpponType[];
+	scores: IpponType[];
 }
 
 const BracketSlot = ({
@@ -13,17 +13,17 @@ const BracketSlot = ({
 	sequence = "-1",
 	name = "-1",
 	isWinner,
-}: // scores,
-BracketSlotProps) => {
-	// const hitMap: Record<string, string> = {
-	// 	Men: "M",
-	// 	Kote: "K",
-	// 	Do: "D",
-	// 	Tsuki: "T",
-	// 	Hantei: "HT",
-	// 	Hansoku: "HS",
-	// 	"": "-",
-	// };
+	scores,
+}: BracketSlotProps) => {
+	const hitMap: Record<IpponType, string> = {
+		Men: "M",
+		Kote: "K",
+		Do: "D",
+		Tsuki: "T",
+		Hantei: "HT",
+		Hansoku: "HS",
+		"": "-",
+	};
 	return (
 		<div className="w-[220px] h-[27px] flex items-center font-poppins">
 			<div
@@ -56,7 +56,7 @@ BracketSlotProps) => {
 					</p>
 				</div>
 				<div className="w-9 h-full gap-1 flex items-center justify-center">
-					{/* {scores.map((score, index) => (
+					{scores.map((score, index) => (
 						<div
 							key={index}
 							className="w-full h-full flex items-center justify-center"
@@ -66,10 +66,10 @@ BracketSlotProps) => {
 									isWinner ? "text-figma_green" : "text-white"
 								}`}
 							>
-								{hitMap[score] || "-"}
+								{hitMap[score]}
 							</p>
 						</div>
-					))} */}
+					))}
 				</div>
 			</div>
 		</div>
