@@ -17,13 +17,14 @@ interface MatchesActions {
 		value: IpponType
 	) => void;
 	submitScore: (matchId: string, winner: Participant | null) => void;
-	resetBracket: () => void
+	resetBracket: () => void,
+	isBracketCompleted: () => boolean
 }
 
 type MatchesStore = MatchesState & MatchesActions;
 
 export const useMatchesStore = create<MatchesStore>()(
-	immer((set) => ({
+	immer((set, get) => ({
 		rounds: [],
 		initialRounds: null,
 
@@ -88,6 +89,11 @@ export const useMatchesStore = create<MatchesStore>()(
 				if (state.initialRounds) state.rounds = state.initialRounds
 				else throw new Error("There is no initial bracket!")
 			})
-		}
+		},
+		isBracketCompleted: () => 
+			get().rounds
+				.flat()
+				.filter((match) => match.id !== "BYE")
+				.every((match) => match.winner !== null),
 	}))
 );

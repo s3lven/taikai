@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useBracketStore } from "@/stores/bracket-store";
 import { useShallow } from "zustand/react/shallow";
 import BracketView from "./bracket-view/bracket-view";
+import BracketDialogWrapper from "./components/bracket-dialog-wrapper";
 
 const BracketPage = () => {
 	const fetchBracketData = useBracketStore(
@@ -23,10 +24,10 @@ const BracketPage = () => {
 	}, [fetchBracketData, bracketId]);
 
 	return (
-		<div className="w-full flex-1 flex gap-5 bg-figma_shade2">
+		<BracketDialogWrapper className="w-full flex-1 flex gap-5 bg-figma_shade2">
 			<BracketPanel />
 			<BracketView />
-		</div>
+		</BracketDialogWrapper>
 	);
 };
 

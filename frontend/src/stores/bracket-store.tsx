@@ -89,7 +89,7 @@ export const useBracketStore = create<BracketStore>()(
 					entityId: state.bracket.id,
 					payload: { status: "Editing" },
 				});
-				useMatchesStore.getState().resetBracket()
+				useMatchesStore.getState().resetBracket();
 				return newState;
 			}),
 		completeBracket: () =>
