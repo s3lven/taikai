@@ -57,6 +57,9 @@ export interface Participant {
 	sequence: number;
 	name: string;
 }
+export interface ParticipantsData {
+	participants: Participant[]
+};
 
 // const dummyTournamentData: Tournament[] = [
 // 	{

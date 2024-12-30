@@ -1,4 +1,4 @@
-import { Participant } from "@/types";
+import { Participant, ParticipantsData } from "@/types";
 import { arrayMove } from "@dnd-kit/sortable";
 // import _ from "lodash";
 import { create } from "zustand";
@@ -7,6 +7,7 @@ import { immer } from "zustand/middleware/immer";
 
 interface ParticipantState {
 	participants: Participant[];
+	initialParticipants: Participant[]
 }
 
 interface ParticipantActions {
@@ -17,20 +18,30 @@ interface ParticipantActions {
 	shuffleParticipants: () => void;
 	setParticipants: (participants: Participant[]) => void;
 	updateParticipantName: (id: number, name: string) => void;
+	fetchParticipants: (bracketId: number) => Promise<void>;
 }
 
 type ParticipantStore = ParticipantState & ParticipantActions;
 
 export const useParticipantStore = create<ParticipantStore>()(
 	immer((set) => ({
-		participants: [
-			{ name: "John Doe", id: 1, sequence: 1 },
-			{ name: "Jane Doe", id: 2, sequence: 2 },
-			{ name: "John Smith", id: 3, sequence: 3 },
-			{ name: "Jane Smith", id: 4, sequence: 4 },
-			{ name: "John Johnson", id: 5, sequence: 5 },
-			{ name: "Jane Johnson", id: 6, sequence: 6 },
-		],
+		participants: [],
+		initialParticipants: [],
+		fetchParticipants: async (bracketId) => {
+			try {
+				const response = await fetch(
+					`http://localhost:3001/api/participants/${bracketId}`
+				);
+				if (!response.ok) throw new Error("Failed to fetch participants");
+				const data: ParticipantsData =
+					(await response.json()) as unknown as ParticipantsData;
+				set({ participants: data.participants });
+				set({ initialParticipants: data.participants });
+
+			} catch (error) {
+				console.error(error);
+			}
+		},
 		addParticipant: () => {
 			set((state) => {
 				const newId = state.participants.length
