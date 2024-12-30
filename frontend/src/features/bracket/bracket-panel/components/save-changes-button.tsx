@@ -3,6 +3,7 @@ import { Change } from "@/types/changes";
 import { useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import EditorButton from "../../components/editor-button";
+import { useParticipantStore } from "@/stores/participant-store";
 
 const saveChangesToBackend = async (changes: Change[]) => {
 	console.log("Received changes: ", changes);
@@ -36,6 +37,9 @@ const SaveChangeButton = () => {
 				state.hasUnsavedChanges,
 			])
 		);
+	const generateParticipantChanges = useParticipantStore(
+		useShallow((state) => state.generateParticipantChanges)
+	);
 	const [isSaving, setIsSaving] = useState(false);
 
 	const handleSave = async () => {
@@ -43,9 +47,16 @@ const SaveChangeButton = () => {
 		setIsSaving(true);
 
 		try {
+			// Generate changes by comparing against initial state
+			generateParticipantChanges();
+
 			// Get consolidated changes before saving
 			const consolidatedChanges = getConsolidatedChanges();
 			await saveChangesToBackend(consolidatedChanges);
+
+			useParticipantStore.setState((state) => {
+				state.initialParticipants = state.participants;
+			});
 			clearChanges();
 		} catch (error) {
 			console.error("Failed to save changes", error);

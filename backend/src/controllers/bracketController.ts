@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { db } from '../database';
-import { tournaments, brackets } from '../database/schema';
-import { eq } from 'drizzle-orm';
+import { tournaments, brackets, participants, participantsBracket } from '../database/schema';
+import { and, eq } from 'drizzle-orm';
 import { BracketWithTournamentName } from '../types';
-import { Change } from '../types/changes';
+import { Change, ChangeType } from '../types/changes';
 
 export const getBracket = async (req: Request, res: Response) => {
   console.info('[INFO]: Fetching bracket');
@@ -102,16 +102,77 @@ const processBracketChange = async (
   }
 };
 
-const processChange = async (change: Change, trx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => {
+const processParticipantsChange = async (
+  changeType: ChangeType,
+  participantId: number,
+  payload: any,
+  trx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+) => {
+  switch (changeType) {
+    case 'update':
+      if (payload.name) {
+        // Update participant name
+        await trx
+          .update(participants)
+          .set({ name: payload.name })
+          .where(eq(participants.id, participantId));
+      }
+
+      if (payload.sequence) {
+        // Update sequence in the junction table
+        await trx
+          .update(participantsBracket)
+          .set({ sequence: payload.sequence })
+          .where(
+            and(
+              eq(participantsBracket.participantId, participantId),
+              eq(participantsBracket.bracketId, payload.bracketId),
+            ),
+          );
+      }
+      break;
+
+      break;
+    case 'create': 
+    {
+      // First create the participant
+      const [newParticipant] = await trx
+        .insert(participants)
+        .values({
+          name: payload.name,
+        })
+        .returning({ id: participants.id });
+
+      // Then create the association in the junction table
+      await trx.insert(participantsBracket).values({
+        participantId: newParticipant.id,
+        bracketId: payload.bracketId,
+        sequence: payload.sequence,
+      });
+      break;
+    }
+    case 'delete':
+      // The junction table entries will be automatically deleted due to ON DELETE CASCADE
+      await trx.delete(participants).where(eq(participants.id, participantId));
+      break;
+    default:
+      throw new Error(`Unsupported change type for participant: ${changeType}`);
+  }
+};
+
+const processChange = async (
+  change: Change,
+  trx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+) => {
   const { entityType, changeType, entityId, payload } = change;
 
   switch (entityType) {
     case 'bracket':
       await processBracketChange(changeType, entityId, payload, trx);
       break;
-    // case 'participants':
-    //   await processParticipantsChange(changeType, entityId, payload, trx);
-    //   break
+    case 'participant':
+      await processParticipantsChange(changeType, entityId, payload, trx);
+      break;
     default:
       throw new Error(`Unsupported entity type: ${entityType}`);
   }
@@ -144,4 +205,3 @@ export const batchUpdateBracket = async (req: Request, res: Response) => {
   }
   console.info('[INFO]: Finished updating brackets');
 };
-

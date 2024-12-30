@@ -1,4 +1,4 @@
-export type ChangeEntityType = 'tournament' | 'bracket' | 'participants'
+export type ChangeEntityType = 'tournament' | 'bracket' | 'participant'
 export type ChangeType = 'create' | 'update' | 'delete' | 'move' | 'shuffle'
 
 export interface Change {

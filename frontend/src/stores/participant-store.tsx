@@ -1,13 +1,13 @@
 import { Participant, ParticipantsData } from "@/types";
 import { arrayMove } from "@dnd-kit/sortable";
-// import _ from "lodash";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-// import { useChangeTrackingStore } from "./change-tracking-store";
+import { useChangeTrackingStore } from "./change-tracking-store";
+import { useBracketStore } from "./bracket-store";
 
 interface ParticipantState {
 	participants: Participant[];
-	initialParticipants: Participant[]
+	initialParticipants: Participant[];
 }
 
 interface ParticipantActions {
@@ -16,15 +16,15 @@ interface ParticipantActions {
 	updateParticipant: (id: number, name: string) => void;
 	moveParticipant: (oldIndex: number, newIndex: number) => void;
 	shuffleParticipants: () => void;
-	setParticipants: (participants: Participant[]) => void;
 	updateParticipantName: (id: number, name: string) => void;
 	fetchParticipants: (bracketId: number) => Promise<void>;
+	generateParticipantChanges: () => void;
 }
 
 type ParticipantStore = ParticipantState & ParticipantActions;
 
 export const useParticipantStore = create<ParticipantStore>()(
-	immer((set) => ({
+	immer((set, get) => ({
 		participants: [],
 		initialParticipants: [],
 		fetchParticipants: async (bracketId) => {
@@ -37,7 +37,6 @@ export const useParticipantStore = create<ParticipantStore>()(
 					(await response.json()) as unknown as ParticipantsData;
 				set({ participants: data.participants });
 				set({ initialParticipants: data.participants });
-
 			} catch (error) {
 				console.error(error);
 			}
@@ -55,20 +54,11 @@ export const useParticipantStore = create<ParticipantStore>()(
 						name: "",
 					};
 					state.participants = [...state.participants, newParticipant];
-
-					// useChangeTrackingStore.getState().addChange({
-					// 	entityType: "participants",
-					// 	changeType: "create",
-					// 	entityId: newId,
-					// 	payload: newParticipant,
-					// });
 				}
+				useChangeTrackingStore.setState({ hasUnsavedChanges: true });
 			});
 		},
 		removeParticipant: (id) => {
-			// const participant = useParticipantStore.getState().participants.find(
-			// 	(participant) => participant.id === id
-			// );
 			set((state) => {
 				state.participants = state.participants
 					.filter((participant) => participant.id !== id)
@@ -76,13 +66,8 @@ export const useParticipantStore = create<ParticipantStore>()(
 						...participant,
 						sequence: index + 1,
 					}));
+				useChangeTrackingStore.setState({ hasUnsavedChanges: true });
 			});
-			// useChangeTrackingStore.getState().addChange({
-			// 	entityType: "participants",
-			// 	changeType: "delete",
-			// 	entityId: id,
-			// 	payload: participant,
-			// });
 		},
 		updateParticipant: (id, name) =>
 			set((state) => {
@@ -91,14 +76,8 @@ export const useParticipantStore = create<ParticipantStore>()(
 				);
 				if (participant) {
 					participant.name = name;
-
-					// useChangeTrackingStore.getState().addChange({
-					// 	entityType: "participants",
-					// 	changeType: "update",
-					// 	entityId: id,
-					// 	payload: { name },
-					// });
 				}
+				useChangeTrackingStore.setState({ hasUnsavedChanges: true });
 			}),
 		moveParticipant: (oldIndex, newIndex) =>
 			set((state) => {
@@ -106,13 +85,7 @@ export const useParticipantStore = create<ParticipantStore>()(
 					(participant, index) => ({ ...participant, sequence: index + 1 })
 				);
 				state.participants = updated;
-
-				// useChangeTrackingStore.getState().addChange({
-				// 	entityType: "participants",
-				// 	changeType: "move",
-				// 	entityId: updated[newIndex].id,
-				// 	payload: state.participants,
-				// });
+				useChangeTrackingStore.setState({ hasUnsavedChanges: true });
 			}),
 		shuffleParticipants: () => {
 			set((state) => {
@@ -127,13 +100,10 @@ export const useParticipantStore = create<ParticipantStore>()(
 				});
 
 				state.participants = shuffledParticipants;
+				useChangeTrackingStore.setState({ hasUnsavedChanges: true });
 			});
 		},
-		setParticipants: (participants) =>
-			set((state) => {
-				state.participants = participants;
-			}),
-		updateParticipantName: (id, name) =>
+		updateParticipantName: (id, name) => {
 			set((state) => {
 				const participant = state.participants.find(
 					(participant) => participant.id === id
@@ -141,6 +111,72 @@ export const useParticipantStore = create<ParticipantStore>()(
 				if (participant) {
 					participant.name = name;
 				}
-			}),
+				useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+			});
+		},
+		generateParticipantChanges: () => {
+			const state = get();
+			const { participants, initialParticipants } = state;
+			const changeTracker = useChangeTrackingStore.getState();
+			const bracketId = useBracketStore.getState().bracket.id; // Get bracket ID
+
+			// Track deletions
+			initialParticipants.forEach((initial) => {
+				if (!participants.find((p) => p.id === initial.id)) {
+					changeTracker.addChange({
+						entityType: "participant",
+						changeType: "delete",
+						entityId: initial.id,
+						payload: {
+							...initial,
+							bracketId,
+						},
+					});
+				}
+			});
+
+			// Track additions and updates
+			participants.forEach((current) => {
+				const initial = initialParticipants.find((p) => p.id === current.id);
+
+				if (!initial) {
+					// New participant
+					changeTracker.addChange({
+						entityType: "participant",
+						changeType: "create",
+						entityId: current.id,
+						payload: {
+							...current,
+							bracketId,
+						},
+					});
+				} else {
+					// Check for updates
+					const changes: Record<string, unknown> = {};
+					let hasChanges = false;
+
+					if (current.name !== initial.name) {
+						changes.name = current.name;
+						hasChanges = true;
+					}
+					if (current.sequence !== initial.sequence) {
+						changes.sequence = current.sequence;
+						hasChanges = true;
+					}
+
+					if (hasChanges) {
+						changeTracker.addChange({
+							entityType: "participant",
+							changeType: "update",
+							entityId: current.id,
+							payload: {
+								...changes,
+								bracketId,
+							},
+						});
+					}
+				}
+			});
+		},
 	}))
 );
