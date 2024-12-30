@@ -144,3 +144,4 @@ export const batchUpdateBracket = async (req: Request, res: Response) => {
   }
   console.info('[INFO]: Finished updating brackets');
 };
+

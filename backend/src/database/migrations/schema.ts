@@ -31,12 +31,12 @@ export const brackets = pgTable("brackets", {
 export const participants = pgTable("participants", {
 	id: serial().primaryKey().notNull(),
 	name: varchar({ length: 255 }).notNull(),
-	sequence: smallint().notNull(),
 });
 
 export const participantsBracket = pgTable("participants_bracket", {
 	participantId: integer("participant_id").notNull(),
 	bracketId: integer("bracket_id").notNull(),
+	sequence: smallint(),
 }, (table) => [
 	foreignKey({
 			columns: [table.participantId],
