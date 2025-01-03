@@ -8,6 +8,9 @@ import { useBracketStore } from "./bracket-store";
 interface ParticipantState {
 	participants: Participant[];
 	initialParticipants: Participant[];
+	isLoading: boolean;
+	error: Error | null;
+	isInitialized: boolean;
 }
 
 interface ParticipantActions {
@@ -27,7 +30,12 @@ export const useParticipantStore = create<ParticipantStore>()(
 	immer((set, get) => ({
 		participants: [],
 		initialParticipants: [],
+		isLoading: false,
+		error: null,
+		isInitialized: false,
+
 		fetchParticipants: async (bracketId) => {
+			set({ isLoading: true });
 			try {
 				const response = await fetch(
 					`http://localhost:3001/api/participants/${bracketId}`
@@ -35,10 +43,16 @@ export const useParticipantStore = create<ParticipantStore>()(
 				if (!response.ok) throw new Error("Failed to fetch participants");
 				const data: ParticipantsData =
 					(await response.json()) as unknown as ParticipantsData;
-				set({ participants: data.participants });
-				set({ initialParticipants: data.participants });
+				set({
+					participants: data.participants,
+					initialParticipants: data.participants,
+					isInitialized: true,
+				});
 			} catch (error) {
 				console.error(error);
+				set({ error: error as Error });
+			} finally {
+				set({ isLoading: false });
 			}
 		},
 		addParticipant: () => {

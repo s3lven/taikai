@@ -113,7 +113,6 @@ const useTournamentBracket = () => {
 		}
 	}, [participantCount, participants, rounds, setMatches]);
 
-	console.log(matches);
 	return { matches };
 };
 

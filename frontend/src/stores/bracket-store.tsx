@@ -6,6 +6,9 @@ import { useMatchesStore } from "./matches-store";
 
 interface BracketState {
 	bracket: Bracket & { tournamentName: string };
+	isLoading: boolean
+	error: Error | null
+	isInitialized: boolean
 }
 
 interface BracketActions {
@@ -27,13 +30,18 @@ export const useBracketStore = create<BracketStore>()(
 		bracket: {
 			id: 0,
 			name: "",
-			status: "In Progress" as BracketStatusType,
+			status: "Editing" as BracketStatusType,
 			numberOfParticipants: 0,
 			type: "Single Elimination",
 			tournamentName: "",
 			progress: 0,
 		},
+		isLoading: false,
+		error: null,
+		isInitialized: false,
+		
 		fetchBracketData: async (bracketId: number) => {
+			set({ isLoading: true })
 			try {
 				const response = await fetch(
 					`http://localhost:3001/api/brackets/${bracketId}`
@@ -52,9 +60,12 @@ export const useBracketStore = create<BracketStore>()(
 					progress: data.progress,
 					tournamentName: data.tournamentName,
 				};
-				set({ bracket: newBracket });
+				set({ bracket: newBracket, isInitialized: true });
 			} catch (error) {
 				console.error(error);
+				set({ error: error as Error });
+			} finally {
+				set({ isLoading: false})
 			}
 		},
 		runBracket: () =>

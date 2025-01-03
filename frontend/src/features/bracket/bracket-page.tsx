@@ -1,18 +1,11 @@
 import { useParams } from "react-router-dom";
 import BracketPanel from "./bracket-panel/bracket-panel";
-import { useEffect } from "react";
-import { useBracketStore } from "@/stores/bracket-store";
-import { useShallow } from "zustand/react/shallow";
 import BracketView from "./bracket-view/bracket-view";
 import BracketDialogWrapper from "./components/bracket-dialog-wrapper";
-import { useParticipantStore } from "@/stores/participant-store";
+import BracketDataProvider from "./components/bracket-data-provider";
+import BracketLoadingWrapper from "./components/bracket-loading-wrapper";
 
 const BracketPage = () => {
-	const fetchBracketData = useBracketStore(
-		useShallow((state) => state.fetchBracketData)
-	);
-	const fetchParticipants = useParticipantStore(useShallow((state) => state.fetchParticipants))
-
 	// Extract the bracket id from the URL and check if it exists
 	const params = useParams();
 
@@ -21,16 +14,15 @@ const BracketPage = () => {
 	}
 	const bracketId = parseInt(params.bracketId!);
 
-	useEffect(() => {
-		void fetchBracketData(bracketId);
-		void fetchParticipants(bracketId)
-	}, [fetchBracketData, bracketId, fetchParticipants]);
-
 	return (
-		<BracketDialogWrapper className="w-full flex-1 flex gap-5 bg-figma_shade2">
-			<BracketPanel />
-			<BracketView />
-		</BracketDialogWrapper>
+		<BracketDataProvider bracketId={bracketId} className="flex-1 flex flex-col">
+			<BracketLoadingWrapper>
+				<BracketDialogWrapper className="w-full flex-1 flex gap-5 bg-figma_shade2">
+					<BracketPanel />
+					<BracketView />
+				</BracketDialogWrapper>
+			</BracketLoadingWrapper>
+		</BracketDataProvider>
 	);
 };
 

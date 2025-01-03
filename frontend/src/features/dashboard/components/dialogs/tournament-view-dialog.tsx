@@ -38,7 +38,7 @@ const TournamentViewDialog = () => {
 						)
 						.map((bracket) => (
 							<BracketItem
-								key={`${bracket.name}-${bracket.status}`}
+								key={`${bracket.id}`}
 								bracket={bracket}
 							/>
 						))}

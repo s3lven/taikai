@@ -23,7 +23,8 @@ const BracketRoundsList = () => {
 			Math.log(numberOfParticipants) / Math.log(2)
 		);
 
-		if (numberOfRounds == 0) return ["Finals"];
+		// If there are less than 2 participants, there are no rounds
+		if (numberOfRounds < 2) return [];
 
 		for (let i = 0; i < numberOfRounds; i++) {
 			const roundNumber = i + 1;

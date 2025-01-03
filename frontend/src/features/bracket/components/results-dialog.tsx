@@ -12,7 +12,7 @@ import { useShallow } from "zustand/react/shallow";
 import EditorButton from "./editor-button";
 import { Match, Participant } from "@/types";
 
-import JSConfetti from 'js-confetti'
+import JSConfetti from "js-confetti";
 
 interface ResultsDialogProps {
 	isOpen: boolean;
@@ -23,9 +23,12 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
 	const [completeBracket] = useBracketStore(
 		useShallow((state) => [state.completeBracket])
 	);
-	const lastThreeMatches = useMatchesStore(
-		useShallow((state) => state.rounds.flat().slice(-3))
-	);
+	const rounds = useMatchesStore(useShallow((state) => state.rounds));
+
+	// If there are not enough rounds, return null
+	if (rounds.length < 3) {
+		return null;
+	}
 
 	const formatResults = (matches: Match[]) => {
 		// Create a map to track players and their progression
@@ -103,6 +106,7 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
 		return rankings;
 	};
 
+	const lastThreeMatches = rounds.flat().slice(-3);
 	const results = formatResults(lastThreeMatches);
 
 	const rankStyles: Record<number, string> = {
@@ -112,12 +116,12 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
 	};
 
 	const handleComplete = () => {
-		completeBracket()
-		setIsOpen(false)
-	}
+		completeBracket();
+		setIsOpen(false);
+	};
 
-	const confetti = new JSConfetti()
-	void confetti.addConfetti()
+	const confetti = new JSConfetti();
+	void confetti.addConfetti();
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>

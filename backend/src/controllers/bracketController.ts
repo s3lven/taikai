@@ -50,7 +50,7 @@ export const addBracket = async (req: Request, res: Response) => {
     // Insert the new bracket into the database with default status, location, date (now), and participant count
     const [newBracket] = await db
       .insert(brackets)
-      .values({ name, status: 'Pending', participantCount: 0, tournamentId })
+      .values({ name, status: 'Editing', participantCount: 0, tournamentId })
       .returning({ id: brackets.id });
 
     res.status(201).json({ id: newBracket.id });
@@ -130,8 +130,6 @@ const processParticipantsChange = async (
             ),
           );
       }
-      break;
-
       break;
     case 'create': 
     {

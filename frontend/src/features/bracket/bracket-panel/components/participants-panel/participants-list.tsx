@@ -34,7 +34,7 @@ const ParticipantsList = () => {
 		if (!over) return;
 
 		const oldIndex = participants.findIndex(
-			(participant) => participant.id === active.id
+			(participant) => participant.sequence === active.id
 		);
 		const newIndex = participants.findIndex(
 			(participant) => participant.sequence === over.id
