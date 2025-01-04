@@ -1,6 +1,6 @@
 import { Participant } from "@/types";
 import {
-    closestCenter,
+	closestCenter,
 	DndContext,
 	DragEndEvent,
 	KeyboardSensor,
@@ -17,6 +17,8 @@ import {
 import ParticipantSlot from "./participant-slot";
 import { useShallow } from "zustand/react/shallow";
 import { useParticipantStore } from "@/stores/participant-store";
+import { useBracketStore } from "@/stores/bracket-store";
+import ParticipantSlotView from "./participant-slot-view";
 
 const ParticipantsList = () => {
 	const { participants, removeParticipant, moveParticipant } =
@@ -27,6 +29,10 @@ const ParticipantsList = () => {
 				moveParticipant: state.moveParticipant,
 			}))
 		);
+
+	const [bracketStatus] = useBracketStore(
+		useShallow((state) => [state.bracket.status])
+	);
 
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
@@ -62,31 +68,39 @@ const ParticipantsList = () => {
 		useSensor(TouchSensor)
 	);
 
-	return participants?.length ? (
-		<div className="flex flex-col gap-2">
-			<DndContext
-				collisionDetection={closestCenter}
-				onDragEnd={handleDragEnd}
-				sensors={sensors}
-			>
-				<SortableContext
-					items={participants.map((participant) => participant.sequence)}
-					strategy={verticalListSortingStrategy}
-				>
-					{participants.map((participant) => (
-						<ParticipantSlot
+	return (
+		participants && (
+			<div className="flex flex-col gap-2">
+				{bracketStatus === "Editing" ? (
+					<DndContext
+						collisionDetection={closestCenter}
+						onDragEnd={handleDragEnd}
+						sensors={sensors}
+					>
+						<SortableContext
+							items={participants.map((participant) => participant.sequence)}
+							strategy={verticalListSortingStrategy}
+						>
+							{participants.map((participant) => (
+								<ParticipantSlot
+									key={participant.id}
+									participant={participant}
+									removeParticipant={removeParticipant}
+								/>
+							))}
+						</SortableContext>
+					</DndContext>
+				) : (
+					// Render the participant list in a read-only mode
+					participants.map((participant) => (
+						<ParticipantSlotView
 							key={participant.id}
 							participant={participant}
-							removeParticipant={removeParticipant}
 						/>
-					))}
-				</SortableContext>
-			</DndContext>
-		</div>
-	) : (
-		participants.map((participant) => (
-			<p key={participant.id}>{participant.name}</p>
-		))
+					))
+				)}
+			</div>
+		)
 	);
 };
 
