@@ -53,12 +53,13 @@ export const createTournament = async (req: Request, res: Response) => {
       status,
       location,
       date,
-      numberOfParticipants: participantCount,
+      participantCount,
       brackets: bracketData,
     } = req.body;
 
+    // TODO: Add zod for proper validation -- adding participantCount (which is 0) makes the validation fail
     // Sanitize and Validate Input
-    if (!name || !status || !location || !date || !participantCount) {
+    if (!name || !status || !location || !date) {
       console.info('CreateTournament parameters were not valid. Please check the request object.');
       res.status(400).json({ error: 'Please fill out all the required fields' });
       return;

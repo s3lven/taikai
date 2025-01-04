@@ -45,10 +45,9 @@ const TournamentNewDialog = () => {
 			status: "Upcoming",
 			location: "here",
 			date: new Date().toLocaleDateString(),
-			numberOfParticipants: 25,
+			participantCount: 0,
 		};
 		
-		// TODO: Wrap in try-catch? Yeah put one here
 		void addTournament(newTournament);
 		setIsAddingTournament(false);
 	};

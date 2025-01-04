@@ -21,7 +21,7 @@ export interface Tournament {
 	status: TournamentStatusType;
 	location: string;
 	date: string;
-	numberOfParticipants: number;
+	participantCount: number;
 	brackets: Bracket[];
 }
 export type CreateTournament = Omit<Tournament, "brackets" | "id">;
@@ -31,15 +31,13 @@ export interface Bracket {
 	id: number;
 	name: string;
 	status: BracketStatusType;
-	numberOfParticipants: number;
+	participantCount: number;
 	type: string;
 	progress: number;
-	// participants: Participant[]
 }
 
-export type BracketData = Omit<Bracket, "numberOfParticipants"> & {
+export type BracketData = Bracket & {
 	tournamentName: string;
-	participantCount: number;
 };
 
 export interface Match {

@@ -45,7 +45,7 @@ const TournamentEditDialog = () => {
 			brackets: [],
 			location: "here",
 			date: "2024-02-29",
-			numberOfParticipants: 25,
+			participantCount: 25,
 		};
 		try {
 			await updateTournament(editingTournament!.id, newTournament);

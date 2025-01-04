@@ -60,7 +60,7 @@ const TournamentList = ({ status }: TournamentListProps) => {
 										</span>
 										<span className="flex items-center h-full">
 											<User size={14} />{" "}
-											<span>{tournament.numberOfParticipants}</span>
+											<span>{tournament.participantCount}</span>
 										</span>
 									</CardDescription>
 								</CardHeader>
