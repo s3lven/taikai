@@ -21,10 +21,11 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	const bracketStatus = useBracketStore(
 		useShallow((state) => state.bracket.status)
 	);
-	const [matchFromStore, submitScore] = useMatchesStore(
+	const [matchFromStore, submitScore, resetMatch] = useMatchesStore(
 		useShallow((state) => [
 			state.rounds.flat().find((m: Match) => m.id === match.id),
 			state.submitScore,
+			state.resetMatch
 		])
 	);
 
@@ -43,6 +44,11 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 			setWinner(matchFromStore.winner);
 		}
 	}, [matchFromStore]);
+
+	const handleResetMatch = () => {
+		console.log("Resetting match", match.id);
+		resetMatch(match.id)
+	}
 
 	const InProgressMatchView = () => (
 		<div
@@ -84,6 +90,16 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 					<EditorButton
 						text={"submit scores"}
 						onClickHandler={handleSubmitScore}
+					/>
+				</div>
+			</Dialog.Close>
+			{/* Reset Button */}
+			<Dialog.Close asChild>
+				<div className="absolute bottom-4 right-4">
+					<EditorButton
+						text={"reset match"}
+						variant="no-outline"
+						onClickHandler={handleResetMatch}
 					/>
 				</div>
 			</Dialog.Close>

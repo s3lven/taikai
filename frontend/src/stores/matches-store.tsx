@@ -17,8 +17,9 @@ interface MatchesActions {
 		value: IpponType
 	) => void;
 	submitScore: (matchId: string, winner: Participant | null) => void;
-	resetBracket: () => void,
-	isBracketCompleted: () => boolean
+	resetBracket: () => void;
+	isBracketCompleted: () => boolean;
+	resetMatch: (matchId: string) => void;
 }
 
 type MatchesStore = MatchesState & MatchesActions;
@@ -66,34 +67,88 @@ export const useMatchesStore = create<MatchesStore>()(
 					})
 				);
 				// Calculate and Update the progress
-				let totalMatches = 0
-				let completedMatches = 0
+				let totalMatches = 0;
+				let completedMatches = 0;
 
 				state.rounds.forEach((round) => {
 					round.forEach((match) => {
 						// Check if the match is not a bye round
 						if (match.id !== "BYE") {
-							totalMatches++
-							if (match.winner) completedMatches++
+							totalMatches++;
+							if (match.winner) completedMatches++;
 						}
-					})
-				})
+					});
+				});
 
 				// Don't divide by 0
-				const progress = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0
-				useBracketStore.getState().updateProgress(progress)
+				const progress =
+					totalMatches > 0
+						? Math.round((completedMatches / totalMatches) * 100)
+						: 0;
+				useBracketStore.getState().updateProgress(progress);
 			}),
-
+		// Used in bracket store to reset all matches
 		resetBracket: () => {
 			set((state) => {
-				if (state.initialRounds) state.rounds = state.initialRounds
-				else throw new Error("There is no initial bracket!")
-			})
+				if (state.initialRounds) state.rounds = state.initialRounds;
+				else throw new Error("There is no initial bracket!");
+			});
 		},
-		isBracketCompleted: () => 
-			get().rounds
+		isBracketCompleted: () =>
+			get()
+				.rounds.flat()
 				.flat()
 				.filter((match) => match.id !== "BYE")
 				.every((match) => match.winner !== null),
+		resetMatch: (matchId) => {
+			// Find the round index and match index
+			const roundIndex = get().rounds.findIndex((round) =>
+				round.find((match) => match.id === matchId)
+			);
+			const matchIndex = get().rounds[roundIndex].findIndex(
+				(match) => match.id === matchId
+			);
+
+			// If there's no round or match index, return
+			if (roundIndex === -1 || matchIndex === -1) return;
+
+			set((state) => {
+				const resetDependentMatches = (
+					currentRoundIndex: number,
+					currentMatchIndex: number
+				) => {
+					if (currentRoundIndex >= state.rounds.length - 1) return; // Stop at the last round
+
+					const nextRound = state.rounds[currentRoundIndex + 1];
+					const dependentMatchIndex = Math.floor(currentMatchIndex / 2);
+					const dependentMatch = nextRound[dependentMatchIndex];
+
+					if (!dependentMatch) return;
+
+					// Reset the dependent match
+					dependentMatch.player1Score = [];
+					dependentMatch.player2Score = [];
+					dependentMatch.winner = null;
+
+					if (currentMatchIndex % 2 === 0) {
+						dependentMatch.player1 = null;
+					} else {
+						dependentMatch.player2 = null;
+					}
+
+					// Recur to reset matches in the next round
+					resetDependentMatches(currentRoundIndex + 1, dependentMatchIndex);
+				};
+
+				// Reset the initial match
+				const match = state.rounds[roundIndex][matchIndex];
+				match.player1Score = [];
+				match.player2Score = [];
+				match.winner = null;
+
+				// Reset all dependent matches recursively
+				resetDependentMatches(roundIndex, matchIndex);
+			});
+		},
 	}))
 );

@@ -65,7 +65,7 @@ export const useParticipantStore = create<ParticipantStore>()(
 					const newParticipant = {
 						id: newId,
 						sequence: state.participants.length + 1,
-						name: "",
+						name: `Player ${state.participants.length + 1}`,
 					};
 					state.participants = [...state.participants, newParticipant];
 				}
