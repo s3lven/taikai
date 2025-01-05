@@ -2,6 +2,7 @@ import { useBracketStore } from "@/stores/bracket-store";
 import EditorButton from "../../../components/editor-button";
 import { useShallow } from "zustand/react/shallow";
 import { Progress } from "@/components/ui/progress";
+import { useSaveAllChanges } from "@/features/bracket/hooks/useSaveAllChanges";
 
 const PlayProgress = () => {
 	const [
@@ -24,6 +25,14 @@ const PlayProgress = () => {
 		])
 	);
 
+	const saveAllChanges = useSaveAllChanges()
+
+
+	const handleRunBracket = async () => {
+		runBracket()
+		await saveAllChanges()
+	}
+
 	return (
 		<>
 			<div className="w-full pb-2 border-b border-figma_neutral8 ">
@@ -40,7 +49,7 @@ const PlayProgress = () => {
 
 			<div className="flex flex-col justify-center items-center gap-2">
 				{bracketStatus === "Editing" ? (
-					<EditorButton text="start tournament" onClickHandler={runBracket} />
+					<EditorButton text="start tournament" onClickHandler={handleRunBracket} />
 				) : (
 					<>
 						{progress === 100 && bracketStatus === "In Progress" && (

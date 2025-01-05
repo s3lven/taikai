@@ -3,7 +3,7 @@ import BracketStructure from './bracket-structure'
 
 const BracketView = () => {
   return (
-    <div className="w-fit h-full flex-1 space-y-4 pr-5 overflow-y-scroll no-scrollbar pb-20">
+    <div className="w-fit h-full flex-1 space-y-4 pr-5">
       {/* Round Titles */}
       <BracketRoundsList />
 

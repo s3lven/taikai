@@ -6,7 +6,7 @@ const MainLayout = () => {
 	const { isDarkMode } = useDarkModeStore();
 
 	return (
-		<div className={isDarkMode ? "dark" : ""}>
+		<div className={`${isDarkMode && "dark"} overflow-auto no-scrollbar`}>
 			<div
 				className={`w-screen min-h-screen flex flex-col transition-colors duration-300 font-poppins`}
 			>
