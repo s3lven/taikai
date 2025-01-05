@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { useChangeTrackingStore } from "./change-tracking-store";
 import { immer } from "zustand/middleware/immer";
 import { useMatchesStore } from "./matches-store";
+import { useParticipantStore } from "./participant-store";
 
 interface BracketState {
 	bracket: Bracket & { tournamentName: string };
@@ -68,8 +69,19 @@ export const useBracketStore = create<BracketStore>()(
 				set({ isLoading: false})
 			}
 		},
-		runBracket: () =>
+		runBracket: () => {
 			set((state) => {
+				const participants = useParticipantStore.getState().participants;
+
+				// Check if any participant name is empty
+				const hasEmptyName = participants.some(
+					(participant) => !participant.name
+				);
+				if (hasEmptyName) {
+					// TODO: Send a toast instead of an alert
+					alert("Fill out all of the required participant names");
+					return state; // Early return, no state update
+				}
 				const newState = {
 					bracket: {
 						...state.bracket,
@@ -84,7 +96,8 @@ export const useBracketStore = create<BracketStore>()(
 					payload: { status: "In Progress", progress: 0 },
 				});
 				return newState;
-			}),
+			});
+		},
 		resetBracket: () =>
 			set((state) => {
 				const newState = {
