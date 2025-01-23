@@ -156,7 +156,11 @@ export const useMatchesStore = create<MatchesStore>()(
           currentRoundIndex: number,
           currentMatchIndex: number
         ) => {
-          if (currentRoundIndex >= state.rounds.length - 1) return; // Stop at the last round
+          if (currentRoundIndex >= state.rounds.length - 1) return;  // Stop at the last round
+
+          // Stop if there isnt any players
+          if (!state.rounds[currentRoundIndex][currentMatchIndex].player1 &&
+              !state.rounds[currentRoundIndex][currentMatchIndex].player2) return;
 
           const nextRound = state.rounds[currentRoundIndex + 1];
           const dependentMatchIndex = Math.floor(currentMatchIndex / 2);
@@ -171,8 +175,30 @@ export const useMatchesStore = create<MatchesStore>()(
 
           if (currentMatchIndex % 2 === 0) {
             dependentMatch.player1 = null;
+            useChangeTrackingStore.getState().addChange({
+              entityType: "match",
+              changeType: "update",
+              entityId: dependentMatch.id,
+              payload: {
+                player1: null,
+                player1Score: [],
+                player2Score: [],
+                winner: null,
+              },
+            });
           } else {
             dependentMatch.player2 = null;
+            useChangeTrackingStore.getState().addChange({
+              entityType: "match",
+              changeType: "update",
+              entityId: dependentMatch.id,
+              payload: {
+                player2: null,
+                player1Score: [],
+                player2Score: [],
+                winner: null,
+              },
+            });
           }
 
           // Recur to reset matches in the next round
@@ -184,6 +210,18 @@ export const useMatchesStore = create<MatchesStore>()(
         match.player1Score = [];
         match.player2Score = [];
         match.winner = null;
+
+        // Change tracking of initial match
+        useChangeTrackingStore.getState().addChange({
+          entityType: "match",
+          changeType: "update",
+          entityId: matchId,
+          payload: {
+            player1Score: [],
+            player2Score: [],
+            winner: null,
+          },
+        });
 
         // Reset all dependent matches recursively
         resetDependentMatches(roundIndex, matchIndex);
