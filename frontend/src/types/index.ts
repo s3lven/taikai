@@ -41,7 +41,7 @@ export type BracketData = Bracket & {
 };
 
 export interface Match {
-	id: string;
+	id: number;
 	player1: Participant | null;
 	player2: Participant | null;
 	player1Score: IpponType[];

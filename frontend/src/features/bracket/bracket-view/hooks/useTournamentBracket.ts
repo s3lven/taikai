@@ -4,6 +4,10 @@ import { Match, Participant } from "@/types";
 import { useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
 
+const generateRanbomNumberId = (factor?: number) => {
+	return Math.floor(Math.random() * Math.floor(Math.random() * Date.now())) + (factor || 0)
+}
+
 const useTournamentBracket = () => {
 	const [participants] = useParticipantStore(
 		useShallow((state) => [state.participants])
@@ -48,14 +52,13 @@ const useTournamentBracket = () => {
 				matches = roundMatches;
 			}
 
-			const bracket = matches.map((match, index) => ({
-				id: `R0-M${index}`,
+			const bracket = matches.map((match) => ({
+				id: generateRanbomNumberId(),
 				player1: match[0],
 				player2: match[1],
 				player1Score: [],
 				player2Score: [],
 				winner: null,
-				submitted: false,
 			}));
 
 			return bracket;
@@ -76,17 +79,16 @@ const useTournamentBracket = () => {
 				);
 			}
 
-			const filledBracket = initialBracket.map((round, roundIndex) => {
-				return round.map((match, matchIndex) => {
+			const filledBracket = initialBracket.map((round) => {
+				return round.map((match) => {
 					if (match === null) {
 						return {
-							id: `R${roundIndex}-M${matchIndex}`,
+							id: generateRanbomNumberId(),
 							player1: null,
 							player2: null,
 							player1Score: [],
 							player2Score: [],
 							winner: null,
-							submitted: false,
 						};
 					} else return match;
 				});
@@ -97,10 +99,10 @@ const useTournamentBracket = () => {
 				const nextRoundMatch = Math.floor(index / 2);
 				if (match?.player1 === null) {
 					filledBracket[1][nextRoundMatch].player2 = match.player2;
-					match.id = 'BYE';
+					match.id = -1;
 				} else if (match?.player2 === null) {
 					filledBracket[1][nextRoundMatch].player1 = match.player1;
-					match.id = 'BYE';
+					match.id = -1;
 				}
 			});
 
