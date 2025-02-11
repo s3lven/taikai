@@ -7,19 +7,11 @@ export const useSaveAllChanges = () => {
     (state) => state.getConsolidatedChanges
   );
   const clearChanges = useChangeTrackingStore((state) => state.clearChanges);
-  const hasUnsavedChanges = useChangeTrackingStore(
-    (state) => state.hasUnsavedChanges
-  );
   const generateParticipantChanges = useParticipantStore(
     (state) => state.generateParticipantChanges
   );
 
   const saveAllChanges = async () => {
-    if (!hasUnsavedChanges) {
-      console.error("There are no changes");
-      return;
-    }
-
     try {
       // Generate changes by comparing against initial state
       generateParticipantChanges();
