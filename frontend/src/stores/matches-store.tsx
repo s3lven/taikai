@@ -42,7 +42,7 @@ export const useMatchesStore = create<MatchesStore>()(
           }
         }
       }),
-    submitScore: (matchId, winner) => {
+    submitScore: async (matchId, winner) => {
       set((state) => {
         const match = state.rounds.flat().find((m) => m.id === matchId);
 
@@ -125,6 +125,7 @@ export const useMatchesStore = create<MatchesStore>()(
           player2Score: mat.player2Score,
         },
       });
+
     },
     // Used in bracket store to reset all matches
     resetBracket: () => {

@@ -9,7 +9,7 @@ interface SlotProps {
     isPending?: boolean;
     handleWinner: (player: Participant | null) => void;
     winner: Participant | null;
-    matchId: string;
+    matchId: number;
     scores: IpponType[];
     disabled?: boolean;
   }

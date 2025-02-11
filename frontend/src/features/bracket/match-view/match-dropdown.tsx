@@ -7,7 +7,7 @@ import { useShallow } from "zustand/react/shallow";
 
 interface MatchDropdownType {
 	index: number;
-	matchId: string;
+	matchId: number;
 	playerType: "player1" | "player2";
 	initialValue: IpponType;
 	disabled: boolean;

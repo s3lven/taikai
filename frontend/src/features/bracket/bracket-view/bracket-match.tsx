@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import EditorButton from "../components/editor-button";
 import BracketSlot from "./bracket-slot";
 import SlotView from "../match-view/slot-view";
+import { useSaveAllChanges } from "../hooks/useSaveAllChanges";
 
 interface BracketMatchProps {
 	match: Match;
@@ -17,6 +18,7 @@ interface BracketMatchProps {
 const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	const redPlayer = match.player1;
 	const whitePlayer = match.player2;
+    const saveAllChanges = useSaveAllChanges();
 
 	const bracketStatus = useBracketStore(
 		useShallow((state) => state.bracket.status)
@@ -29,9 +31,10 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 		])
 	);
 
-	const handleSubmitScore = () => {
+	const handleSubmitScore = async () => {
 		console.log(`Submitting winner for match`, match.id);
 		submitScore(match.id, winner);
+		await saveAllChanges()
 	};
 
 	const [winner, setWinner] = useState<Participant | null>(null);

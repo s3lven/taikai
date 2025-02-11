@@ -3,30 +3,39 @@ import { useParticipantStore } from "@/stores/participant-store";
 import saveChanges from "@/features/bracket/utils/saveChanges";
 
 export const useSaveAllChanges = () => {
-    const getConsolidatedChanges = useChangeTrackingStore((state) => state.getConsolidatedChanges);
-    const clearChanges = useChangeTrackingStore((state) => state.clearChanges);
-    const hasUnsavedChanges = useChangeTrackingStore((state) => state.hasUnsavedChanges);
-    const generateParticipantChanges = useParticipantStore((state) => state.generateParticipantChanges);
+  const getConsolidatedChanges = useChangeTrackingStore(
+    (state) => state.getConsolidatedChanges
+  );
+  const clearChanges = useChangeTrackingStore((state) => state.clearChanges);
+  const hasUnsavedChanges = useChangeTrackingStore(
+    (state) => state.hasUnsavedChanges
+  );
+  const generateParticipantChanges = useParticipantStore(
+    (state) => state.generateParticipantChanges
+  );
 
-    const saveAllChanges = async () => {
-        if (!hasUnsavedChanges) return;
+  const saveAllChanges = async () => {
+    if (!hasUnsavedChanges) {
+      console.error("There are no changes");
+      return;
+    }
 
-        try {
-            // Generate changes by comparing against initial state
-            generateParticipantChanges();
+    try {
+      // Generate changes by comparing against initial state
+      generateParticipantChanges();
 
-            // Get consolidated changes before saving
-            const consolidatedChanges = getConsolidatedChanges();
-            await saveChanges(consolidatedChanges);
+      // Get consolidated changes before saving
+      const consolidatedChanges = getConsolidatedChanges();
+      await saveChanges(consolidatedChanges);
 
-            useParticipantStore.setState((state) => {
-                state.initialParticipants = state.participants;
-            });
-            clearChanges();
-        } catch (error) {
-            console.error("Failed to save changes", error);
-        }
-    };
+      useParticipantStore.setState((state) => {
+        state.initialParticipants = state.participants;
+      });
+      clearChanges();
+    } catch (error) {
+      console.error("Failed to save changes", error);
+    }
+  };
 
-    return saveAllChanges;
+  return saveAllChanges;
 };
