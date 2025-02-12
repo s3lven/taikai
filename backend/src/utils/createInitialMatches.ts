@@ -89,13 +89,13 @@ export default async function insertInitialMatches(bracketId: number) {
       {
         player1: participants[0],
         player2: participants[1],
-        roundNumber: 1,
+        roundNumber: 0,
         position: 0,
       },
       {
         player1: participants[2],
         player2: participants[3],
-        roundNumber: 1,
+        roundNumber: 0,
         position: 1,
       },
     ],
