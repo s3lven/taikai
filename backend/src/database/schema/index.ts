@@ -80,8 +80,8 @@ export const matches = pgTable('matches', {
   player2: integer('player2')
     .notNull()
     .references(() => participants.id),
-  score1: integer('score1').notNull(), // score for player1
-  score2: integer('score2').notNull(), // score for player2
+  player1Score: integer('score1').notNull(), // score for player1
+  player2Score: integer('score2').notNull(), // score for player2
   winner: integer('winner')
   .notNull()
   .references(() => participants.id),
