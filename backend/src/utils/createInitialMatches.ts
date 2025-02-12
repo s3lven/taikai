@@ -21,9 +21,9 @@ export interface Participant {
 
 export type IpponType = 'Men' | 'Kote' | 'Do' | 'Tsuki' | 'Hantei' | 'Hansoku' | 'None';
 
-async function getParticipantsByBracketId(bracketId: number) {
+export async function getParticipantsByBracketId(bracketId: number) {
   if (isNaN(bracketId)) {
-    throw new Error('Inalid bracket ID provided');
+    throw new Error('Invalid bracket ID provided');
   }
 
   const bracketParticipants = await db
@@ -39,10 +39,12 @@ async function getParticipantsByBracketId(bracketId: number) {
 
   if (bracketParticipants.length > 0) {
     return bracketParticipants as Participant[];
+  } else {
+    throw new Error(`No participants found in bracket ${bracketId}`);
   }
 }
 
-async function generateNewParticipants(bracketId: number) {
+export async function generateNewParticipants(bracketId: number) {
   // Generate default participants if none exist
   const defaultParticipants = Array.from({ length: 4 }, (_, i) => ({
     name: `Player ${i + 1}`,
@@ -79,7 +81,7 @@ async function generateNewParticipants(bracketId: number) {
 
 export default async function insertInitialMatches(bracketId: number) {
   const participants = await generateNewParticipants(bracketId);
-  console.log("Inserted new participants")
+  console.log('Inserted new participants');
   if (!participants) throw new Error(`There are no participants for bracketId ${bracketId}`);
 
   if (participants.length < 2) return [];

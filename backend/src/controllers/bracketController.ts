@@ -4,6 +4,7 @@ import { tournaments, brackets, participants, participantsBracket } from '../dat
 import { and, eq } from 'drizzle-orm';
 import { BracketWithTournamentName } from '../types';
 import { Change, ChangeType } from '../types/changes';
+import { generateNewParticipants } from '../utils/createInitialMatches';
 
 export const getBracket = async (req: Request, res: Response) => {
   console.info('[INFO]: Fetching bracket');
@@ -51,6 +52,8 @@ export const addBracket = async (req: Request, res: Response) => {
       .insert(brackets)
       .values({ name, status: 'Editing', participantCount: 0, tournamentId })
       .returning({ id: brackets.id });
+
+    await generateNewParticipants(newBracket.id);
 
     res.status(201).json({ id: newBracket.id });
   } catch (error) {

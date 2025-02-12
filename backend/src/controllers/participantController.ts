@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { db } from '../database';
-import { participants, participantsBracket } from '../database/schema';
-import { eq } from 'drizzle-orm';
+import { getParticipantsByBracketId } from '../utils/createInitialMatches';
 
 export const getParticipants = async (req: Request, res: Response) => {
   console.info('[INFO]: Fetching bracket');
@@ -9,24 +7,8 @@ export const getParticipants = async (req: Request, res: Response) => {
     // Extract the id from the request parameters
     const bracketId = parseInt(req.params.id as string);
 
-    if (isNaN(bracketId)) {
-      res.status(400).json({
-        error: 'Invalid bracket ID provided',
-      });
-      return;
-    }
-
     // Fetch participants associated with the bracket
-    const bracketParticipants = await db
-      .select({
-        id: participants.id,
-        name: participants.name,
-        sequence: participantsBracket.sequence,
-      })
-      .from(participantsBracket)
-      .leftJoin(participants, eq(participants.id, participantsBracket.participantId))
-      .where(eq(participantsBracket.bracketId, bracketId))
-      .orderBy(participantsBracket.sequence);
+    const bracketParticipants = await getParticipantsByBracketId(bracketId)
 
     res.status(200).json({
       participants: bracketParticipants,
@@ -38,7 +20,6 @@ export const getParticipants = async (req: Request, res: Response) => {
     } else {
       res.status(500).json({ error: 'Failed to fetch participants' });
     }
-    return;
   }
   console.info('[INFO]: Finished fetching participants');
 };
