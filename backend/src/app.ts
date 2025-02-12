@@ -5,6 +5,7 @@ import cors from 'cors';
 import tournamentRoutes from './routes/tournamentRoutes';
 import bracketRoutes from './routes/bracketRoutes';
 import participantRoutes from './routes/participantRoutes'
+import matchesRoutes from './routes/matchesRoutes'
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.get('/', (_req: Request, res: Response) => {
 app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/brackets', bracketRoutes);
 app.use('/api/participants', participantRoutes)
+app.use('/api/matches', matchesRoutes)
 
 app.listen(port, () => {
   console.log(`[SERVER]: Server is running on port ${port}`);

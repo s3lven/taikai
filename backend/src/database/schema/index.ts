@@ -8,6 +8,7 @@ import {
   integer,
   primaryKey,
   timestamp,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 
 export const tournaments = pgTable('tournaments', {
@@ -74,17 +75,11 @@ export const matches = pgTable('matches', {
   bracketId: integer('bracket_id').references(() => brackets.id, { onDelete: 'cascade' }),
   roundNumber: integer('round_number').notNull(),
   position: integer('position').notNull(),
-  player1: integer('player1')
-    .notNull()
-    .references(() => participants.id),
-  player2: integer('player2')
-    .notNull()
-    .references(() => participants.id),
-  player1Score: integer('score1').notNull(), // score for player1
-  player2Score: integer('score2').notNull(), // score for player2
-  winner: integer('winner')
-  .notNull()
-  .references(() => participants.id),
+  player1: integer('player1').references(() => participants.id),
+  player2: integer('player2').references(() => participants.id),
+  player1Score: jsonb('player1_score').default([]).notNull(),
+  player2Score: jsonb('player2_score').default([]).notNull(),
+  winner: integer('winner').references(() => participants.id),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
