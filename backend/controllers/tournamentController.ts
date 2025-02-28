@@ -14,6 +14,17 @@ export class TournamentController {
     }
   }
 
+    async getBracketsByTournamentID(req: Request, res: Response, next: NextFunction) {
+      try {
+        const id = parseInt(req.params.id)
+        console.info(`[INFO]: Getting brackets from tournament ${id}`)
+        const brackets = await tournamentService.getBracketsByTournamentID(id)
+        res.json({ message: "Getting brackets", payload: brackets})
+      } catch (error) {
+        next(error)
+      }
+    }
+
   async createTournament(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, location, date } = req.body;

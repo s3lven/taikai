@@ -7,6 +7,10 @@ router.get("/", async (req, res, next) => {
   tournamentController.getTournaments(req, res, next);
 });
 
+router.get("/:id/brackets", async (req, res, next) => {
+  tournamentController.getBracketsByTournamentID(req, res, next);
+});
+
 router.post("/", async (req, res, next) => {
   tournamentController.createTournament(req, res, next);
 });

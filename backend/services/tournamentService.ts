@@ -1,6 +1,7 @@
 import pool from "../db";
+import { Bracket } from "../models/bracketModel";
 import { Tournament } from "../models/tournamentModel";
-import { TournamentDTO } from "../types";
+import { BracketDTO, TournamentDTO } from "../types";
 import { AppError } from "../utils/AppError";
 
 export class TournamentService {
@@ -11,7 +12,41 @@ export class TournamentService {
         .orderBy("id", "desc");
       return result;
     } catch (error: any) {
-      throw new AppError("Internal server error", 500);
+      throw new AppError();
+    }
+  }
+
+  async getBracketsByTournamentID(id: number): Promise<BracketDTO[]> {
+    try {
+      // Check if tournament id exists
+      const tournamentExists = await pool<Tournament>("tournaments")
+        .select("*")
+        .where("id", id)
+        .first();
+
+      if (!tournamentExists)
+        throw new AppError(`Tournament ${id} does not exist`, 404);
+
+      // Get the brackets
+      const result = await pool<Bracket>("brackets")
+        .where("tournament_id", id)
+        .select("id", "tournament_id", "name", "type", "status")
+        .orderBy("id", "desc");
+      if (!result)
+        throw new AppError(`There are no bracktes for tournament ${id}`, 404);
+
+      // Format brackets
+      const brackets: BracketDTO[] = result.map((bracket) => ({
+        id: bracket.id,
+        tournamentID: bracket.tournament_id,
+        name: bracket.name,
+        type: bracket.type,
+        status: bracket.status,
+      }));
+      return brackets;
+    } catch (error: any) {
+      if (error instanceof AppError) throw error;
+      else throw new AppError();
     }
   }
 
@@ -45,9 +80,13 @@ export class TournamentService {
     } catch (error: any) {
       console.log(error, typeof error);
       if (error instanceof AppError) throw error;
-      else if (error.code === "22008") throw new AppError(`Date ${data.date} is invalid`, 400)
+      else if (error.code === "22008")
+        throw new AppError(`Date ${data.date} is invalid`, 400);
       else if (error.code === "23514")
-        throw new AppError(`Tournament status ${data.status} is not valid`, 400);
+        throw new AppError(
+          `Tournament status ${data.status} is not valid`,
+          400
+        );
       else throw new AppError("Internal sever error", 500);
     }
   }
@@ -58,7 +97,7 @@ export class TournamentService {
       if (!deleted) throw new AppError(`Tournament ${id} not found`, 404);
     } catch (error: any) {
       if (error instanceof AppError) throw error;
-      else throw new AppError("Internal server error", 500);
+      else throw new AppError();
     }
   }
 }

@@ -19,7 +19,7 @@ export class BracketService {
       }));
       return brackets;
     } catch (error: any) {
-      throw new AppError("Internal server error", 500);
+      throw new AppError();
     }
   }
 
@@ -56,7 +56,7 @@ export class BracketService {
       else if (error.code === "23514") {
         throw new AppError("Bracket already exists", 400);
       } else {
-        throw new AppError("Internal Server Error", 500);
+        throw new AppError();
       }
     }
   }
@@ -67,7 +67,7 @@ export class BracketService {
       if (!deleted) throw new AppError(`Bracket ${id} not found`, 404);
     } catch (error: any) {
       if (error instanceof AppError) throw error;
-      else throw new AppError("Internal server error", 500);
+      else throw new AppError();
     }
   }
 }
