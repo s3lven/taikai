@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { tournamentService } from "../services/tournamentService";
 import { AppError } from "../utils/AppError";
+import { Tournament } from "../models/tournamentModel";
 
 export class TournamentController {
   async getTournaments(req: Request, res: Response, next: NextFunction) {
@@ -29,6 +30,39 @@ export class TournamentController {
       res
         .status(201)
         .json({ message: "Creating Tournaments", payload: newTournament });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async editTournament(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tournamentID = parseInt(req.params.id);
+      if (isNaN(tournamentID)) {
+        throw new AppError(`Invalid tournament ID ${tournamentID}`);
+      }
+      const { name, location, date, status } = req.body;
+      console.info(`[INFO]: Updating tournament ${tournamentID}`);
+
+      if (!name || !location || !date || !status) {
+        throw new AppError(`Required fields are missing`, 400);
+      }
+
+      const tournament: Partial<Tournament> = {
+        name,
+        location,
+        date,
+        status,
+      };
+
+      const updatedTournament = await tournamentService.editTournament(
+        tournamentID,
+        tournament
+      );
+      res.json({
+        message: `Updated test ${tournamentID}`,
+        payload: updatedTournament,
+      });
     } catch (error) {
       next(error);
     }

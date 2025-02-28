@@ -7,12 +7,7 @@ export class TournamentService {
   async getTournaments(): Promise<TournamentDTO[]> {
     try {
       const result = await pool<Tournament>("tournaments")
-        .select(
-          "id",
-          "name",
-          "location",
-          "date",
-          "status"        )
+        .select("id", "name", "location", "date", "status")
         .orderBy("id", "desc");
       return result;
     } catch (error: any) {
@@ -25,13 +20,7 @@ export class TournamentService {
       throw new AppError("Missing required fields", 400);
     const result = await pool<Tournament>("tournaments")
       .insert(data)
-      .returning([
-        "id",
-        "name",
-        "location",
-        "date",
-        "status",
-      ]);
+      .returning(["id", "name", "location", "date", "status"]);
     const newTask: TournamentDTO = {
       id: result[0].id,
       name: result[0].name,
@@ -40,6 +29,27 @@ export class TournamentService {
       status: result[0].status,
     };
     return newTask;
+  }
+
+  async editTournament(id: number, data: Partial<Tournament>) {
+    try {
+      const result = await pool<Tournament>("tournaments")
+        .where("id", id)
+        .update(data)
+        .returning("*");
+      if (!result) throw new AppError(`Tournament ${id} not found`, 404);
+      const updatedTournament: TournamentDTO = {
+        ...result[0],
+      };
+      return updatedTournament;
+    } catch (error: any) {
+      console.log(error, typeof error);
+      if (error instanceof AppError) throw error;
+      else if (error.code === "22008") throw new AppError(`Date ${data.date} is invalid`, 400)
+      else if (error.code === "23514")
+        throw new AppError(`Tournament status ${data.status} is not valid`, 400);
+      else throw new AppError("Internal sever error", 500);
+    }
   }
 
   async deleteTournament(id: number): Promise<void> {
