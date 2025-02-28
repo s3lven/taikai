@@ -1,7 +1,9 @@
+import { Knex } from "knex";
 import pool from "../db";
 import { Bracket } from "../models/bracketModel";
 import { Tournament } from "../models/tournamentModel";
 import { BracketDTO } from "../types";
+import { Change } from "../types/changes";
 import { AppError } from "../utils/AppError";
 
 export class BracketService {
@@ -68,6 +70,82 @@ export class BracketService {
     } catch (error: any) {
       if (error instanceof AppError) throw error;
       else throw new AppError();
+    }
+  }
+
+  async batchUpdateBracket(changes: Change[]) {
+    try {
+      const sortedChanges = changes.sort(
+        (a: Change, b: Change) => a.timestamp - b.timestamp
+      );
+
+      await pool.transaction(async (trx) => {
+        for (const change of sortedChanges) {
+          const { entityType, entityId, changeType, payload } = change;
+
+          switch (entityType) {
+            case "bracket":
+              await this.processBracketChange(
+                changeType,
+                entityId,
+                payload,
+                trx
+              );
+              break;
+            case "participant":
+              break;
+            default:
+              throw new AppError(`Unsupported entity type ${entityType}`);
+          }
+        }
+      });
+    } catch (error: any) {
+      console.error(error);
+      if (error instanceof AppError) throw error;
+      else if (error.code === "23514")
+        throw new AppError(`Tournament payload is not valid`, 400);
+      throw new AppError();
+    }
+  }
+
+  /* 
+    Changes that can be made are name, type, and status.
+    If the payload tries to change bracket id or tournament id, it will throw an error
+  */
+  async processBracketChange(
+    changeType: string,
+    bracketId: number,
+    payload: any,
+    trx: Knex.Transaction<any, any[]>
+  ) {
+    // Get bracket to ensure it exists and check status
+    const bracket = await trx<Bracket>("brackets")
+      .where({ id: bracketId })
+      .first();
+
+    if (!bracket) {
+      throw new AppError(`Bracket with ID ${bracketId} not found`, 404);
+    }
+
+    if (bracket.status !== "Editing") {
+      throw new AppError(
+        "Cannot save changes: bracket is not in editing mode",
+        400
+      );
+    }
+
+    if ("id" in payload || "tournament_id" in payload) {
+      throw new AppError("Cannot modify bracket or tournament IDs", 400);
+    }
+
+    switch (changeType) {
+      case "update":
+        await trx<Bracket>("brackets").where({ id: bracketId }).update(payload);
+        break;
+      default:
+        throw new AppError(
+          `Unsupported change type for bracket: ${changeType}`
+        );
     }
   }
 }

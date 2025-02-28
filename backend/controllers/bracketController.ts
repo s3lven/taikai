@@ -39,7 +39,19 @@ export class BracketController {
       const id = parseInt(req.params.id);
       console.info(`[INFO]: Deleting bracket ${id}`);
       await bracketService.deleteBracket(id);
-      res.status(204).json({ message: `Deleted bracket ${id}` });
+      res.json({ message: `Deleted bracket ${id}` });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async batchUpdateBracket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { changes } = req.body;
+      console.info(`[INFO]: Making batch updates`);
+
+      await bracketService.batchUpdateBracket(changes)
+      res.json({ message: 'Changes were successful'})
     } catch (error) {
       next(error);
     }

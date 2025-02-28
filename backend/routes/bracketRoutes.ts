@@ -11,10 +11,8 @@ router.post("/", async (req, res, next) => {
   bracketController.createBracket(req, res, next);
 });
 
-router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-
-  res.json({ message: `Editing bracket ${id}` });
+router.put("/batch-update", async (req, res, next) => {
+  bracketController.batchUpdateBracket(req, res, next);
 });
 
 router.delete("/:id", async (req, res, next) => {
