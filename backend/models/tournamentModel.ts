@@ -6,5 +6,4 @@ export interface Tournament {
   status: TournamentStatusType;
   location: string;
   date: string;
-  participant_count: number;
 }
