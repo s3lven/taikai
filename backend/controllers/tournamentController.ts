@@ -15,9 +15,9 @@ export class TournamentController {
 
   async createTournament(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, location, date, participantCount } = req.body;
+      const { name, location, date } = req.body;
       console.info(`[INFO]: Creating new tournament ${name}`);
-      if (!name || !location || !date || !participantCount) {
+      if (!name || !location || !date) {
         throw new AppError("Required fields are missing", 400);
       }
 
@@ -25,7 +25,6 @@ export class TournamentController {
         name,
         location,
         date,
-        participant_count: participantCount,
       });
       res
         .status(201)

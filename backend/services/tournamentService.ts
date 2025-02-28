@@ -12,9 +12,7 @@ export class TournamentService {
           "name",
           "location",
           "date",
-          "status",
-          "participant_count as participantCount"
-        )
+          "status"        )
         .orderBy("id", "desc");
       return result;
     } catch (error: any) {
@@ -23,7 +21,7 @@ export class TournamentService {
   }
 
   async createTournament(data: Partial<Tournament>): Promise<TournamentDTO> {
-    if (!data.name || !data.location || !data.date || !data.participant_count)
+    if (!data.name || !data.location || !data.date)
       throw new AppError("Missing required fields", 400);
     const result = await pool<Tournament>("tournaments")
       .insert(data)
@@ -33,7 +31,6 @@ export class TournamentService {
         "location",
         "date",
         "status",
-        "participant_count",
       ]);
     const newTask: TournamentDTO = {
       id: result[0].id,
@@ -41,7 +38,6 @@ export class TournamentService {
       location: result[0].location,
       date: result[0].date,
       status: result[0].status,
-      participantCount: result[0].participant_count,
     };
     return newTask;
   }
