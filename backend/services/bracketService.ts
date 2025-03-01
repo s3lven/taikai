@@ -2,11 +2,12 @@ import { Knex } from "knex";
 import pool from "../db";
 import { Bracket, BracketStatusType } from "../models/bracketModel";
 import { Tournament } from "../models/tournamentModel";
-import { BracketDTO } from "../types";
+import { BracketDTO, ClientParticipant } from "../types";
 import { Change } from "../types/changes";
 import { AppError } from "../utils/AppError";
 import { Participant } from "../models/participantModel";
 import { BracketParticipant } from "../models/bracketParticipantModel";
+import { Match } from "../models/matchModel";
 
 export class BracketService {
   async getBrackets(): Promise<BracketDTO[]> {
@@ -230,7 +231,7 @@ export class BracketService {
         );
       }
 
-      await pool.transaction(async (trx) => {
+      return await pool.transaction(async (trx) => {
         // Save any changes
         if (changes) await this.batchUpdateBracket(changes);
 
@@ -238,7 +239,7 @@ export class BracketService {
         await this.updateBracketStatus(id, "In Progress", trx);
 
         // Construct matches and save in database
-        // await createInitialMatches(id, trx);
+        return await this.createInitialMatches(id, trx);
       });
     } catch (error: any) {
       if (error instanceof AppError) throw error;
@@ -299,45 +300,121 @@ export class BracketService {
   }
 
   async createInitialMatches(bracketId: number, trx: Knex.Transaction) {
-    async function createSingleElimMatches() {
-      for (let i = 0; i < firstRoundMatches; i++) {
-        const seedPosition1 = i + 1;
-        const seedPosition2 = totalSlots - i;
-
-        const participant1 = participants[seedPosition1 - 1] || null;
-        const participant2 = participants[seedPosition2 - 1] || null;
-
-        const match = {
-          bracket_id: bracketId,
-        };
-      }
-    }
-
-    // 1. Get bracket information including participants and bracket type
+    // Get bracket information including participants and bracket type
     const bracket = await trx<Bracket>("brackets")
       .where({ id: bracketId })
       .first();
 
     if (!bracket) {
-      throw new Error(`Bracket with ID ${bracketId} not found`);
+      throw new AppError(`Bracket with ID ${bracketId} not found`);
     }
 
-    // 2. Get all participants in this bracket
-    const participants = await trx("bracket_participants")
-      .where({ bracket_id: bracketId })
-      .orderBy("sequence", "asc");
+    const participants: ClientParticipant[] = await trx<Participant>(
+      "participants"
+    )
+      .select("participants.*", "bracket_participants.sequence")
+      .join(
+        "bracket_participants",
+        "participants.id",
+        "=",
+        "bracket_participants.participant_id"
+      );
 
-    // 3. Determine bracket structure based on participant count
     const participantCount = participants.length;
+    const rounds = Math.ceil(Math.log2(participantCount));
 
-    // Get the next power of 2 to determine total slots
-    const totalSlots = Math.pow(2, Math.ceil(Math.log2(participantCount)));
-    const firstRoundMatches = totalSlots / 2;
-    const byes = totalSlots - participantCount;
+    async function createSingleElimMatches() {
+      const changeIntoBye = (seed: number) => {
+        return seed <= participantCount
+          ? participants.find((player) => player.sequence === seed)!
+          : null;
+      };
+
+      // Single Elimination Algorithm
+      const createMapping = () => {
+        let matches: (ClientParticipant | null)[][] = [
+          [
+            participants.find((player) => player.sequence === 1)!,
+            participants.find((player) => player.sequence === 2)!,
+          ],
+        ];
+        for (let currRound = 1; currRound < rounds; currRound++) {
+          const roundMatches = [];
+          const sum = Math.pow(2, currRound + 1) + 1;
+          for (const match of matches) {
+            let player1 = changeIntoBye(match[0]!.sequence);
+            let player2 = changeIntoBye(sum - match[0]!.sequence);
+            roundMatches.push([player1, player2]);
+            player1 = changeIntoBye(sum - match[1]!.sequence);
+            player2 = changeIntoBye(match[1]!.sequence);
+            roundMatches.push([player1, player2]);
+          }
+          matches = roundMatches;
+        }
+
+        // Match construction
+        const bracket: Omit<Match, "id">[] = matches.map(
+          (match, matchIndex) => ({
+            bracket_id: bracketId,
+            player1: match[0],
+            player2: match[1],
+            player1_score: [],
+            player2_score: [],
+            winner: null,
+            round: 0,
+            match: matchIndex,
+            bye_match: false,
+          })
+        );
+        return bracket;
+      };
+
+      const matches: Omit<Match, "id">[] = [];
+      const initialMatches = createMapping();
+      const initialMatchCount = initialMatches.length;
+
+      // Create placeholder matches
+      matches.push(...initialMatches);
+      for (let round = 1; round < rounds; round++) {
+        const roundMatchCount = initialMatchCount / Math.pow(2, round);
+        for (let match = 0; match < roundMatchCount; match++) {
+          matches.push({
+            bracket_id: bracketId,
+            player1: null,
+            player2: null,
+            player1_score: [],
+            player2_score: [],
+            winner: null,
+            round,
+            match,
+            bye_match: false,
+          });
+        }
+      }
+
+      // Process bye rounds and advance players
+      const firstRoundMatches = matches.filter((match) => match.round === 0);
+      firstRoundMatches.forEach((match, matchIndex) => {
+        const nextRoundMatch = matches.find(
+          (m) => m.round === 1 && m.match === Math.floor(matchIndex / 2)
+        );
+
+        if (nextRoundMatch) {
+          if (match.player1 === null) {
+            nextRoundMatch.player2 = match.player2;
+            match.bye_match = true;
+          } else if (match.player2 === null) {
+            nextRoundMatch.player1 = match.player1;
+          }
+        }
+      });
+
+      return matches;
+    }
 
     switch (bracket.type) {
       case "Single Elimination":
-        await createSingleElimMatches();
+        return await createSingleElimMatches();
         break;
       case "Double Elimination":
       case "Round Robin":

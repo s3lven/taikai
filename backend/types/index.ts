@@ -3,6 +3,8 @@ import {
   BracketStatusType,
   BracketType,
 } from "../models/bracketModel";
+import { BracketParticipant } from "../models/bracketParticipantModel";
+import { Participant } from "../models/participantModel";
 import { TournamentStatusType } from "../models/tournamentModel";
 
 export interface TournamentDTO {
@@ -21,3 +23,6 @@ export interface BracketDTO {
   status: BracketStatusType;
   type: BracketType;
 }
+
+export type ClientParticipant = Participant &
+  Pick<BracketParticipant, "sequence">;
