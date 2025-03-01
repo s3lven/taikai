@@ -28,6 +28,77 @@ export class BracketService {
     }
   }
 
+  async getBracketInfo(id: number) {
+    try {
+      // Get bracket details
+      const bracket = await pool<Bracket>("brackets").where({ id }).first();
+      if (!bracket) throw new AppError(`Bracket ${id} was not found`, 404);
+
+      // Get all participants in the bracket
+      const participants: ClientParticipant[] = await pool<BracketParticipant>(
+        "participants"
+      )
+        .select(["participants.*", "bracket_participants.sequence"])
+        .join(
+          "bracket_participants",
+          "participants.id",
+          "=",
+          "bracket_participants.participant_id"
+        )
+        .where("bracket_participants.bracket_id", id)
+        .orderBy("bracket_participants.sequence", "asc");
+
+        console.log(participants)
+
+      // Get all matches
+      const matches: Match[] = await pool<Match>("matches")
+        .where("bracket_id", id)
+        .orderBy([
+          { column: "round", order: "asc" },
+          { column: "match", order: "asc" },
+        ]);
+
+      console.log(matches)
+
+      // Create a map for easy participant lookup
+      const participantsMap = new Map();
+      participants.forEach((p) => {
+        participantsMap.set(p.id, p);
+      });
+
+      console.log(participantsMap);
+
+      // Transform matches to include full participant objects
+      const matchesWithParticipants = matches.map((match) => ({
+        id: match.id,
+        bracket_id: match.bracket_id,
+        player1: match.player1_id
+          ? participantsMap.get(match.player1_id) || null
+          : null,
+        player2: match.player2_id
+          ? participantsMap.get(match.player2_id) || null
+          : null,
+        player1_score: match.player1_score || [],
+        player2_score: match.player2_score || [],
+        winner: match.winner_id
+          ? participantsMap.get(match.winner_id) || null
+          : null,
+        round: match.round,
+        match: match.match,
+        bye_match: match.bye_match,
+      }));
+
+      return {
+        bracket,
+        participants,
+        matches: matchesWithParticipants,
+      };
+    } catch (error: any) {
+      console.error(error);
+      throw new AppError();
+    }
+  }
+
   async createBracket(data: Partial<Bracket>): Promise<BracketDTO> {
     try {
       if (!data.tournament_id || !data.name || !data.type)

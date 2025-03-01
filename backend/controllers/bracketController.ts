@@ -13,6 +13,17 @@ export class BracketController {
     }
   }
 
+  async getBracketInfo(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id)
+      console.info(`[INFO]: Get info for bracket ${id}`);
+      const data = await bracketService.getBracketInfo(id);
+      res.json({ message: "Getting brackets", payload: data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createBracket(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, tournamentID, type } = req.body;

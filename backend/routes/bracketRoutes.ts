@@ -7,6 +7,10 @@ router.get("/", async (req, res, next) => {
   bracketController.getBrackets(req, res, next);
 });
 
+router.get("/:id", async (req, res, next) => {
+  bracketController.getBracketInfo(req, res, next);
+});
+
 router.post("/", async (req, res, next) => {
   bracketController.createBracket(req, res, next);
 });
