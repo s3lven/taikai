@@ -27,4 +27,12 @@ router.patch("/:id/reset", async (req, res, next) => {
   bracketController.resetBracket(req, res, next);
 });
 
+router.patch("/:id/open", async (req, res, next) => {
+  bracketController.openBracket(req, res, next);
+});
+
+router.patch("/:id/complete", async (req, res, next) => {
+  bracketController.completeBracket(req, res, next);
+});
+
 export default router;

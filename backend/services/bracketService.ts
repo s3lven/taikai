@@ -138,7 +138,7 @@ export class BracketService {
 
     if (bracket.status !== "Editing") {
       throw new AppError(
-        "Cannot save changes: bracket is not in editing mode",
+        "Cannot save changes: bracket is not in Editing mode",
         400
       );
     }
@@ -292,9 +292,62 @@ export class BracketService {
     }
   }
 
-  async openBracket(id: number) {}
+  async openBracket(id: number) {
+    try {
+      // Get bracket to ensure it exists and check status
+      const bracket = await pool<Bracket>("brackets").where({ id }).first();
 
-  async completeBracket(id: number) {}
+      if (!bracket) {
+        throw new AppError(`Bracket with ID ${id} not found`, 404);
+      }
+
+      if (bracket.status !== "Completed") {
+        throw new AppError(
+          "Cannot open bracket: bracket is not Completed",
+          400
+        );
+      }
+
+      // Change Status
+      await pool.transaction(async (trx) => {
+        // Update the status
+        await this.updateBracketStatus(id, "In Progress", trx);
+      });
+    } catch (error: any) {
+      console.error(error);
+      if (error instanceof AppError) throw error;
+      else throw new AppError();
+    }
+  }
+
+  async completeBracket(id: number) {
+    try {
+      // Get bracket to ensure it exists and check status
+      const bracket = await pool<Bracket>("brackets").where({ id }).first();
+
+      if (!bracket) {
+        throw new AppError(`Bracket with ID ${id} not found`, 404);
+      }
+
+      // Optional: Check if all the matches in the bracket have a winner
+      if (bracket.status !== "In Progress") {
+        throw new AppError(
+          "Cannot complete bracket: bracket is not In Progress",
+          400
+        );
+      }
+
+      // Change Status
+      await pool.transaction(async (trx) => {
+        // Update the status
+        await this.updateBracketStatus(id, "Completed", trx);
+      });
+    } catch (error: any) {
+      console.error(error);
+      if (error instanceof AppError) throw error;
+      else throw new AppError();
+    }
+  }
 
   /**
    * Update the status of a bracket
