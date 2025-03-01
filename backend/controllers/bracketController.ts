@@ -15,7 +15,7 @@ export class BracketController {
 
   async getBracketInfo(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id)
+      const id = parseInt(req.params.id);
       console.info(`[INFO]: Get info for bracket ${id}`);
       const data = await bracketService.getBracketInfo(id);
       res.json({ message: "Getting brackets", payload: data });
@@ -80,6 +80,7 @@ export class BracketController {
       next(error);
     }
   }
+
   async resetBracket(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
@@ -90,6 +91,7 @@ export class BracketController {
       next(error);
     }
   }
+
   async openBracket(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);
@@ -100,6 +102,7 @@ export class BracketController {
       next(error);
     }
   }
+  
   async completeBracket(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id);

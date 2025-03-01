@@ -1,5 +1,5 @@
-export type ChangeEntityType = 'bracket' | 'participant'
-export type ChangeType = 'create' | 'update' | 'delete' | 'move' | 'shuffle'
+export type ChangeEntityType = 'bracket' | 'participant' | 'matches'
+export type ChangeType = 'create' | 'update' | 'delete'
 
 export interface Change {
     entityType: ChangeEntityType,

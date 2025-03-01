@@ -3,7 +3,7 @@ import pool from "../db";
 import { Bracket, BracketStatusType } from "../models/bracketModel";
 import { Tournament } from "../models/tournamentModel";
 import { BracketDTO, ClientParticipant } from "../types";
-import { Change } from "../types/changes";
+import { Change, ChangeType } from "../types/changes";
 import { AppError } from "../utils/AppError";
 import { Participant } from "../models/participantModel";
 import { BracketParticipant } from "../models/bracketParticipantModel";
@@ -174,6 +174,14 @@ export class BracketService {
                 trx
               );
               break;
+            case "matches":
+              await this.processMatchChanges(
+                changeType,
+                entityId,
+                payload,
+                trx
+              );
+              break;
             default:
               throw new AppError(`Unsupported entity type ${entityType}`);
           }
@@ -193,7 +201,7 @@ export class BracketService {
     If the payload tries to change bracket id or tournament id, it will throw an error
   */
   async processBracketChange(
-    changeType: string,
+    changeType: ChangeType,
     bracketId: number,
     payload: any,
     trx: Knex.Transaction<any, any[]>
@@ -224,7 +232,8 @@ export class BracketService {
         break;
       default:
         throw new AppError(
-          `Unsupported change type for bracket: ${changeType}`
+          `Unsupported change type for bracket: ${changeType}`,
+          404
         );
     }
   }
@@ -235,7 +244,7 @@ export class BracketService {
     "delete": {participantId}
   */
   async processParticipantChange(
-    changeType: string,
+    changeType: ChangeType,
     participantId: number,
     payload: any,
     trx: Knex.Transaction<any, any[]>
@@ -296,7 +305,45 @@ export class BracketService {
         break;
       default:
         throw new AppError(
-          `Unsupported change type for participant: ${changeType}`
+          `Unsupported change type for participant: ${changeType}`,
+          404
+        );
+    }
+  }
+
+  // Users should only be allowed to update score, winner, and players
+  async processMatchChanges(
+    changeType: ChangeType,
+    bracketId: number,
+    payload: any,
+    trx: Knex.Transaction<any, any[]>
+  ) {
+    // Get bracket to ensure it exists and check status
+    const bracket = await trx<Bracket>("brackets")
+      .where({ id: bracketId })
+      .first();
+
+    if (!bracket) {
+      throw new AppError(`Bracket with ID ${bracketId} not found`, 404);
+    }
+
+    if (bracket.status !== "In Progress") {
+      throw new AppError(
+        "Cannot save changes: bracket is not In Progress",
+        400
+      );
+    }
+
+    switch (changeType) {
+      case "update":
+        await trx<Participant>("matches")
+          .where({ id: payload.id })
+          .update(payload);
+        break;
+      default:
+        throw new AppError(
+          `Unsupported change type for matches: ${changeType}`,
+          404
         );
     }
   }
