@@ -238,10 +238,21 @@ export class BracketService {
         // Update the status
         await this.updateBracketStatus(id, "In Progress", trx);
 
-        // Construct matches and save in database
-        return await this.createInitialMatches(id, trx);
+        // Construct matches
+        const matches = await this.createInitialMatches(id, trx);
+        console.log("Created matches:", matches);
+
+        // Save matches in the database
+        for (const match of matches) {
+          const inserted = await trx<Match>("matches").insert(match);
+          if (!inserted)
+            throw new AppError(
+              `Failed to insert new match: bracket ${match.bracket_id}-${match.round}-${match.match}`
+            );
+        }
       });
     } catch (error: any) {
+      console.error(error);
       if (error instanceof AppError) throw error;
       else throw new AppError();
     }
@@ -268,8 +279,14 @@ export class BracketService {
         // Update the status
         await this.updateBracketStatus(id, "Editing", trx);
         // Drop the matches
+        const deleted = await trx<Match>("matches")
+          .where({ bracket_id: id })
+          .del();
+        if (!deleted)
+          throw new AppError(`Could not delete matches for bracket ${id}`);
       });
     } catch (error: any) {
+      console.error(error);
       if (error instanceof AppError) throw error;
       else throw new AppError();
     }
@@ -356,11 +373,11 @@ export class BracketService {
         const bracket: Omit<Match, "id">[] = matches.map(
           (match, matchIndex) => ({
             bracket_id: bracketId,
-            player1: match[0],
-            player2: match[1],
+            player1_id: match[0]?.id || null,
+            player2_id: match[1]?.id || null,
             player1_score: [],
             player2_score: [],
-            winner: null,
+            winner_id: null,
             round: 0,
             match: matchIndex,
             bye_match: false,
@@ -380,11 +397,11 @@ export class BracketService {
         for (let match = 0; match < roundMatchCount; match++) {
           matches.push({
             bracket_id: bracketId,
-            player1: null,
-            player2: null,
+            player1_id: null,
+            player2_id: null,
             player1_score: [],
             player2_score: [],
-            winner: null,
+            winner_id: null,
             round,
             match,
             bye_match: false,
@@ -400,11 +417,11 @@ export class BracketService {
         );
 
         if (nextRoundMatch) {
-          if (match.player1 === null) {
-            nextRoundMatch.player2 = match.player2;
+          if (match.player1_id === null) {
+            nextRoundMatch.player2_id = match.player2_id;
             match.bye_match = true;
-          } else if (match.player2 === null) {
-            nextRoundMatch.player1 = match.player1;
+          } else if (match.player2_id === null) {
+            nextRoundMatch.player1_id = match.player1_id;
           }
         }
       });
@@ -415,12 +432,15 @@ export class BracketService {
     switch (bracket.type) {
       case "Single Elimination":
         return await createSingleElimMatches();
-        break;
       case "Double Elimination":
+        console.log("Creating Double Elimination Matches");
+        return [];
       case "Round Robin":
+        console.log("Creating Round Robin Matches");
+        return [];
       case "Swiss":
-        console.log("Creating matches");
-        break;
+        console.log("Creating Swiss Matches");
+        return [];
       default:
         throw new AppError(`Unknown bracket status ${bracket.type}`);
     }

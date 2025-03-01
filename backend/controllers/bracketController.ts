@@ -63,8 +63,8 @@ export class BracketController {
       const { changes } = req.body;
 
       console.info(`[INFO]: Running bracket ${id}`);
-      const matches = await bracketService.runBracket(id, changes);
-      res.json({ message: `Ran bracket ${id}`, matches });
+      await bracketService.runBracket(id, changes);
+      res.json({ message: `Ran bracket ${id}` });
     } catch (error) {
       next(error);
     }
