@@ -9,8 +9,8 @@ const DashboardPage = () => {
   const {
     editingTournament,
     viewingTournament,
-    isAddingTournament,
-    setIsAddingTournament,
+    isAddingDialogOpen,
+    setIsAddingDialogOpen,
   } = useTournamentStore();
 
   return (
@@ -20,7 +20,7 @@ const DashboardPage = () => {
         <Button
           className="bg-figma_shade2 hover:bg-figma_shade2/90 text-white 
                     transition-transform hover:scale-105 duration-300"
-          onClick={() => setIsAddingTournament(true)}
+          onClick={() => setIsAddingDialogOpen(true)}
         >
           Create New Taikai
         </Button>
@@ -31,7 +31,7 @@ const DashboardPage = () => {
       {/* Show Dialogs/Modals on the page-level*/}
       {editingTournament && <TournamentEditDialog />}
       {viewingTournament && <TournamentViewDialog />}
-      {isAddingTournament && <TournamentNewDialog />}
+      {isAddingDialogOpen && <TournamentNewDialog />}
     </div>
   );
 };
