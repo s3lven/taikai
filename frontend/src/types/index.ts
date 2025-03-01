@@ -1,3 +1,4 @@
+// Constants
 export type TournamentStatusType = "Active" | "Upcoming" | "Past";
 export type BracketRoundType =
 	| `Round ${number}`
@@ -14,6 +15,10 @@ export const hitMap: Record<IpponType, string> = {
 	Hansoku: "HS",
 	None: "",
 };
+export type BracketType = "Single Elimination" | "Double Elimination" | "Round Robin" | "Swiss"
+export type BracketStatusType = "Editing" | "In Progress" | "Completed";
+export type PlayerColorType = "Red" | "White"
+
 
 export interface Tournament {
 	id: number;
@@ -21,19 +26,19 @@ export interface Tournament {
 	status: TournamentStatusType;
 	location: string;
 	date: string;
-	participantCount: number;
+	// participantCount: number;
 	brackets: Bracket[];
 }
 export type CreateTournament = Omit<Tournament, "brackets" | "id">;
 
-export type BracketStatusType = "Editing" | "In Progress" | "Completed";
+
 export interface Bracket {
 	id: number;
 	name: string;
 	status: BracketStatusType;
-	participantCount: number;
-	type: string;
-	progress: number;
+	// participantCount: number;
+	type: BracketType;
+	// progress: number;
 }
 
 export type BracketData = Bracket & {
@@ -49,7 +54,6 @@ export interface Match {
 	winner: Participant | null
 }
 
-export type PlayerColorType = "Red" | "White"
 export interface Participant {
 	id: number;
 	sequence: number;
@@ -58,55 +62,3 @@ export interface Participant {
 export interface ParticipantsData {
 	participants: Participant[]
 };
-
-// const dummyTournamentData: Tournament[] = [
-// 	{
-//         id: 1,
-// 		name: "Sac Taikai",
-// 		status: "Active",
-//         location: "Sacramento, CA",
-//         date: "2024-03-15",
-//         numberOfParticipants: 36,
-//         brackets: [
-//             {
-//                 id: 1,
-//                 name: "Kyu",
-//                 status: "Past",
-//                 numberOfParticipants: 16,
-//                 type: "Single Elimination"
-//             },
-//             {
-//                 id: 2,
-//                 name: "Dan",
-//                 status: "Active",
-//                 numberOfParticipants: 20,
-//                 type: "Single Elimination"
-//             }
-//         ]
-// 	},
-// 	{
-//         id: 2,
-// 		name: "HSSK Taikai",
-// 		status: "Active",
-//         location: "Newark, CA",
-//         date: "2024-05-12",
-//         numberOfParticipants: 42,
-
-//         brackets: [
-//             {
-//                 id: 1,
-//                 name: "Kyu",
-//                 status: "Active",
-//                 numberOfParticipants: 18,
-//                 type: "Single Elimination"
-//             },
-//             {
-//                 id: 2,
-//                 name: "Dan",
-//                 status: "Upcoming",
-//                 numberOfParticipants: 24,
-//                 type: "Single Elimination"
-//             }
-//         ]
-// 	},
-// ];
