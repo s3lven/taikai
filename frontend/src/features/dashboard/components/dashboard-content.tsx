@@ -1,8 +1,9 @@
 import { useTournamentStore } from "@/stores/tournament-store";
 import TournamentList from "./tournament-list";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { getTournaments } from "../api";
 
 const EmptyDashboard = () => {
 	const { setIsAddingTournament } = useTournamentStore();
@@ -51,16 +52,14 @@ const DashboardError = () => {
 };
 
 const DashboardContent = () => {
-	const { tournaments, fetchTournaments, isLoading, error } =
-		useTournamentStore();
-
-	useEffect(() => {
-		void fetchTournaments();
-	}, [fetchTournaments]);
+	const {data: tournaments, isLoading, isError, error, refetch} = useQuery({
+		queryKey: ["tournaments"],
+		queryFn: getTournaments
+	})
 
 	if (isLoading) return <DashboardLoading />;
 
-	if (error) return <DashboardError />;
+	if (error || !tournaments) return <DashboardError />;
 
 	return tournaments.length > 0 ? (
 		<div className="w-full flex flex-col gap-12 pt-6">
