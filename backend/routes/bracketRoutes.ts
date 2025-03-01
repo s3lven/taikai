@@ -19,4 +19,12 @@ router.delete("/:id", async (req, res, next) => {
   bracketController.deleteBracket(req, res, next);
 });
 
+router.patch("/:id/run", async (req, res, next) => {
+  bracketController.runBracket(req, res, next);
+});
+
+router.patch("/:id/reset", async (req, res, next) => {
+  bracketController.resetBracket(req, res, next);
+});
+
 export default router;

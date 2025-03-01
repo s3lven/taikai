@@ -50,8 +50,52 @@ export class BracketController {
       const { changes } = req.body;
       console.info(`[INFO]: Making batch updates`);
 
-      await bracketService.batchUpdateBracket(changes)
-      res.json({ message: 'Changes were successful'})
+      await bracketService.batchUpdateBracket(changes);
+      res.json({ message: "Changes were successful" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async runBracket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id);
+      const { changes } = req.body;
+
+      console.info(`[INFO]: Running bracket ${id}`);
+      await bracketService.runBracket(id, changes);
+      res.json({ message: `Ran bracket ${id}` });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async resetBracket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id);
+      console.info(`[INFO]: Resetting bracket ${id}`);
+      await bracketService.resetBracket(id);
+      res.json({ message: `Resetted bracket ${id}` });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async openBracket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id);
+      console.info(`[INFO]: Opening bracket ${id}`);
+      await bracketService.openBracket(id);
+      res.json({ message: `Opened bracket ${id}` });
+    } catch (error) {
+      next(error);
+    }
+  
+  }
+  async completeBracket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id);
+      console.info(`[INFO]: Closing bracket ${id}`);
+      await bracketService.completeBracket(id);
+      res.json({ message: `Closed bracket ${id}` });
     } catch (error) {
       next(error);
     }

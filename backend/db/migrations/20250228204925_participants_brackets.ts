@@ -25,7 +25,7 @@ export async function up(knex: Knex): Promise<void> {
       .onDelete("CASCADE");
 
     // Additional attributes
-    table.integer("sequence").unsigned();
+    table.integer("sequence").unsigned().notNullable();
 
     // Composite unique key to prevent duplicates
     table.unique(["bracket_id", "participant_id"]);
