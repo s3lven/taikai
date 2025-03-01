@@ -10,8 +10,8 @@ import {
 import { User } from "lucide-react";
 import TournamentSettings from "./tournament-settings";
 
-import { Tournament, TournamentStatusType } from "@/types";
-import { useQueryClient } from "@tanstack/react-query";
+import { TournamentStatusType } from "@/types";
+import useTournamentData from "../hooks/useTournamentData";
 
 interface TournamentListProps {
   status: TournamentStatusType;
@@ -19,11 +19,8 @@ interface TournamentListProps {
 
 const TournamentList = ({ status }: TournamentListProps) => {
   const { setViewingTournament } = useTournamentStore();
-
-  const queryClient = useQueryClient();
-  const tournaments: Tournament[] =
-    queryClient.getQueryData(["tournaments"]) ?? [];
-  const filteredTournaments = tournaments.filter((t) => t.status === status);
+  const { getFilteredTournaments } = useTournamentData();
+  const filteredTournaments = getFilteredTournaments(status);
 
   return (
     filteredTournaments.length > 0 && (

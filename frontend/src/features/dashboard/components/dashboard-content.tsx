@@ -2,8 +2,7 @@ import { useTournamentStore } from "@/stores/tournament-store";
 import TournamentList from "./tournament-list";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { getTournaments } from "../api";
+import useTournamentData from "../hooks/useTournamentData";
 
 const EmptyDashboard = () => {
   const { setIsAddingTournament } = useTournamentStore();
@@ -52,16 +51,8 @@ const DashboardError = () => {
 };
 
 const DashboardContent = () => {
-  const {
-    data: tournaments,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["tournaments"],
-    queryFn: getTournaments,
-  });
+  const { tournaments, isLoading, isError, error, refetch } =
+    useTournamentData();
 
   if (isLoading) return <DashboardLoading />;
 
