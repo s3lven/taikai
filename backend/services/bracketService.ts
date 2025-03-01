@@ -48,7 +48,7 @@ export class BracketService {
         .where("bracket_participants.bracket_id", id)
         .orderBy("bracket_participants.sequence", "asc");
 
-        console.log(participants)
+      console.log(participants);
 
       // Get all matches
       const matches: Match[] = await pool<Match>("matches")
@@ -58,7 +58,7 @@ export class BracketService {
           { column: "match", order: "asc" },
         ]);
 
-      console.log(matches)
+      console.log(matches);
 
       // Create a map for easy participant lookup
       const participantsMap = new Map();
@@ -240,6 +240,21 @@ export class BracketService {
     payload: any,
     trx: Knex.Transaction<any, any[]>
   ) {
+    // Get bracket to ensure it exists and check status
+    const bracket = await trx<Bracket>("brackets")
+      .where({ id: payload.bracketId })
+      .first();
+
+    if (!bracket) {
+      throw new AppError(`Bracket with ID ${payload.bracketId} not found`, 404);
+    }
+
+    if (bracket.status !== "Editing") {
+      throw new AppError(
+        "Cannot save changes: bracket is not in Editing mode",
+        400
+      );
+    }
     switch (changeType) {
       case "update":
         if (payload.name) {
@@ -278,10 +293,10 @@ export class BracketService {
           .del();
         if (!deleted)
           throw new AppError(`Participant ${participantId} not found`, 404);
-
+        break;
       default:
         throw new AppError(
-          `Unsupported change type for bracket: ${changeType}`
+          `Unsupported change type for participant: ${changeType}`
         );
     }
   }
@@ -546,6 +561,7 @@ export class BracketService {
             match.bye_match = true;
           } else if (match.player2_id === null) {
             nextRoundMatch.player1_id = match.player1_id;
+            match.bye_match = true;
           }
         }
       });
