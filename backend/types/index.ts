@@ -13,7 +13,6 @@ export interface TournamentDTO {
   status: TournamentStatusType;
   location: string;
   date: string;
-  // brackets: Bracket[]
 }
 
 export interface BracketDTO {
