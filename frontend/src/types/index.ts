@@ -40,32 +40,38 @@ export interface Tournament {
   // participantCount: number;
   brackets: Bracket[];
 }
-export type TournamentForm = Omit<Tournament, "id" | "brackets">
-export type CreateTournamentForm = Omit<Tournament, "brackets" | "id"  | "status">;
+export type TournamentForm = Omit<Tournament, "id" | "brackets">;
+export type CreateTournamentForm = Omit<
+  Tournament,
+  "brackets" | "id" | "status"
+>;
 
 export interface Bracket {
   id: number;
   tournamentID: number;
   name: string;
   status: BracketStatusType;
-  // participantCount: number;
   type: BracketType;
-  // progress: number;
 }
-export type BracketForm = Omit<Bracket, "id">
-export type CreateBracketForm = Omit<Bracket, "id" | "status">
-
-export type BracketData = Bracket & {
+export type BracketForm = Omit<Bracket, "id">;
+export type CreateBracketForm = Omit<Bracket, "id" | "status">;
+export type BracketEditor = Omit<Bracket, "tournamentID"> & {
   tournamentName: string;
+  progress: number;
+  participantCount: number;
 };
 
 export interface Match {
   id: number;
+  bracketID: number;
   player1: Participant | null;
   player2: Participant | null;
   player1Score: IpponType[];
   player2Score: IpponType[];
   winner: Participant | null;
+  round: number;
+  match: number;
+  byeMatch: boolean;
 }
 
 export interface Participant {

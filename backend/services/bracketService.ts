@@ -2,7 +2,12 @@ import { Knex } from "knex";
 import pool from "../db";
 import { Bracket, BracketStatusType } from "../models/bracketModel";
 import { Tournament } from "../models/tournamentModel";
-import { BracketDTO, ClientParticipant } from "../types";
+import {
+  BracketDTO,
+  ClientParticipant,
+  MatchDTO,
+  TournamentDTO,
+} from "../types";
 import { Change, ChangeType } from "../types/changes";
 import { AppError } from "../utils/AppError";
 import { Participant } from "../models/participantModel";
@@ -31,8 +36,23 @@ export class BracketService {
   async getBracketInfo(id: number) {
     try {
       // Get bracket details
-      const bracket = await pool<Bracket>("brackets").where({ id }).first();
+      const bracket: BracketDTO = await pool<Bracket>("brackets")
+        .where({ id })
+        .select("id", "name", "status", "tournament_id as tournamentID", "type")
+        .first();
       if (!bracket) throw new AppError(`Bracket ${id} was not found`, 404);
+
+      // Get tournament detauls
+      const tournament: TournamentDTO | undefined = await pool<Tournament>(
+        "tournaments"
+      )
+        .where({ id: bracket.tournamentID })
+        .first();
+      if (!tournament)
+        throw new AppError(
+          `Tournament ${bracket.tournamentID} was not found`,
+          404
+        );
 
       // Get all participants in the bracket
       const participants: ClientParticipant[] = await pool<BracketParticipant>(
@@ -48,8 +68,6 @@ export class BracketService {
         .where("bracket_participants.bracket_id", id)
         .orderBy("bracket_participants.sequence", "asc");
 
-      console.log(participants);
-
       // Get all matches
       const matches: Match[] = await pool<Match>("matches")
         .where("bracket_id", id)
@@ -58,40 +76,47 @@ export class BracketService {
           { column: "match", order: "asc" },
         ]);
 
-      console.log(matches);
-
       // Create a map for easy participant lookup
       const participantsMap = new Map();
       participants.forEach((p) => {
         participantsMap.set(p.id, p);
       });
 
-      console.log(participantsMap);
-
       // Transform matches to include full participant objects
-      const matchesWithParticipants = matches.map((match) => ({
+      const matchesWithParticipants: MatchDTO[] = matches.map((match) => ({
         id: match.id,
-        bracket_id: match.bracket_id,
+        bracketID: match.bracket_id,
         player1: match.player1_id
           ? participantsMap.get(match.player1_id) || null
           : null,
         player2: match.player2_id
           ? participantsMap.get(match.player2_id) || null
           : null,
-        player1_score: match.player1_score || [],
-        player2_score: match.player2_score || [],
+        player1Score: match.player1_score || [],
+        player2Score: match.player2_score || [],
         winner: match.winner_id
           ? participantsMap.get(match.winner_id) || null
           : null,
         round: match.round,
         match: match.match,
-        bye_match: match.bye_match,
+        byeMatch: match.bye_match,
       }));
 
+      const rounds = Math.log2(matchesWithParticipants.length + 1);
+      const singleEliminationMatchStructure: MatchDTO[][] = Array.from(
+        { length: rounds },
+        () => []
+      );
+
+      matchesWithParticipants.forEach((match) => {
+        singleEliminationMatchStructure[match.round].push(match);
+      });
+
       return {
+        tournament,
         bracket,
         participants,
-        matches: matchesWithParticipants,
+        matches: singleEliminationMatchStructure,
       };
     } catch (error: any) {
       console.error(error);
@@ -521,10 +546,16 @@ export class BracketService {
         "participants.id",
         "=",
         "bracket_participants.participant_id"
-      );
+      )
+      .where("bracket_participants.bracket_id", bracketId)
+      .orderBy("bracket_participants.sequence", "asc");
+
+    console.log(participants);
 
     const participantCount = participants.length;
     const rounds = Math.ceil(Math.log2(participantCount));
+
+    console.log(rounds);
 
     async function createSingleElimMatches() {
       const changeIntoBye = (seed: number) => {
