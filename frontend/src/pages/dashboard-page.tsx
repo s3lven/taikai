@@ -1,4 +1,4 @@
-import { useTournamentStore } from "@/stores/tournament-store";
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
 import TournamentNewDialog from "../features/dashboard/components/dialogs/tournament-new-dialog";
 import TournamentViewDialog from "../features/dashboard/components/dialogs/tournament-view-dialog";
 import { Button } from "@/components/ui/button";

@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTournamentStore } from "@/stores/tournament-store";
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
 import { Bracket } from "@/types";
 
 import { MoreVertical } from "lucide-react";

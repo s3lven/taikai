@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useTournamentStore } from "@/stores/tournament-store";
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
 import { TournamentForm } from "@/types";
 import useTournamentData from "../../hooks/useTournamentData";
 

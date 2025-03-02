@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useTournamentData from "../hooks/useTournamentData";
 import { CreateBracketForm } from "@/types";
-import { useTournamentStore } from "@/stores/tournament-store";
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
 
 const BracketAddButton = () => {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import { useRoutes } from "react-router-dom";
 import MainLayout from "../components/layout/main-layout";
-import HomePage from "../features/home/home-page";
+import HomePage from "../pages/home-page";
 import DashboardPage from "@/pages/dashboard-page";
-import BracketPage from "@/features/bracket/bracket-page";
+import BracketPage from "@/pages/bracket-page";
 
 export const AppRoutes = () => {
   const routes = [

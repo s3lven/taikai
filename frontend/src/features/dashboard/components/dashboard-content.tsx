@@ -1,4 +1,4 @@
-import { useTournamentStore } from "@/stores/tournament-store";
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
 import TournamentList from "./tournament-list";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
