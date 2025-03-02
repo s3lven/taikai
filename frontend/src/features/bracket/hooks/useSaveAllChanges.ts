@@ -1,6 +1,6 @@
 import { useChangeTrackingStore } from "@/stores/change-tracking-store";
 import { useParticipantStore } from "@/stores/participant-store";
-import saveChanges from "@/features/bracket/utils/saveChanges";
+import { batchUpdateBracket } from "../api";
 
 export const useSaveAllChanges = () => {
   const getConsolidatedChanges = useChangeTrackingStore(
@@ -18,7 +18,7 @@ export const useSaveAllChanges = () => {
 
       // Get consolidated changes before saving
       const consolidatedChanges = getConsolidatedChanges();
-      await saveChanges(consolidatedChanges);
+      await batchUpdateBracket(consolidatedChanges);
 
       useParticipantStore.setState((state) => {
         state.initialParticipants = state.participants;
