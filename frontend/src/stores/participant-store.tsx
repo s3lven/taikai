@@ -120,10 +120,9 @@ export const useParticipantStore = create<ParticipantStore>()(
           changeTracker.addChange({
             entityType: "participant",
             changeType: "delete",
-            entityId: initial.id,
+            entityId: bracketId,
             payload: {
-              ...initial,
-              bracketId,
+              id: initial.id,
             },
           });
         }
@@ -138,10 +137,11 @@ export const useParticipantStore = create<ParticipantStore>()(
           changeTracker.addChange({
             entityType: "participant",
             changeType: "create",
-            entityId: current.id,
+            entityId: bracketId,
             payload: {
-              ...current,
-              bracketId,
+              id: current.id,
+              name: current.name,
+              sequence: current.sequence,
             },
           });
         } else {
@@ -162,10 +162,10 @@ export const useParticipantStore = create<ParticipantStore>()(
             changeTracker.addChange({
               entityType: "participant",
               changeType: "update",
-              entityId: current.id,
+              entityId: bracketId,
               payload: {
                 ...changes,
-                bracketId,
+                id: current.id,
               },
             });
           }

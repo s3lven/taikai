@@ -30,19 +30,12 @@ export const getAllBracketInfo = async (
 };
 
 export const batchUpdateBracket = async (changes: Change[]) => {
-  console.log("Received changes: ", changes);
-  const plainChanges = changes.map((change) => ({
-    ...change,
-    payload: JSON.parse(JSON.stringify(change.payload)),
-  }));
-  console.log("Plain changes: ", plainChanges);
-
-  const response = await fetch(`http://localhost:3001/api/brackets/changes`, {
-    method: "POST",
+  const response = await fetch(`/api/brackets/batch-update`, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ changes: plainChanges }),
+    body: JSON.stringify({ changes }),
   });
   if (!response.ok) throw new Error("Failed to save changes to bracket");
   console.log("Chanes saved successfully");

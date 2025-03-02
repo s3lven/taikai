@@ -178,38 +178,46 @@ export class BracketService {
         (a: Change, b: Change) => a.timestamp - b.timestamp
       );
 
-      await pool.transaction(async (trx) => {
-        for (const change of sortedChanges) {
-          const { entityType, entityId, changeType, payload } = change;
+      const bracketId = sortedChanges[0].entityId;
 
-          switch (entityType) {
-            case "bracket":
-              await this.processBracketChange(
-                changeType,
-                entityId,
-                payload,
-                trx
-              );
-              break;
-            case "participant":
-              await this.processParticipantChange(
-                changeType,
-                entityId,
-                payload,
-                trx
-              );
-              break;
-            case "matches":
-              await this.processMatchChanges(
-                changeType,
-                entityId,
-                payload,
-                trx
-              );
-              break;
-            default:
-              throw new AppError(`Unsupported entity type ${entityType}`);
-          }
+      await pool.transaction(async (trx) => {
+        const bracketChanges = sortedChanges.filter(
+          (c) => c.entityType === "bracket"
+        );
+        const participantChanges = sortedChanges.filter(
+          (c) => c.entityType === "participant"
+        );
+        const matchChanges = sortedChanges.filter(
+          (c) => c.entityType === "matches"
+        );
+
+        // Process bracket changes
+        for (const change of bracketChanges) {
+          await this.processBracketChanges(
+            change.changeType,
+            bracketId,
+            change.payload,
+            trx
+          );
+        }
+
+        // Process participant changes with our new method
+        if (participantChanges.length > 0) {
+          await this.processParticipantChanges(
+            bracketId,
+            participantChanges,
+            trx
+          );
+        }
+
+        // Process match changes
+        for (const change of matchChanges) {
+          await this.processMatchChanges(
+            change.changeType,
+            bracketId,
+            change.payload,
+            trx
+          );
         }
       });
     } catch (error: any) {
@@ -225,7 +233,7 @@ export class BracketService {
     Changes that can be made are name, type, and status.
     If the payload tries to change bracket id or tournament id, it will throw an error
   */
-  async processBracketChange(
+  async processBracketChanges(
     changeType: ChangeType,
     bracketId: number,
     payload: any,
@@ -263,76 +271,241 @@ export class BracketService {
     }
   }
 
-  /* 
-    "update": {name, sequence, bracketId}
-    "create": {name, sequence, bracaketId}
-    "delete": {participantId}
-  */
-  async processParticipantChange(
-    changeType: ChangeType,
-    participantId: number,
-    payload: any,
+  async processParticipantChanges(
+    bracketId: number,
+    changes: Change[],
     trx: Knex.Transaction<any, any[]>
   ) {
-    // Get bracket to ensure it exists and check status
-    const bracket = await trx<Bracket>("brackets")
-      .where({ id: payload.bracketId })
-      .first();
+    // Filter only participant changes and sort by timestamp
+    const participantChanges = changes
+      .filter((change) => change.entityType === "participant")
+      .sort((a, b) => a.payload.sequence - b.payload.sequence);
 
-    if (!bracket) {
-      throw new AppError(`Bracket with ID ${payload.bracketId} not found`, 404);
+    if (participantChanges.length === 0) return;
+
+    // Get all existing participants for this bracket
+    const existingParticipants = await trx("bracket_participants")
+      .where({ bracket_id: bracketId })
+      .join(
+        "participants",
+        "bracket_participants.participant_id",
+        "participants.id"
+      )
+      .select(
+        "participants.id",
+        "participants.name",
+        "bracket_participants.sequence"
+      );
+
+    // Create maps for quick lookups
+    const participantIdMap = new Map();
+    const sequenceMap = new Map();
+    existingParticipants.forEach((p) => {
+      participantIdMap.set(p.id, p);
+      sequenceMap.set(p.sequence, p);
+    });
+
+    console.log("Participant ID Map", participantIdMap);
+    console.log("Sequene Map", sequenceMap);
+
+    // First process deletions to free up sequences
+    const deletions = participantChanges.filter(
+      (c) => c.changeType === "delete"
+    );
+    for (const deletion of deletions) {
+      const participantId = deletion.payload.id;
+
+      // Delete from bracket_participants first due to foreign key constraints
+      await trx("bracket_participants")
+        .where({
+          bracket_id: bracketId,
+          participant_id: participantId,
+        })
+        .del();
+
+      // Then delete the participant if needed
+      await trx("participants").where({ id: participantId }).del();
+
+      // Update our maps
+      if (participantIdMap.has(participantId)) {
+        const participant = participantIdMap.get(participantId);
+        sequenceMap.delete(participant.sequence);
+        participantIdMap.delete(participantId);
+      }
     }
 
-    if (bracket.status !== "Editing") {
-      throw new AppError(
-        "Cannot save changes: bracket is not in Editing mode",
-        400
+    // Process creations next
+    const creations = participantChanges.filter(
+      (c) => c.changeType === "create"
+    );
+    for (const creation of creations) {
+      const { name, sequence } = creation.payload;
+
+      // Check if the sequence is already occupied
+      if (sequenceMap.has(sequence)) {
+        // We need to shift sequences up to make room
+        const result = await trx<BracketParticipant>("bracket_participants")
+          .where({ bracket_id: bracketId })
+          .andWhere("sequence", ">=", sequence)
+          .increment("sequence", 1)
+          .returning("*");
+
+        console.log("Result of shift:", result);
+        
+        // Update our maps after shifting sequences
+        result.forEach(bp => {
+          const participant = participantIdMap.get(bp.participant_id);
+          if (participant) {
+        // Remove old sequence mapping
+        sequenceMap.delete(participant.sequence);
+        // Update participant sequence
+        participant.sequence = bp.sequence;
+        // Add new sequence mapping
+        sequenceMap.set(bp.sequence, participant);
+          }
+        });
+      }
+
+      // Create participant
+      const [newParticipant] = await trx("participants")
+        .insert({ name })
+        .returning("*");
+      console.log("Created participant", newParticipant);
+
+      // Create bracket participant relationship
+      await trx("bracket_participants").insert({
+        bracket_id: bracketId,
+        participant_id: newParticipant.id,
+        sequence,
+      });
+      console.log(
+        "Successfully added them to bracket_participants in sequence",
+        sequence
+      );
+
+      // Update our maps
+      participantIdMap.set(newParticipant.id, {
+        id: newParticipant.id,
+        name,
+        sequence,
+      });
+      sequenceMap.set(sequence, {
+        id: newParticipant.id,
+        name,
+        sequence,
+      });
+    }
+
+    // Process name updates
+    const nameUpdates = participantChanges.filter(
+      (c) => c.changeType === "update" && c.payload.name && !c.payload.sequence
+    );
+    for (const update of nameUpdates) {
+      const { id, name } = update.payload;
+
+      // Check if participant exists
+      if (!participantIdMap.has(id)) {
+        throw new AppError(`Participant ${id} not found`, 404);
+      }
+
+      // Update name
+      await trx("participants").where({ id }).update({ name });
+
+      // Update our map
+      const participant = participantIdMap.get(id);
+      participant.name = name;
+    }
+
+    // Finally, process sequence updates
+    // This is the most complex part due to potential conflicts
+    const sequenceUpdates = participantChanges.filter(
+      (c) => c.changeType === "update" && c.payload.sequence !== undefined
+    );
+
+    if (sequenceUpdates.length > 0) {
+      // Create a plan for sequence moves to avoid conflicts
+      await this.processSequenceUpdates(
+        bracketId,
+        sequenceUpdates,
+        participantIdMap,
+        sequenceMap,
+        trx
       );
     }
-    switch (changeType) {
-      case "update":
-        if (payload.name) {
-          await trx<Participant>("participants")
-            .where({ id: participantId })
-            .update(payload);
-        }
+  }
 
-        if (payload.sequence) {
-          await trx<BracketParticipant>("bracket_participants")
-            .where({
-              participant_id: participantId,
-              bracket_id: payload.bracketId,
-            })
-            .update(payload);
-        }
-        break;
-      case "create":
-        const newParticipant = await trx<Participant>("participants")
-          .insert({ name: payload.name })
-          .returning("*");
-        console.log("New Participant:", newParticipant);
+  // Helper function to process sequence updates
+  async processSequenceUpdates(
+    bracketId: number,
+    updates: Change[],
+    participantIdMap: Map<number, any>,
+    sequenceMap: Map<number, any>,
+    trx: Knex.Transaction
+  ) {
+    // Sort updates by sequence to handle moves in order
+    updates.sort((a, b) => a.payload.sequence - b.payload.sequence);
 
-        if (!newParticipant)
-          throw new AppError(`Failed to create participant ${payload.name}`);
+    // We'll use temporary negative sequences to avoid conflicts
+    let tempSequence = -1;
 
-        await trx<BracketParticipant>("bracket_participants").insert({
-          participant_id: newParticipant[0].id,
-          bracket_id: payload.bracketId,
-          sequence: payload.sequence,
-        });
-        break;
-      case "delete":
-        const deleted = await trx<Participant>("participants")
-          .where({ id: participantId })
-          .del();
-        if (!deleted)
-          throw new AppError(`Participant ${participantId} not found`, 404);
-        break;
-      default:
-        throw new AppError(
-          `Unsupported change type for participant: ${changeType}`,
-          404
-        );
+    // For each update, move the participant to a temporary sequence first
+    for (const update of updates) {
+      const { id, sequence, name } = update.payload;
+
+      // Check if participant exists
+      if (!participantIdMap.has(id)) {
+        throw new AppError(`Participant ${id} not found`, 404);
+      }
+
+      const currentParticipant = participantIdMap.get(id);
+      const currentSequence = currentParticipant.sequence;
+
+      // Update name if provided
+      if (name && name !== currentParticipant.name) {
+        await trx("participants").where({ id }).update({ name });
+
+        currentParticipant.name = name;
+      }
+
+      // Skip if sequence hasn't changed
+      if (currentSequence === sequence) continue;
+
+      // Move to temporary sequence to avoid conflicts
+      await trx("bracket_participants")
+        .where({
+          bracket_id: bracketId,
+          participant_id: id,
+        })
+        .update({ sequence: tempSequence });
+
+      // Update maps
+      sequenceMap.delete(currentSequence);
+      sequenceMap.set(tempSequence, currentParticipant);
+      currentParticipant.sequence = tempSequence;
+
+      tempSequence--;
+    }
+
+    // Now move each to their final position
+    for (const update of updates) {
+      const { id, sequence } = update.payload;
+      const participant = participantIdMap.get(id);
+
+      // Skip if already at correct sequence (not needed but safe)
+      if (participant.sequence === sequence) continue;
+
+      // Move to final sequence
+      await trx("bracket_participants")
+        .where({
+          bracket_id: bracketId,
+          participant_id: id,
+        })
+        .update({ sequence });
+
+      // Update maps
+      sequenceMap.delete(participant.sequence);
+      sequenceMap.set(sequence, participant);
+      participant.sequence = sequence;
     }
   }
 
