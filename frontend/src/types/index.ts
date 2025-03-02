@@ -40,17 +40,20 @@ export interface Tournament {
   // participantCount: number;
   brackets: Bracket[];
 }
-export type TournamentForm = Omit<Tournament, "id" | "brackets" | "status">
-export type CreateTournament = Omit<Tournament, "brackets" | "id">;
+export type TournamentForm = Omit<Tournament, "id" | "brackets">
+export type CreateTournamentForm = Omit<Tournament, "brackets" | "id"  | "status">;
 
 export interface Bracket {
   id: number;
+  tournamentID: number;
   name: string;
   status: BracketStatusType;
   // participantCount: number;
   type: BracketType;
   // progress: number;
 }
+export type BracketForm = Omit<Bracket, "id">
+export type CreateBracketForm = Omit<Bracket, "id" | "status">
 
 export type BracketData = Bracket & {
   tournamentName: string;
