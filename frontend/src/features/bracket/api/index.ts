@@ -18,8 +18,6 @@ interface BracketInfoPayload {
 export const getAllBracketInfo = async (
   bracketID: number
 ): Promise<BracketInfoPayload> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
   const response = await fetch(`${API_URL}/${bracketID}`);
   if (!response.ok) {
     throw new Error("Failed to fetch bracket information");

@@ -1,8 +1,9 @@
 import { useChangeTrackingStore } from "@/stores/change-tracking-store";
 import { useParticipantStore } from "@/stores/participant-store";
-import { batchUpdateBracket } from "../api";
 import { useBracketStore } from "@/stores/bracket-store";
 import { useShallow } from "zustand/react/shallow";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { batchUpdateBracket } from "../api";
 
 export const useSaveAllChanges = () => {
   const clearChanges = useChangeTrackingStore((state) => state.clearChanges);
@@ -12,6 +13,16 @@ export const useSaveAllChanges = () => {
   const generateBracketChanges = useBracketStore(
     useShallow((state) => state.generateBracketChanges)
   );
+
+  const queryClient = useQueryClient();
+
+  const saveChangesMutation = useMutation({
+    mutationFn: batchUpdateBracket,
+    onSuccess: async () => {
+      console.log(`Successfully saved changes`);
+      await queryClient.invalidateQueries({ queryKey: ["bracket"] });
+    },
+  });
 
   const saveAllChanges = async () => {
     try {
@@ -24,9 +35,9 @@ export const useSaveAllChanges = () => {
       const newChanges = useChangeTrackingStore.getState().changes;
 
       console.log("Received changes: ", newChanges);
-      await batchUpdateBracket(newChanges);
-
-      console.log("Resetting Data")
+      saveChangesMutation.mutate(newChanges)
+      
+      console.log("Resetting Data");
       useParticipantStore.setState((state) => {
         state.initialParticipants = state.participants;
       });
@@ -39,5 +50,5 @@ export const useSaveAllChanges = () => {
     }
   };
 
-  return saveAllChanges;
+  return { saveAllChanges, isSaving: saveChangesMutation.isPending  };
 };
