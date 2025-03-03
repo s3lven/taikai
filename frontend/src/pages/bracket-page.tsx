@@ -5,6 +5,8 @@ import { useBracketStore } from "@/stores/bracket-store";
 import { useEffect } from "react";
 import BracketView from "@/features/bracket/bracket-view/bracket-view";
 import useCurrentBracketData from "@/features/bracket/hooks/useCurrentBracketData";
+import { useMatchesStore } from "@/stores/matches-store";
+import useTournamentBracket from "@/features/bracket/bracket-view/hooks/useTournamentBracket";
 
 const BracketPage = () => {
   const bracket = useCurrentBracketData();
@@ -13,12 +15,18 @@ const BracketPage = () => {
     useShallow((state) => [state.setParticipants])
   );
   const setBracket = useBracketStore(useShallow((state) => state.setBracket));
+  const setMatches = useMatchesStore(useShallow((state) => state.setMatches));
+  const matches = useTournamentBracket();
 
   useEffect(() => {
     if (bracket?.data?.participants) setParticipants(bracket.data.participants);
     if (bracket?.data?.bracket && bracket?.data?.tournament)
       setBracket(bracket.data.bracket, bracket.data.tournament);
-    // if (bracket?.data?.matches) setMatches(bracket.data.matches);
+    if (bracket?.data?.matches.length) {
+      setMatches(bracket.data.matches);
+    } else {
+      setMatches(matches);
+    }
   }, [bracket]);
 
   if (bracket?.isLoading) return <>Loading...</>;

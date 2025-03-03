@@ -13,6 +13,7 @@ import { AppError } from "../utils/AppError";
 import { Participant } from "../models/participantModel";
 import { BracketParticipant } from "../models/bracketParticipantModel";
 import { Match } from "../models/matchModel";
+import parsePostgresArray from "../utils/parsePostgresArray";
 
 export class BracketService {
   async getBrackets(): Promise<BracketDTO[]> {
@@ -69,15 +70,22 @@ export class BracketService {
         .orderBy("bracket_participants.sequence", "asc");
 
       // Get all matches
-      const matches: Match[] = await pool<Match>("matches")
+      const matches: Match[] = await pool("matches")
         .where("bracket_id", id)
         .orderBy([
           { column: "round", order: "asc" },
           { column: "match", order: "asc" },
-        ]);
+        ])
+        .then((matches) =>
+          matches.map((match) => ({
+            ...match,
+            player1_score: parsePostgresArray(match.player1_score),
+            player2_score: parsePostgresArray(match.player2_score),
+          }))
+        );
 
       // Create a map for easy participant lookup
-      const participantsMap = new Map();
+      const participantsMap = new Map<number, ClientParticipant>();
       participants.forEach((p) => {
         participantsMap.set(p.id, p);
       });
@@ -351,17 +359,17 @@ export class BracketService {
           .returning("*");
 
         console.log("Result of shift:", result);
-        
+
         // Update our maps after shifting sequences
-        result.forEach(bp => {
+        result.forEach((bp) => {
           const participant = participantIdMap.get(bp.participant_id);
           if (participant) {
-        // Remove old sequence mapping
-        sequenceMap.delete(participant.sequence);
-        // Update participant sequence
-        participant.sequence = bp.sequence;
-        // Add new sequence mapping
-        sequenceMap.set(bp.sequence, participant);
+            // Remove old sequence mapping
+            sequenceMap.delete(participant.sequence);
+            // Update participant sequence
+            participant.sequence = bp.sequence;
+            // Add new sequence mapping
+            sequenceMap.set(bp.sequence, participant);
           }
         });
       }

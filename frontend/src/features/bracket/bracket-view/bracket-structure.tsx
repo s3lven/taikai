@@ -1,8 +1,10 @@
 import { useRef } from "react";
 import BracketMatch from "./bracket-match";
-import { Match } from "@/types";
+import { useMatchesStore } from "@/stores/matches-store";
+import { useShallow } from "zustand/react/shallow";
 
-const BracketStructure = ({ matches }: { matches: Match[][] }) => {
+const BracketStructure = () => {
+  const matches = useMatchesStore(useShallow((state) => state.rounds));
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Constants for layout
