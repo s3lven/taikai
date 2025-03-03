@@ -51,7 +51,7 @@ const PlayProgress = () => {
     completeBracket();
 
     // Server Side
-    runBracketMutation.mutate(bracketId);
+    completeBracketMutation.mutate(bracketId);
   };
 
   const handleReopenBracket = async () => {
