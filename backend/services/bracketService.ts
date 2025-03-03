@@ -613,8 +613,6 @@ export class BracketService {
         const deleted = await trx<Match>("matches")
           .where({ bracket_id: id })
           .del();
-        if (!deleted)
-          throw new AppError(`Could not delete matches for bracket ${id}`);
       });
     } catch (error: any) {
       console.error(error);

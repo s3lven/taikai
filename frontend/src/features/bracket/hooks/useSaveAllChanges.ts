@@ -24,7 +24,7 @@ export const useSaveAllChanges = () => {
     },
   });
 
-  const saveAllChanges = async () => {
+  const saveAllChanges = () => {
     try {
       clearChanges();
 
@@ -33,11 +33,10 @@ export const useSaveAllChanges = () => {
       generateBracketChanges();
 
       const newChanges = useChangeTrackingStore.getState().changes;
+      if (newChanges.length === 0) return;
+      saveChangesMutation.mutate(newChanges);
 
-      console.log("Received changes: ", newChanges);
-      saveChangesMutation.mutate(newChanges)
-      
-      console.log("Resetting Data");
+      // Reset the initial states
       useParticipantStore.setState((state) => {
         state.initialParticipants = state.participants;
       });
@@ -50,5 +49,5 @@ export const useSaveAllChanges = () => {
     }
   };
 
-  return { saveAllChanges, isSaving: saveChangesMutation.isPending  };
+  return { saveAllChanges, isSaving: saveChangesMutation.isPending };
 };

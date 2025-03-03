@@ -3,6 +3,7 @@ import EditorButton from "../../../components/editor-button";
 import { useShallow } from "zustand/react/shallow";
 import { Progress } from "@/components/ui/progress";
 import { useSaveAllChanges } from "@/features/bracket/hooks/useSaveAllChanges";
+import { useBracketMutations } from "@/features/bracket/hooks/useBracketMutations";
 
 const PlayProgress = () => {
   const [
@@ -12,6 +13,7 @@ const PlayProgress = () => {
     completeBracket,
     reopenBracket,
     resetBracket,
+    bracketId,
   ] = useBracketStore(
     useShallow((state) => [
       state.bracket.status,
@@ -20,14 +22,56 @@ const PlayProgress = () => {
       state.completeBracket,
       state.reopenBracket,
       state.resetBracket,
+      state.bracket.id,
     ])
   );
 
-  const saveAllChanges = useSaveAllChanges();
-
+  const { saveAllChanges, isSaving } = useSaveAllChanges();
+  const {
+    runBracketMutation,
+    completeBracketMutation,
+    openBracketMutation,
+    resetBracketMutation,
+  } = useBracketMutations();
   const handleRunBracket = async () => {
+    console.log(`Running bracket ${bracketId}`);
+
+    // Client Side
     runBracket();
-    await saveAllChanges();
+
+    // Server Side
+    saveAllChanges();
+    runBracketMutation.mutate(bracketId);
+  };
+
+  const handleCompleteBracket = async () => {
+    console.log(`Completing bracket ${bracketId}`);
+
+    // Client Side
+    completeBracket();
+
+    // Server Side
+    runBracketMutation.mutate(bracketId);
+  };
+
+  const handleReopenBracket = async () => {
+    console.log(`Reopening bracket ${bracketId}`);
+
+    // Client Side
+    reopenBracket();
+
+    // Server Side
+    openBracketMutation.mutate(bracketId);
+  };
+
+  const handleResetBracket = async () => {
+    console.log(`Resetting bracket ${bracketId}`);
+
+    // Client Side
+    resetBracket();
+
+    // Server Side
+    resetBracketMutation.mutate(bracketId);
   };
 
   return (
@@ -49,6 +93,7 @@ const PlayProgress = () => {
           <EditorButton
             text="start tournament"
             onClickHandler={handleRunBracket}
+            disabled={isSaving || runBracketMutation.isPending}
           />
         ) : (
           <>
@@ -56,20 +101,23 @@ const PlayProgress = () => {
               <EditorButton
                 variant={"no-outline"}
                 text="mark as complete"
-                onClickHandler={completeBracket}
+                onClickHandler={handleCompleteBracket}
+                disabled={completeBracketMutation.isPending}
               />
             )}
             {bracketStatus === "Completed" && (
               <EditorButton
                 variant="no-outline"
                 text="reopen bracket"
-                onClickHandler={reopenBracket}
+                onClickHandler={handleReopenBracket}
+                disabled={openBracketMutation.isPending}
               />
             )}
             <EditorButton
               variant={"no-outline"}
               text="reset bracket"
-              onClickHandler={resetBracket}
+              onClickHandler={handleResetBracket}
+              disabled={resetBracketMutation.isPending}
             />
           </>
         )}
