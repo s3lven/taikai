@@ -45,7 +45,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
   useEffect(() => {
     if (matchFromStore) {
 		console.group("Match", matchFromStore.id)
-		console.log(matchFromStore.winner)
+		console.log("Winner:", matchFromStore.winner)
 		console.log(redPlayer)
 		console.log(whitePlayer)
 		console.groupEnd()

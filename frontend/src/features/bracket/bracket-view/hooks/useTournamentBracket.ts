@@ -2,7 +2,7 @@ import { useBracketStore } from "@/stores/bracket-store";
 import { useMatchesStore } from "@/stores/matches-store";
 import { useParticipantStore } from "@/stores/participant-store";
 import { Match, Participant } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 const generateRanbomNumberId = (factor?: number) => {
@@ -13,15 +13,17 @@ const generateRanbomNumberId = (factor?: number) => {
 };
 
 const useTournamentBracket = () => {
-  const [matches, setMatches] = useState<Match[][]>([]);
+  const [matches, setMatches] = useMatchesStore(
+    useShallow((state) => [state.rounds, state.setMatches])
+  );
 
   const [participants] = useParticipantStore(
     useShallow((state) => [state.participants])
   );
   const participantCount = participants.length;
   const rounds = Math.ceil(Math.log2(participantCount));
-  const [bracketId] = useBracketStore(
-    useShallow((state) => [state.bracket.id])
+  const [bracketId, status] = useBracketStore(
+    useShallow((state) => [state.bracket.id, state.bracket.status])
   );
 
   useEffect(() => {
@@ -123,11 +125,9 @@ const useTournamentBracket = () => {
       return filledBracket;
     };
 
-    if (participantCount < 3) setMatches([]);
-    else {
-      setMatches(createInitialMatches());
-    }
-  }, [participantCount, participants, rounds, setMatches]);
+    // Only create the initial matches if the bracket is in editting mode!
+    if (status === "Editing") setMatches(createInitialMatches());
+  }, [participantCount, participants, rounds, setMatches, status]);
 
   return matches;
 };

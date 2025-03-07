@@ -1,10 +1,9 @@
 import { useRef } from "react";
 import BracketMatch from "./bracket-match";
-import { useMatchesStore } from "@/stores/matches-store";
-import { useShallow } from "zustand/react/shallow";
+import useTournamentBracket from "./hooks/useTournamentBracket";
 
 const BracketStructure = () => {
-  const matches = useMatchesStore(useShallow((state) => state.rounds));
+  const matches = useTournamentBracket()
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Constants for layout
