@@ -8,7 +8,7 @@ import {
   MatchDTO,
   TournamentDTO,
 } from "../types";
-import { Change, ChangeType } from "../types/changes";
+import { Change, ChangeType, validEntityTypes } from "../types/changes";
 import { AppError } from "../utils/AppError";
 import { Participant } from "../models/participantModel";
 import { BracketParticipant } from "../models/bracketParticipantModel";
@@ -182,6 +182,13 @@ export class BracketService {
 
   async batchUpdateBracket(changes: Change[]) {
     try {
+      // Validate entityType
+
+      changes.forEach((change) => {
+        if (!validEntityTypes.includes(change.entityType)) {
+          throw new AppError(`Invalid entityType: ${change.entityType}`, 400);
+        }
+      });
       const sortedChanges = changes.sort(
         (a: Change, b: Change) => a.timestamp - b.timestamp
       );
@@ -196,7 +203,7 @@ export class BracketService {
           (c) => c.entityType === "participant"
         );
         const matchChanges = sortedChanges.filter(
-          (c) => c.entityType === "matches"
+          (c) => c.entityType === "match"
         );
 
         // Process bracket changes

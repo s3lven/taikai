@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import EditorButton from "../components/editor-button";
 import BracketSlot from "./bracket-slot";
 import SlotView from "../match-view/slot-view";
-import { useSaveAllChanges } from "../hooks/useSaveAllChanges";
+import { useSubmitScoreQuery } from "../hooks/useSubmitScoreQuery";
 
 interface BracketMatchProps {
   match: Match;
@@ -18,7 +18,6 @@ interface BracketMatchProps {
 const BracketMatch = ({ match, style }: BracketMatchProps) => {
   const redPlayer = match.player1;
   const whitePlayer = match.player2;
-  const saveAllChanges = useSaveAllChanges();
 
   const bracketStatus = useBracketStore(
     useShallow((state) => state.bracket.status)
@@ -31,10 +30,12 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
     ])
   );
 
+  const { submitScore: submitScoreQuery } = useSubmitScoreQuery();
+
   const handleSubmitScore = async () => {
     console.log(`Submitting winner for match`, match.id);
     submitScore(match.id, winner);
-    // await saveAllChanges()
+    submitScoreQuery();
   };
 
   const [winner, setWinner] = useState<Participant | null>(match.winner);
@@ -44,11 +45,11 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
   // Used to reset the winner state and styles when clicking on reset bracket
   useEffect(() => {
     if (matchFromStore) {
-		console.group("Match", matchFromStore.id)
-		console.log("Winner:", matchFromStore.winner)
-		console.log(redPlayer)
-		console.log(whitePlayer)
-		console.groupEnd()
+      // console.group("Match", matchFromStore.id);
+      // console.log("Winner:", matchFromStore.winner);
+      // console.log(redPlayer);
+      // console.log(whitePlayer);
+      // console.groupEnd();
       setWinner(matchFromStore.winner);
     }
   }, [matchFromStore]);
