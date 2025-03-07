@@ -126,8 +126,29 @@ const useTournamentBracket = () => {
     };
 
     // Only create the initial matches if the bracket is in editting mode!
-    if (status === "Editing") setMatches(createInitialMatches());
-  }, [participantCount, participants, rounds, setMatches, status]);
+    if (status === "Editing") {
+      setMatches(createInitialMatches());
+    } else {
+      // Calculate progress for In Progress or Completed brackets
+      let totalMatches = 0;
+      let completedMatches = 0;
+
+      matches.forEach((round) => {
+        round.forEach((match) => {
+          if (!match.byeMatch) {
+            totalMatches++;
+            if (match.winner) completedMatches++;
+          }
+        });
+      });
+
+      const progress =
+        totalMatches > 0
+          ? Math.round((completedMatches / totalMatches) * 100)
+          : 0;
+      useBracketStore.getState().updateProgress(progress);
+    }
+  }, [participantCount, participants, rounds, setMatches, status, matches]);
 
   return matches;
 };
