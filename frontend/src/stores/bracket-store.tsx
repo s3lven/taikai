@@ -1,4 +1,10 @@
-import { Bracket, BracketData, BracketStatusType } from "@/types";
+import {
+  Bracket,
+  BracketEditor,
+  BracketStatusType,
+  BracketType,
+  Tournament,
+} from "@/types";
 import { create } from "zustand";
 import { useChangeTrackingStore } from "./change-tracking-store";
 import { immer } from "zustand/middleware/immer";
@@ -6,193 +12,161 @@ import { useMatchesStore } from "./matches-store";
 import { useParticipantStore } from "./participant-store";
 
 interface BracketState {
-	bracket: Bracket & { tournamentName: string };
-	isLoading: boolean
-	error: Error | null
-	isInitialized: boolean
+  bracket: BracketEditor;
+  initialBracket: BracketEditor;
 }
 
 interface BracketActions {
-	fetchBracketData: (bracketId: number) => Promise<void>;
-	runBracket: () => void;
-	resetBracket: () => void;
-	completeBracket: () => void;
-	reopenBracket: () => void;
-	updateProgress: (progress: number) => void;
-	testBracket: () => void;
-	setBracketName: (name: string) => void;
-	setBracketType: (type: string) => void;
+  setBracket: (
+    bracket: Bracket,
+    tournament: Omit<Tournament, "brackets">
+  ) => void;
+  runBracket: () => void;
+  resetBracket: () => void;
+  completeBracket: () => void;
+  reopenBracket: () => void;
+  updateProgress: (progress: number) => void;
+  setBracketName: (name: string) => void;
+  setBracketType: (type: BracketType) => void;
+  generateBracketChanges: () => void;
 }
 
 type BracketStore = BracketState & BracketActions;
 
 export const useBracketStore = create<BracketStore>()(
-	immer((set) => ({
-		bracket: {
-			id: 0,
-			name: "",
-			status: "Editing" as BracketStatusType,
-			participantCount: 0,
-			type: "Single Elimination",
-			tournamentName: "",
-			progress: 0,
-		},
-		isLoading: false,
-		error: null,
-		isInitialized: false,
-		
-		fetchBracketData: async (bracketId: number) => {
-			set({ isLoading: true })
-			try {
-				const response = await fetch(
-					`http://localhost:3001/api/brackets/${bracketId}`
-				);
-				if (!response.ok) {
-					throw new Error("Failed to fetch bracket data");
-				}
-				const data: BracketData =
-					(await response.json()) as unknown as BracketData;
-				const newBracket: Bracket & { tournamentName: string } = {
-					id: data.id,
-					name: data.name,
-					status: data.status,
-					participantCount: data.participantCount,
-					type: data.type,
-					progress: data.progress,
-					tournamentName: data.tournamentName,
-				};
-				set({ bracket: newBracket, isInitialized: true });
-			} catch (error) {
-				console.error(error);
-				set({ error: error as Error });
-			} finally {
-				set({ isLoading: false})
-			}
-		},
-		runBracket: () => {
-			set((state) => {
-				const participants = useParticipantStore.getState().participants;
+  immer((set, get) => ({
+    bracket: {
+      id: 0,
+      name: "",
+      status: "Editing",
+      type: "Single Elimination",
+      tournamentName: "",
 
-				// Check if any participant name is empty
-				const hasEmptyName = participants.some(
-					(participant) => !participant.name
-				);
-				if (hasEmptyName) {
-					// TODO: Send a toast instead of an alert
-					alert("Fill out all of the required participant names");
-					return state; // Early return, no state update
-				}
-				const newState = {
-					bracket: {
-						...state.bracket,
-						status: "In Progress" as BracketStatusType,
-						progress: 0,
-					},
-				};
-				useChangeTrackingStore.getState().addChange({
-					entityType: "bracket",
-					changeType: "update",
-					entityId: state.bracket.id,
-					payload: { status: "In Progress", progress: 0 },
-				});
-				return newState;
-			});
-		},
-		resetBracket: () =>
-			set((state) => {
-				const newState = {
-					bracket: {
-						...state.bracket,
-						status: "Editing" as BracketStatusType,
-						progress: 0,
-					},
-				};
-				useChangeTrackingStore.getState().addChange({
-					entityType: "bracket",
-					changeType: "update",
-					entityId: state.bracket.id,
-					payload: { status: "Editing" },
-				});
-				useMatchesStore.getState().resetBracket();
-				return newState;
-			}),
-		completeBracket: () =>
-			set((state) => {
-				const newState = {
-					bracket: {
-						...state.bracket,
-						status: "Completed" as BracketStatusType,
-					},
-				};
-				useChangeTrackingStore.getState().addChange({
-					entityType: "bracket",
-					changeType: "update",
-					entityId: state.bracket.id,
-					payload: { status: "Completed" },
-				});
-				return newState;
-			}),
-		reopenBracket: () =>
-			set((state) => {
-				const newState = {
-					bracket: {
-						...state.bracket,
-						status: "In Progress" as BracketStatusType,
-					},
-				};
-				useChangeTrackingStore.getState().addChange({
-					entityType: "bracket",
-					changeType: "update",
-					entityId: state.bracket.id,
-					payload: { status: "In Progress" },
-				});
-				return newState;
-			}),
-		updateProgress: (progress: number) =>
-			set((state) => {
-				state.bracket.progress = progress;
-			}),
-		testBracket: () => {
-			set((state) => {
-				if (state.bracket.progress !== 100) {
-					const newProgress = Math.min(state.bracket.progress + 10, 100);
-					useChangeTrackingStore.getState().addChange({
-						entityType: "bracket",
-						changeType: "update",
-						entityId: state.bracket.id,
-						payload: { progress: newProgress },
-					});
-					return {
-						bracket: {
-							...state.bracket,
-							progress: newProgress,
-						},
-					};
-				}
-				return state;
-			});
-		},
-		setBracketName: (name: string) =>
-			set((state) => {
-				const newState = { bracket: { ...state.bracket, name } };
-				useChangeTrackingStore.getState().addChange({
-					entityType: "bracket",
-					changeType: "update",
-					entityId: state.bracket.id,
-					payload: { name },
-				});
-				return newState;
-			}),
-		setBracketType: (type: string) =>
-			set((state) => {
-				const newState = { bracket: { ...state.bracket, type } };
-				useChangeTrackingStore.getState().addChange({
-					entityType: "bracket",
-					changeType: "update",
-					entityId: state.bracket.id,
-					payload: { type },
-				});
-				return newState;
-			}),
-	}))
+      // Client only
+      participantCount: 0,
+      progress: 0,
+    },
+    initialBracket: {
+      id: 0,
+      name: "",
+      status: "Editing",
+      type: "Single Elimination",
+      tournamentName: "",
+
+      // Client only
+      participantCount: 0,
+      progress: 0,
+    },
+
+    setBracket: (bracket: Bracket, tournament: Omit<Tournament, "brackets">) =>
+      set((state) => {
+        state.bracket = {
+          ...state.bracket,
+          ...bracket,
+          tournamentName: tournament.name,
+        };
+        state.initialBracket = {
+          ...state.initialBracket,
+          ...bracket,
+          tournamentName: tournament.name,
+        };
+      }),
+    runBracket: () => {
+      set((state) => {
+        const participants = useParticipantStore.getState().participants;
+
+        // Check if any participant name is empty
+        const hasEmptyName = participants.some(
+          (participant) => !participant.name
+        );
+        if (hasEmptyName) {
+          // TODO: Send a toast instead of an alert
+          alert("Fill out all of the required participant names");
+          return state; // Early return, no state update
+        }
+        state.bracket = {
+          ...state.bracket,
+          status: "In Progress" as BracketStatusType,
+          progress: 0,
+        };
+        useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+      });
+    },
+    resetBracket: () =>
+      set((state) => {
+        state.bracket = {
+          ...state.bracket,
+          status: "Editing",
+          progress: 0,
+        };
+        useMatchesStore.getState().resetBracket();
+        useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+      }),
+    completeBracket: () =>
+      set((state) => {
+        state.bracket = {
+          ...state.bracket,
+          status: "Completed",
+        };
+        useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+      }),
+    reopenBracket: () =>
+      set((state) => {
+        state.bracket = {
+          ...state.bracket,
+          status: "In Progress",
+        };
+        useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+      }),
+    updateProgress: (progress: number) =>
+      set((state) => {
+        state.bracket.progress = progress;
+        useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+      }),
+    setBracketName: (name: string) =>
+      set((state) => {
+        const newState = { bracket: { ...state.bracket, name } };
+        useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+
+        return newState;
+      }),
+    setBracketType: (type: BracketType) =>
+      set((state) => {
+        state.bracket = { ...state.bracket, type };
+        useChangeTrackingStore.setState({ hasUnsavedChanges: true });
+      }),
+    generateBracketChanges: () => {
+      const state = get();
+      const changeTracker = useChangeTrackingStore.getState();
+
+      const { bracket, initialBracket } = state;
+
+      if (bracket.name !== initialBracket.name) {
+        changeTracker.addChange({
+          entityType: "bracket",
+          changeType: "update",
+          entityId: bracket.id,
+          payload: { name: bracket.name },
+        });
+      }
+
+      if (bracket.type !== initialBracket.type) {
+        changeTracker.addChange({
+          entityType: "bracket",
+          changeType: "update",
+          entityId: bracket.id,
+          payload: { type: bracket.type },
+        });
+      }
+
+      if (bracket.status !== initialBracket.status) {
+        changeTracker.addChange({
+          entityType: "bracket",
+          changeType: "update",
+          entityId: bracket.id,
+          payload: { status: bracket.status },
+        });
+      }
+    },
+  }))
 );

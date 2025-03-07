@@ -1,9 +1,9 @@
-import useTournamentBracket from "./hooks/useTournamentBracket";
 import { useRef } from "react";
 import BracketMatch from "./bracket-match";
+import useTournamentBracket from "./hooks/useTournamentBracket";
 
 const BracketStructure = () => {
-  const { matches } = useTournamentBracket();
+  const matches = useTournamentBracket()
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Constants for layout
@@ -86,7 +86,7 @@ const BracketStructure = () => {
 
                   return (
                     // If one of the players is null (a bye scenario) then don't render
-                    match.id !== -1 && (
+                    !match.byeMatch && (
                       <path
                         key={`connector-R${roundIndex}-M${matchIndex}`}
                         d={createConnectorPath(
@@ -121,7 +121,7 @@ const BracketStructure = () => {
 
             return (
               // If one of the players is null (a bye scenario) then don't render
-              match.id !== -1 && (
+              !match.byeMatch && (
                 <BracketMatch
                   key={`R${roundIndex}-M${matchIndex}`}
                   match={match}

@@ -1,9 +1,6 @@
-import {
-  Bracket,
-  BracketStatusType,
-  BracketType,
-} from "../models/bracketModel";
+import { BracketStatusType, BracketType } from "../models/bracketModel";
 import { BracketParticipant } from "../models/bracketParticipantModel";
+import { IpponType } from "../models/matchModel";
 import { Participant } from "../models/participantModel";
 import { TournamentStatusType } from "../models/tournamentModel";
 
@@ -13,7 +10,6 @@ export interface TournamentDTO {
   status: TournamentStatusType;
   location: string;
   date: string;
-  // brackets: Bracket[]
 }
 
 export interface BracketDTO {
@@ -26,3 +22,16 @@ export interface BracketDTO {
 
 export type ClientParticipant = Participant &
   Pick<BracketParticipant, "sequence">;
+
+export interface MatchDTO {
+  id: number;
+  bracketID: number;
+  player1: ClientParticipant | null;
+  player2: ClientParticipant | null;
+  player1Score: IpponType[];
+  player2Score: IpponType[];
+  winner: ClientParticipant | null;
+  round: number;
+  match: number;
+  byeMatch: boolean;
+}

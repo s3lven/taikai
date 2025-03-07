@@ -1,33 +1,50 @@
 import { useChangeTrackingStore } from "@/stores/change-tracking-store";
 import { useParticipantStore } from "@/stores/participant-store";
-import saveChanges from "@/features/bracket/utils/saveChanges";
+import { useBracketStore } from "@/stores/bracket-store";
+import { useShallow } from "zustand/react/shallow";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { batchUpdateBracket } from "../api";
+import { useCallback } from "react";
 
 export const useSaveAllChanges = () => {
-  const getConsolidatedChanges = useChangeTrackingStore(
-    (state) => state.getConsolidatedChanges
-  );
   const clearChanges = useChangeTrackingStore((state) => state.clearChanges);
   const generateParticipantChanges = useParticipantStore(
     (state) => state.generateParticipantChanges
   );
+  const generateBracketChanges = useBracketStore(
+    useShallow((state) => state.generateBracketChanges)
+  );
 
-  const saveAllChanges = async () => {
-    try {
-      // Generate changes by comparing against initial state
-      generateParticipantChanges();
+  const queryClient = useQueryClient();
 
-      // Get consolidated changes before saving
-      const consolidatedChanges = getConsolidatedChanges();
-      await saveChanges(consolidatedChanges);
+  const saveChangesMutation = useMutation({
+    mutationFn: batchUpdateBracket,
+    onSuccess: async () => {
+      console.log(`Successfully saved changes`);
+      await queryClient.invalidateQueries({ queryKey: ["bracket"] });
+    },
+  });
 
-      useParticipantStore.setState((state) => {
-        state.initialParticipants = state.participants;
-      });
-      clearChanges();
-    } catch (error) {
-      console.error("Failed to save changes", error);
-    }
-  };
+  const saveAllChanges = useCallback(() => {
+    clearChanges();
 
-  return saveAllChanges;
+    // Generate changes by comparing against initial state
+    generateParticipantChanges();
+    generateBracketChanges();
+
+    const newChanges = useChangeTrackingStore.getState().changes;
+    if (newChanges.length === 0) return;
+    saveChangesMutation.mutate(newChanges);
+
+    // Reset the initial states
+    useParticipantStore.setState((state) => {
+      state.initialParticipants = state.participants;
+    });
+    useBracketStore.setState((state) => {
+      state.initialBracket = state.bracket;
+    });
+    clearChanges();
+  }, [saveChangesMutation]);
+
+  return { saveAllChanges, isSaving: saveChangesMutation.isPending };
 };

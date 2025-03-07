@@ -4,16 +4,16 @@ import "@testing-library/jest-dom";
 import { afterEach } from "vitest";
 import { cleanup, renderHook } from "@testing-library/react";
 import { server } from "./__tests__/mocks/server";
-import { useTournamentStore } from "./stores/tournament-store";
+import { useTournamentStore } from "./features/dashboard/hooks/tournament-store";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterAll(() => server.close());
 
 // Run cleanup after each test case (e.g. clearing jsdom, stores)
 afterEach(() => {
-	const { result } = renderHook(() => useTournamentStore());
-	result.current.tournaments = [];
+  const { result } = renderHook(() => useTournamentStore());
+  result.current.tournaments = [];
 
-	cleanup();
-	server.resetHandlers();
+  cleanup();
+  server.resetHandlers();
 });

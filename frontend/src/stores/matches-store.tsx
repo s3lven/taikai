@@ -43,6 +43,7 @@ export const useMatchesStore = create<MatchesStore>()(
         }
       }),
     submitScore: (matchId, winner) => {
+      const bracketId = useBracketStore.getState().bracket.id;
       set((state) => {
         const match = state.rounds.flat().find((m) => m.id === matchId);
 
@@ -68,16 +69,16 @@ export const useMatchesStore = create<MatchesStore>()(
               useChangeTrackingStore.getState().addChange({
                 entityType: "match",
                 changeType: "update",
-                entityId: nextMatch.id,
-                payload: { player1: winner },
+                entityId: bracketId,
+                payload: { id: nextMatch.id, player1_id: winner?.id },
               });
             } else {
               nextMatch.player2 = winner;
               useChangeTrackingStore.getState().addChange({
                 entityType: "match",
                 changeType: "update",
-                entityId: nextMatch.id,
-                payload: { player2: winner },
+                entityId: bracketId,
+                payload: { id: nextMatch.id, player2_id: winner?.id },
               });
             }
           }
@@ -118,11 +119,12 @@ export const useMatchesStore = create<MatchesStore>()(
       useChangeTrackingStore.getState().addChange({
         entityType: "match",
         changeType: "update",
-        entityId: matchId,
+        entityId: bracketId,
         payload: {
-          winner: winner,
-          player1Score: mat.player1Score,
-          player2Score: mat.player2Score,
+          id: matchId,
+          winner_id: winner?.id,
+          player1_score: mat.player1Score,
+          player2_score: mat.player2Score,
         },
       });
     },
@@ -140,6 +142,8 @@ export const useMatchesStore = create<MatchesStore>()(
         .filter((match) => match.id !== -1)
         .every((match) => match.winner !== null),
     resetMatch: (matchId) => {
+      const bracketId = useBracketStore.getState().bracket.id;
+
       // Find the round index and match index
       const roundIndex = get().rounds.findIndex((round) =>
         round.find((match) => match.id === matchId)
@@ -156,11 +160,14 @@ export const useMatchesStore = create<MatchesStore>()(
           currentRoundIndex: number,
           currentMatchIndex: number
         ) => {
-          if (currentRoundIndex >= state.rounds.length - 1) return;  // Stop at the last round
+          if (currentRoundIndex >= state.rounds.length - 1) return; // Stop at the last round
 
           // Stop if there isnt any players
-          if (!state.rounds[currentRoundIndex][currentMatchIndex].player1 &&
-              !state.rounds[currentRoundIndex][currentMatchIndex].player2) return;
+          if (
+            !state.rounds[currentRoundIndex][currentMatchIndex].player1 &&
+            !state.rounds[currentRoundIndex][currentMatchIndex].player2
+          )
+            return;
 
           const nextRound = state.rounds[currentRoundIndex + 1];
           const dependentMatchIndex = Math.floor(currentMatchIndex / 2);
@@ -178,11 +185,12 @@ export const useMatchesStore = create<MatchesStore>()(
             useChangeTrackingStore.getState().addChange({
               entityType: "match",
               changeType: "update",
-              entityId: dependentMatch.id,
+              entityId: bracketId,
               payload: {
-                player1: null,
-                player1Score: [],
-                player2Score: [],
+                id: dependentMatch.id,
+                player1_id: null,
+                player1_score: [],
+                player2_score: [],
                 winner: null,
               },
             });
@@ -191,11 +199,12 @@ export const useMatchesStore = create<MatchesStore>()(
             useChangeTrackingStore.getState().addChange({
               entityType: "match",
               changeType: "update",
-              entityId: dependentMatch.id,
+              entityId: bracketId,
               payload: {
-                player2: null,
-                player1Score: [],
-                player2Score: [],
+                id: dependentMatch.id,
+                player2_id: null,
+                player1_score: [],
+                player2_score: [],
                 winner: null,
               },
             });
@@ -215,11 +224,12 @@ export const useMatchesStore = create<MatchesStore>()(
         useChangeTrackingStore.getState().addChange({
           entityType: "match",
           changeType: "update",
-          entityId: matchId,
+          entityId: bracketId,
           payload: {
-            player1Score: [],
-            player2Score: [],
-            winner: null,
+            id: matchId,
+            player1_score: [],
+            player2_score: [],
+            winner_id: null,
           },
         });
 

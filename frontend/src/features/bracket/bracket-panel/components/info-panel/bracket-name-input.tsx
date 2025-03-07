@@ -3,10 +3,11 @@ import { Input } from "@headlessui/react";
 import { useShallow } from "zustand/react/shallow";
 
 const BracketNameInput = () => {
-	const { name, setBracketName } = useBracketStore(
+	const { name, setBracketName, status } = useBracketStore(
 		useShallow((state) => ({
 			name: state.bracket.name,
 			setBracketName: state.setBracketName,
+			status: state.bracket.status
 		}))
 	);
 
@@ -19,6 +20,7 @@ const BracketNameInput = () => {
 				onChange={(e) => {
 					setBracketName(e.target.value);
 				}}
+				disabled={status !== "Editing"}
 			/>
 		</div>
 	);

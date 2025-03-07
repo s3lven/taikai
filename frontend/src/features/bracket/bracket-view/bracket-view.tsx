@@ -1,5 +1,5 @@
-import BracketRoundsList from './bracket-rounds-list'
-import BracketStructure from './bracket-structure'
+import BracketRoundsList from "./bracket-rounds-list";
+import BracketStructure from "./bracket-structure";
 
 const BracketView = () => {
   return (
@@ -10,7 +10,7 @@ const BracketView = () => {
       {/* Bracket */}
       <BracketStructure />
     </div>
-  )
-}
+  );
+};
 
-export default BracketView
+export default BracketView;

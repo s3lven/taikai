@@ -55,13 +55,13 @@ const SlotView = ({
 						<Button
 							onClick={() => handleWinner(player)}
 							className={`outline-none hover:bg-figma_neutral8 rounded disabled:hover:bg-transparent ${
-								disabled && winner !== player && "opacity-0"
+								disabled && JSON.stringify(winner) !== JSON.stringify(player) && "opacity-0"
 							}`}
 							disabled={disabled}
 						>
 							<Check
 								size={"30px"}
-								color={`${winner === player ? "#2ECC71" : "white"}`}
+								color={`${JSON.stringify(winner) === JSON.stringify(player) ? "#2ECC71" : "white"}`}
 								className="transition-colors ease-in-out"
 							/>
 						</Button>

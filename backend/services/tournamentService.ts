@@ -5,12 +5,32 @@ import { BracketDTO, TournamentDTO } from "../types";
 import { AppError } from "../utils/AppError";
 
 export class TournamentService {
-  async getTournaments(): Promise<TournamentDTO[]> {
+  async getTournaments(): Promise<
+    (TournamentDTO & { bracket: Omit<BracketDTO, "tournamentID">[] })[]
+  > {
     try {
-      const result = await pool<Tournament>("tournaments")
-        .select("id", "name", "location", "date", "status")
-        .orderBy("id", "desc");
-      return result;
+      // Grabs the tournament and bracket data such that bracket is an object in the tournament results
+      const tournaments = await pool("tournaments")
+        .select(
+          "tournaments.id",
+          "tournaments.name",
+          "tournaments.status",
+          "tournaments.location",
+          "tournaments.date",
+          pool.raw(`COALESCE(JSON_AGG(json_build_object(
+          'id', brackets.id,
+          'name', brackets.name,
+          'status', brackets.status,
+          'type', brackets.type
+          ) ORDER BY brackets.id
+          ) FILTER (WHERE brackets.id IS NOT NULL),
+          '[]'
+          ) AS brackets
+          `)
+        )
+        .leftJoin("brackets", "tournaments.id", "brackets.tournament_id")
+        .groupBy("tournaments.id");
+      return tournaments;
     } catch (error: any) {
       throw new AppError();
     }
