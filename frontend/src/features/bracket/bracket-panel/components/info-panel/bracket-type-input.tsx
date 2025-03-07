@@ -5,15 +5,16 @@ import {
 	SelectTrigger,
 } from "@/components/ui/select";
 import { useBracketStore } from "@/stores/bracket-store";
+import { BracketType } from "@/types";
 import { useShallow } from "zustand/react/shallow";
 
 const BracketTypeInput = () => {
-	const [type, setBracketType] = useBracketStore(useShallow((state) => [state.bracket.type, state.setBracketType]));
+	const [type, setBracketType, status] = useBracketStore(useShallow((state) => [state.bracket.type, state.setBracketType, state.bracket.status]));
 
 	return (
 		<div className="w-full h-full flex flex-col gap-1">
 			<p className="text-figma_grey text-desc">Bracket Type</p>
-			<Select defaultValue={type} value={type} onValueChange={(value) => {setBracketType(value)}}>
+			<Select defaultValue={type} value={type} onValueChange={(value: BracketType) => {setBracketType(value)}} disabled={status !== "Editing"}>
 				<SelectTrigger
 					className={`px-4 py-0 bg-transparent  border-figma_grey font-poppins text-figma_grey text-desc
                     flex justify-between items-center ring-offset-none focus:ring-transparent`}
