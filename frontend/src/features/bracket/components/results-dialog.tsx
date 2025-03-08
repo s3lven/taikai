@@ -120,8 +120,10 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
     setIsOpen(false);
   };
 
-  const confetti = new JSConfetti();
-  void confetti.addConfetti();
+  if (isOpen) {
+    const confetti = new JSConfetti();
+    void confetti.addConfetti();
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

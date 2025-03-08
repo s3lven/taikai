@@ -80,6 +80,8 @@ const useTournamentBracket = () => {
       const initialBracket: Match[][] = [];
       const initialMatches = createMapping().length;
 
+      if (initialMatches === 0) return [[]];
+
       // Push the initial bracket
       initialBracket.push(createMapping());
 
@@ -148,7 +150,7 @@ const useTournamentBracket = () => {
           : 0;
       useBracketStore.getState().updateProgress(progress);
     }
-  }, [participantCount, participants, rounds, setMatches, status, matches]);
+  }, [participantCount, participants, rounds, setMatches, status]);
 
   return matches;
 };
