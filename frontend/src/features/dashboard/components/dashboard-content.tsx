@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import useTournamentData from "../hooks/useTournamentData";
 
 const EmptyDashboard = () => {
-  const { setIsAddingTournament } = useTournamentStore();
+  const { setIsAddingDialogOpen } = useTournamentStore();
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 h-full flex-1">
@@ -14,7 +14,7 @@ const EmptyDashboard = () => {
       <Button
         className="bg-figma_shade2 hover:bg-figma_shade2/90 text-white 
                     transition-transform hover:scale-105 duration-300"
-        onClick={() => setIsAddingTournament(true)}
+        onClick={() => setIsAddingDialogOpen(true)}
       >
         Create New Taikai
       </Button>
@@ -51,7 +51,7 @@ const DashboardError = () => {
 };
 
 const DashboardContent = () => {
-  const { tournaments, isLoading, isError, error, refetch } =
+  const { tournaments, isLoading, isError, error } =
     useTournamentData();
 
   if (isLoading) return <DashboardLoading />;

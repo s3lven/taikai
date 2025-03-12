@@ -46,6 +46,7 @@ const TournamentNewDialog = () => {
       name: values.name,
       location: "here",
       date: new Date().toLocaleDateString(),
+      status: "Active"
     };
 
     addTournament(newTournament);
