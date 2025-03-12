@@ -75,21 +75,21 @@ export type Database = {
           id: number
           name: string
           status: Database["public"]["Enums"]["bracket_status"]
-          tournament_id: number | null
+          tournament_id: number
           type: Database["public"]["Enums"]["bracket_type"]
         }
         Insert: {
           id?: number
           name: string
           status?: Database["public"]["Enums"]["bracket_status"]
-          tournament_id?: number | null
+          tournament_id?: number
           type?: Database["public"]["Enums"]["bracket_type"]
         }
         Update: {
           id?: number
           name?: string
           status?: Database["public"]["Enums"]["bracket_status"]
-          tournament_id?: number | null
+          tournament_id?: number
           type?: Database["public"]["Enums"]["bracket_type"]
         }
         Relationships: [
