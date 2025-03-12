@@ -82,7 +82,7 @@ export type Database = {
           id?: number
           name: string
           status?: Database["public"]["Enums"]["bracket_status"]
-          tournament_id?: number
+          tournament_id: number
           type?: Database["public"]["Enums"]["bracket_type"]
         }
         Update: {
@@ -104,8 +104,8 @@ export type Database = {
       }
       matches: {
         Row: {
-          bracket_id: number | null
-          bye_match: boolean | null
+          bracket_id: number
+          bye_match: boolean
           created_at: string | null
           id: number
           match: number
@@ -118,8 +118,8 @@ export type Database = {
           winner_id: number | null
         }
         Insert: {
-          bracket_id?: number | null
-          bye_match?: boolean | null
+          bracket_id: number
+          bye_match?: boolean
           created_at?: string | null
           id?: number
           match: number
@@ -132,8 +132,8 @@ export type Database = {
           winner_id?: number | null
         }
         Update: {
-          bracket_id?: number | null
-          bye_match?: boolean | null
+          bracket_id?: number
+          bye_match?: boolean
           created_at?: string | null
           id?: number
           match?: number
@@ -202,7 +202,7 @@ export type Database = {
         Insert: {
           date: string
           id?: number
-          location?: string
+          location: string
           name: string
           status?: Database["public"]["Enums"]["tournament_status"]
         }
@@ -220,7 +220,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reset_bracket: {
+        Args: {
+          reset_bracket_id: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       bracket_status: "Editing" | "In Progress" | "Completed"
@@ -240,7 +245,13 @@ export type Database = {
       tournament_status: "Active" | "Upcoming" | "Past"
     }
     CompositeTypes: {
-      [_ in never]: never
+      change_record: {
+        entity_type: string | null
+        change_type: string | null
+        entity_id: number | null
+        payload: Json | null
+        timestamp: number | null
+      }
     }
   }
 }

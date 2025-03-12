@@ -159,14 +159,14 @@ export const useBracketStore = create<BracketStore>()(
         });
       }
 
-      if (bracket.status !== initialBracket.status) {
-        changeTracker.addChange({
-          entityType: "bracket",
-          changeType: "update",
-          entityId: bracket.id,
-          payload: { status: bracket.status },
-        });
-      }
+      // if (bracket.status !== initialBracket.status) {
+      //   changeTracker.addChange({
+      //     entityType: "bracket",
+      //     changeType: "update",
+      //     entityId: bracket.id,
+      //     payload: { status: bracket.status },
+      //   });
+      // }
     },
   }))
 );

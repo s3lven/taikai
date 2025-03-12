@@ -12,7 +12,7 @@ import { Change, ChangeType, validEntityTypes } from "../types/changes"
 import { AppError } from "../utils/AppError"
 import { Participant } from "../models/participantModel"
 import { BracketParticipant } from "../models/bracketParticipantModel"
-import { Match } from "../models/matchModel"
+import { Match, NewMatch } from "../models/matchModel"
 import parsePostgresArray from "../utils/parsePostgresArray"
 import supabase from "../utils/supabase"
 
@@ -195,19 +195,98 @@ export class BracketService {
     }
   }
 
+  async resetBracket(id: number) {
+    try {
+      // Call RPC to handle transaction
+      const { error } = await supabase.rpc("reset_bracket", {
+        reset_bracket_id: id,
+      })
+
+      if (error) {
+        throw new AppError(error.message)
+      }
+    } catch (error: any) {
+      throw error instanceof AppError ? error : new AppError()
+    }
+  }
+
+  async openBracket(id: number) {
+    try {
+      // Get bracket status
+      const { data: bracket, error: bracketError } = await supabase
+        .from("brackets")
+        .select("*")
+        .eq("id", id)
+        .single()
+
+      if (bracketError || !bracket) {
+        throw new AppError(`Bracket with ID ${id} not found`, 404)
+      }
+
+      if (bracket.status !== "Completed") {
+        throw new AppError("Cannot open bracket: bracket is not Completed", 400)
+      }
+
+      // Update bracket status
+      const { error: updateError } = await supabase
+        .from("brackets")
+        .update({ status: "In Progress" })
+        .eq("id", id)
+
+      if (updateError) {
+        throw new AppError(updateError.message)
+      }
+    } catch (error: any) {
+      console.error(error)
+      throw error instanceof AppError ? error : new AppError()
+    }
+  }
+
+  async completeBracket(id: number) {
+    try {
+      // Get bracket status
+      const { data: bracket, error: bracketError } = await supabase
+        .from("brackets")
+        .select("*")
+        .eq("id", id)
+        .single()
+
+      if (bracketError || !bracket) {
+        throw new AppError(`Bracket with ID ${id} not found`, 404)
+      }
+
+      if (bracket.status !== "In Progress") {
+        throw new AppError(
+          "Cannot complete bracket: bracket is not In Progress",
+          400
+        )
+      }
+
+      // Update bracket status
+      const { error: updateError } = await supabase
+        .from("brackets")
+        .update({ status: "Completed" })
+        .eq("id", id)
+
+      if (updateError) {
+        throw new AppError(updateError.message)
+      }
+    } catch (error: any) {
+      console.error(error)
+      throw error instanceof AppError ? error : new AppError()
+    }
+  }
+
+  // Transaction-related (should use Knex.js)
   async batchUpdateBracket(changes: Change[]) {
     try {
       // Validate entityType
-
       changes.forEach((change) => {
         if (!validEntityTypes.includes(change.entityType)) {
           throw new AppError(`Invalid entityType: ${change.entityType}`, 400)
         }
       })
-      const sortedChanges = changes.sort(
-        (a: Change, b: Change) => a.timestamp - b.timestamp
-      )
-
+      const sortedChanges = changes.sort((a, b) => a.timestamp - b.timestamp)
       const bracketId = sortedChanges[0].entityId
 
       await pool.transaction(async (trx) => {
@@ -573,155 +652,6 @@ export class BracketService {
     }
   }
 
-  async runBracket(id: number, changes: Change[]) {
-    try {
-      // Get bracket to ensure it exists and check status
-      const bracket = await pool<Bracket>("brackets").where({ id }).first()
-
-      if (!bracket) {
-        throw new AppError(`Bracket with ID ${id} not found`, 404)
-      }
-
-      if (bracket.status !== "Editing") {
-        throw new AppError(
-          "Cannot run bracket: bracket is not in editing mode",
-          400
-        )
-      }
-
-      return await pool.transaction(async (trx) => {
-        // Save any changes
-        if (changes) await this.batchUpdateBracket(changes)
-
-        // Update the status
-        await this.updateBracketStatus(id, "In Progress", trx)
-
-        // Construct matches
-        const matches = await this.createInitialMatches(id, trx)
-        console.log("Created matches:", matches)
-
-        // Save matches in the database
-        for (const match of matches) {
-          const inserted = await trx<Match>("matches").insert(match)
-          if (!inserted)
-            throw new AppError(
-              `Failed to insert new match: bracket ${match.bracket_id}-${match.round}-${match.match}`
-            )
-        }
-      })
-    } catch (error: any) {
-      console.error(error)
-      if (error instanceof AppError) throw error
-      else throw new AppError()
-    }
-  }
-
-  async resetBracket(id: number) {
-    try {
-      // Get bracket to ensure it exists and check status
-      const bracket = await pool<Bracket>("brackets").where({ id }).first()
-
-      if (!bracket) {
-        throw new AppError(`Bracket with ID ${id} not found`, 404)
-      }
-
-      if (bracket.status === "Editing") {
-        throw new AppError(
-          "Cannot reset bracket: bracket cannot be in editing mode",
-          400
-        )
-      }
-
-      // Change Status
-      await pool.transaction(async (trx) => {
-        // Update the status
-        await this.updateBracketStatus(id, "Editing", trx)
-        // Drop the matches
-        const deleted = await trx<Match>("matches")
-          .where({ bracket_id: id })
-          .del()
-      })
-    } catch (error: any) {
-      console.error(error)
-      if (error instanceof AppError) throw error
-      else throw new AppError()
-    }
-  }
-
-  async openBracket(id: number) {
-    try {
-      // Get bracket to ensure it exists and check status
-      const bracket = await pool<Bracket>("brackets").where({ id }).first()
-
-      if (!bracket) {
-        throw new AppError(`Bracket with ID ${id} not found`, 404)
-      }
-
-      if (bracket.status !== "Completed") {
-        throw new AppError("Cannot open bracket: bracket is not Completed", 400)
-      }
-
-      // Change Status
-      await pool.transaction(async (trx) => {
-        // Update the status
-        await this.updateBracketStatus(id, "In Progress", trx)
-      })
-    } catch (error: any) {
-      console.error(error)
-      if (error instanceof AppError) throw error
-      else throw new AppError()
-    }
-  }
-
-  async completeBracket(id: number) {
-    try {
-      // Get bracket to ensure it exists and check status
-      const bracket = await pool<Bracket>("brackets").where({ id }).first()
-
-      if (!bracket) {
-        throw new AppError(`Bracket with ID ${id} not found`, 404)
-      }
-
-      // Optional: Check if all the matches in the bracket have a winner
-      if (bracket.status !== "In Progress") {
-        throw new AppError(
-          "Cannot complete bracket: bracket is not In Progress",
-          400
-        )
-      }
-
-      // Change Status
-      await pool.transaction(async (trx) => {
-        // Update the status
-        await this.updateBracketStatus(id, "Completed", trx)
-      })
-    } catch (error: any) {
-      console.error(error)
-      if (error instanceof AppError) throw error
-      else throw new AppError()
-    }
-  }
-
-  /**
-   * Update the status of a bracket
-   * @param {number} id - The ID of the bracket to update
-   * @param {BracketStatusType} status - The new status ('Editting', 'In Progress', 'Completed')
-   * @param {Knex.Transaction} trx - The database transaction object (optional)
-   * @returns {Promise} - Resolves when the update is complete
-   */
-  async updateBracketStatus(
-    id: number,
-    status: BracketStatusType,
-    trx?: Knex.Transaction
-  ): Promise<void> {
-    const queryBuilder = trx
-      ? trx<Bracket>("brackets")
-      : pool<Bracket>("brackets")
-
-    const result = await queryBuilder.where({ id }).update({ status })
-    if (result === 0) throw new AppError(`Bracket with ID ${id} not found`)
-  }
-
   async createInitialMatches(bracketId: number, trx: Knex.Transaction) {
     // Get bracket information including participants and bracket type
     const bracket = await trx<Bracket>("brackets")
@@ -782,23 +712,21 @@ export class BracketService {
         }
 
         // Match construction
-        const bracket: Omit<Match, "id">[] = matches.map(
-          (match, matchIndex) => ({
-            bracket_id: bracketId,
-            player1_id: match[0]?.id || null,
-            player2_id: match[1]?.id || null,
-            player1_score: [],
-            player2_score: [],
-            winner_id: null,
-            round: 0,
-            match: matchIndex,
-            bye_match: false,
-          })
-        )
+        const bracket: NewMatch[] = matches.map((match, matchIndex) => ({
+          bracket_id: bracketId,
+          player1_id: match[0]?.id || null,
+          player2_id: match[1]?.id || null,
+          player1_score: [],
+          player2_score: [],
+          winner_id: null,
+          round: 0,
+          match: matchIndex,
+          bye_match: false,
+        }))
         return bracket
       }
 
-      const matches: Omit<Match, "id">[] = []
+      const matches: NewMatch[] = []
       const initialMatches = createMapping()
       const initialMatchCount = initialMatches.length
 
@@ -856,6 +784,53 @@ export class BracketService {
         return []
       default:
         throw new AppError(`Unknown bracket status ${bracket.type}`)
+    }
+  }
+
+  async runBracket(id: number, changes: Change[]) {
+    try {
+      // Get bracket status
+      const { data: bracket, error: bracketError } = await supabase
+        .from("brackets")
+        .select("*")
+        .eq("id", id)
+        .single()
+
+      if (bracketError || !bracket) {
+        throw new AppError(`Bracket with ID ${id} not found`, 404)
+      }
+
+      if (bracket.status !== "Editing") {
+        throw new AppError(
+          "Cannot run bracket: bracket is not in editing mode",
+          400
+        )
+      }
+
+      return pool.transaction(async (trx) => {
+        // Save any changes
+        if (changes) await this.batchUpdateBracket(changes)
+
+        // Update the status
+        await trx<Bracket>("brackets")
+          .where({ id })
+          .update({ status: "In Progress" })
+
+        // Construct matches
+        const matches = await this.createInitialMatches(id, trx)
+        console.log("Created matches:", matches)
+
+        // Save matches in the database
+        for (const match of matches) {
+          const inserted = await trx<Match>("matches").insert(match)
+          if (!inserted)
+            throw new AppError(
+              `Failed to insert new match: bracket ${match.bracket_id}-${match.round}-${match.match}`
+            )
+        }
+      })
+    } catch (error: any) {
+      throw error instanceof AppError ? error : new AppError()
     }
   }
 }

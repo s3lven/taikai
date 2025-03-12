@@ -1,4 +1,4 @@
-export interface Participant {
-  id: number;
-  name: string;
-}
+import { Database } from "./supabase.models";
+
+export type Participant = Database["public"]["Tables"]["participants"]["Row"]
+
