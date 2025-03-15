@@ -18,10 +18,10 @@ const navlinks: NavLinkType[] = [
 		name: "Dashboard",
 		to: "/dashboard",
 	},
-	{
-		name: "Explore",
-		to: "explore",
-	},
+	// {
+	// 	name: "Explore",
+	// 	to: "explore",
+	// },
 ];
 
 const NavLink = ({ name, to }: NavLinkType) => {
@@ -55,7 +55,7 @@ const Navbar = () => {
 						{navlinks.map((link) => (
 							<NavLink key={link.name} name={link.name} to={link.to} />
 						))}
-						<DarkModeToggle />
+						{/* <DarkModeToggle /> */}
 					</NavigationMenuList>
 				</NavigationMenu>
 			</div>

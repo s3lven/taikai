@@ -30,14 +30,14 @@ const PlayPanel = () => {
 			</div>
 
 			{/* Bracket Status */}
-			<div className="w-full flex flex-col gap-4 px-2 py-4 bg-figma_shade2_30 shadow rounded-sm">
+			{/* <div className="w-full flex flex-col gap-4 px-2 py-4 bg-figma_shade2_30 shadow rounded-sm">
 				<p className="text-desc text-center text-figma_grey">
 					Let others know about your bracket!
 				</p>
 				<div className="flex justify-center items-center">
 					<EditorButton text="share" />
 				</div>
-			</div>
+			</div> */}
 		</div>
 	);
 };
