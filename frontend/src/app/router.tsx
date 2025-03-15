@@ -8,7 +8,11 @@ import ProfilePage from "@/pages/profile-page"
 import useAuth from "@/hooks/useAuth"
 
 const ProtectedRoute = () => {
-  const { session } = useAuth()
+  const { session, loading } = useAuth()
+
+  if (loading) {
+    return null // Or return a loading spinner component
+  }
 
   if (!session) {
     return <Navigate to={"login"} replace />

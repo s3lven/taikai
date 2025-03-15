@@ -5,16 +5,21 @@ import { useEffect, useState } from "react"
 
 const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
+      setLoading(false)
+
     })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
+      setLoading(false)
+
     })
 
     return () => subscription.unsubscribe()
@@ -31,8 +36,8 @@ const useAuth = () => {
     image: session?.user.user_metadata.picture,
     joined_at: session?.user.created_at,
   }
-
-  return { session, signOut, user }
+  
+  return { session, loading, signOut, user }
 }
 
 export default useAuth
