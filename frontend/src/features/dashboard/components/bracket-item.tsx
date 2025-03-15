@@ -24,13 +24,13 @@ const BracketItem = ({ bracket }: BracketItemProps) => {
 				<div className="flex items-center text-right justify-end w-1/4">
 					<p className="w-full">{bracket.status}</p>
 				</div>
-				<div className="flex gap-4 justify-end items-center w-1/4">
+				{/* <div className="flex gap-4 justify-end items-center w-1/4">
 					<div className="flex gap-1 justify-end items-center">
-						{/* TODO: Implement participant count */}
+						TODO: Implement participant count
 						<p className="text-right">10</p>
 						<User />
 					</div>
-				</div>
+				</div> */}
 				<BracketSettings bracket={bracket} />
 			</div>
 		</div>
