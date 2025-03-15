@@ -3,6 +3,7 @@ import MainLayout from "../components/layout/main-layout"
 import HomePage from "../pages/home-page"
 import DashboardPage from "@/pages/dashboard-page"
 import BracketPage from "@/pages/bracket-page"
+import LoginPage from "@/pages/login-page"
 
 export const AppRoutes = () => {
   return (
@@ -11,6 +12,7 @@ export const AppRoutes = () => {
         <Route index element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/bracket/:bracketId" element={<BracketPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Route>
       <Route path="*" element={<Navigate to={"/"} replace />} />
     </Routes>
