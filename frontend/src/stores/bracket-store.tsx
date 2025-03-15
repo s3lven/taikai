@@ -89,7 +89,6 @@ export const useBracketStore = create<BracketStore>()(
           status: "In Progress" as BracketStatusType,
           progress: 0,
         }
-        useChangeTrackingStore.setState({ hasUnsavedChanges: true })
       })
     },
     resetBracket: () =>
@@ -100,7 +99,6 @@ export const useBracketStore = create<BracketStore>()(
           progress: 0,
         }
         useMatchesStore.getState().resetBracket()
-        useChangeTrackingStore.setState({ hasUnsavedChanges: true })
       }),
     completeBracket: () =>
       set((state) => {
@@ -108,7 +106,6 @@ export const useBracketStore = create<BracketStore>()(
           ...state.bracket,
           status: "Completed",
         }
-        useChangeTrackingStore.setState({ hasUnsavedChanges: true })
       }),
     reopenBracket: () =>
       set((state) => {
@@ -116,7 +113,6 @@ export const useBracketStore = create<BracketStore>()(
           ...state.bracket,
           status: "In Progress",
         }
-        useChangeTrackingStore.setState({ hasUnsavedChanges: true })
       }),
     updateProgress: () => {
       const matches = useMatchesStore.getState().rounds.flat()
@@ -130,15 +126,12 @@ export const useBracketStore = create<BracketStore>()(
         }
       })
 
-      console.log(completedMatches)
-
       const progress =
         totalMatches > 0
           ? Math.round((completedMatches / totalMatches) * 100)
           : 0
       set((state) => {
         state.bracket.progress = progress
-        useChangeTrackingStore.setState({ hasUnsavedChanges: true })
       })
     },
     setBracketName: (name: string) =>
