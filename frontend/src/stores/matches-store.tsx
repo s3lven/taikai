@@ -173,7 +173,7 @@ export const useMatchesStore = create<MatchesStore>()(
                 player1_id: null,
                 player1_score: [],
                 player2_score: [],
-                winner: null,
+                winner_id: null,
               },
             });
           } else {
@@ -187,7 +187,7 @@ export const useMatchesStore = create<MatchesStore>()(
                 player2_id: null,
                 player1_score: [],
                 player2_score: [],
-                winner: null,
+                winner_id: null,
               },
             });
           }

@@ -26,8 +26,6 @@ export const useSaveAllChanges = () => {
   });
 
   const saveAllChanges = useCallback(() => {
-    clearChanges();
-
     // Generate changes by comparing against initial state
     generateParticipantChanges();
     generateBracketChanges();
