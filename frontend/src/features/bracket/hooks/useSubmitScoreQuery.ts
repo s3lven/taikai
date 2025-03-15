@@ -13,7 +13,6 @@ export const useSubmitScoreQuery = () => {
   const submitScoreMutation = useMutation({
     mutationFn: batchUpdateBracket,
     onSuccess: async () => {
-      console.log(`Successfully submitted score`);
       await queryClient.invalidateQueries({ queryKey: ["bracket"] });
     },
   });

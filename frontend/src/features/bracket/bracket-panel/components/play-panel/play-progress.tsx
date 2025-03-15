@@ -34,8 +34,6 @@ const PlayProgress = () => {
     resetBracketMutation,
   } = useBracketMutations();
   const handleRunBracket = async () => {
-    console.log(`Running bracket ${bracketId}`);
-
     // Client Side
     runBracket();
 
@@ -45,8 +43,6 @@ const PlayProgress = () => {
   };
 
   const handleCompleteBracket = async () => {
-    console.log(`Completing bracket ${bracketId}`);
-
     // Client Side
     completeBracket();
 
@@ -55,8 +51,6 @@ const PlayProgress = () => {
   };
 
   const handleReopenBracket = async () => {
-    console.log(`Reopening bracket ${bracketId}`);
-
     // Client Side
     reopenBracket();
 
@@ -65,8 +59,6 @@ const PlayProgress = () => {
   };
 
   const handleResetBracket = async () => {
-    console.log(`Resetting bracket ${bracketId}`);
-
     // Client Side
     resetBracket();
 

@@ -414,9 +414,6 @@ export class BracketService {
       sequenceMap.set(p.sequence, p)
     })
 
-    console.log("Participant ID Map", participantIdMap)
-    console.log("Sequene Map", sequenceMap)
-
     // First process deletions to free up sequences
     const deletions = participantChanges.filter(
       (c) => c.changeType === "delete"
@@ -459,8 +456,6 @@ export class BracketService {
           .increment("sequence", 1)
           .returning("*")
 
-        console.log("Result of shift:", result)
-
         // Update our maps after shifting sequences
         result.forEach((bp) => {
           const participant = participantIdMap.get(bp.participant_id)
@@ -479,7 +474,6 @@ export class BracketService {
       const [newParticipant] = await trx("participants")
         .insert({ name })
         .returning("*")
-      console.log("Created participant", newParticipant)
 
       // Create bracket participant relationship
       await trx("bracket_participants").insert({
@@ -487,10 +481,6 @@ export class BracketService {
         participant_id: newParticipant.id,
         sequence,
       })
-      console.log(
-        "Successfully added them to bracket_participants in sequence",
-        sequence
-      )
 
       // Update our maps
       participantIdMap.set(newParticipant.id, {
@@ -675,12 +665,8 @@ export class BracketService {
       .where("bracket_participants.bracket_id", bracketId)
       .orderBy("bracket_participants.sequence", "asc")
 
-    console.log(participants)
-
     const participantCount = participants.length
     const rounds = Math.ceil(Math.log2(participantCount))
-
-    console.log(rounds)
 
     async function createSingleElimMatches() {
       const changeIntoBye = (seed: number) => {
@@ -774,13 +760,10 @@ export class BracketService {
       case "Single Elimination":
         return await createSingleElimMatches()
       case "Double Elimination":
-        console.log("Creating Double Elimination Matches")
         return []
       case "Round Robin":
-        console.log("Creating Round Robin Matches")
         return []
       case "Swiss":
-        console.log("Creating Swiss Matches")
         return []
       default:
         throw new AppError(`Unknown bracket status ${bracket.type}`)
@@ -818,7 +801,6 @@ export class BracketService {
 
         // Construct matches
         const matches = await this.createInitialMatches(id, trx)
-        console.log("Created matches:", matches)
 
         // Save matches in the database
         for (const match of matches) {

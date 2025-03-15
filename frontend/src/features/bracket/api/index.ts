@@ -23,7 +23,6 @@ export const getAllBracketInfo = async (
     throw new Error("Failed to fetch bracket information");
   }
   const data: ResponsePayload<BracketInfoPayload> = await response.json();
-  console.log(data);
   return data.payload;
 };
 
@@ -47,7 +46,6 @@ export const runBracket = async (id: number, changes?: []) => {
     body: JSON.stringify({ changes }),
   });
   if (!response.ok) throw new Error("Failed to run the bracket");
-  console.log("Bracket running successfully");
 };
 
 export const resetBracket = async (id: number) => {

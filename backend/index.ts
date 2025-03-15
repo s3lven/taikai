@@ -19,7 +19,7 @@ app.use(errorHandler);
 
 app
   .listen(PORT, () => {
-    console.log(`Application running on port ${PORT}`);
+    console.info(`Application running on port ${PORT}`);
   })
   .on("error", (error) => {
     throw new Error(error.message);
