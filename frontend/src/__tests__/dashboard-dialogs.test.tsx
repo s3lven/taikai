@@ -126,7 +126,6 @@
 //     });
 
 //     render(<TournamentNewDialog />);
-//     console.log(result.current.tournaments);
 
 //     const input = screen.getByPlaceholderText("NCKF Taikai");
 //     const submitButton = screen.getByText("Submit");

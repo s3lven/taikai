@@ -20,7 +20,6 @@ export const useSaveAllChanges = () => {
   const saveChangesMutation = useMutation({
     mutationFn: batchUpdateBracket,
     onSuccess: async () => {
-      console.log(`Successfully saved changes`);
       await queryClient.invalidateQueries({ queryKey: ["bracket"] });
     },
   });
