@@ -1,4 +1,5 @@
 import supabase from "@/lib/supabase"
+import { User } from "@/types/auth.types"
 import { Session } from "@supabase/supabase-js"
 import { useEffect, useState } from "react"
 
@@ -24,14 +25,11 @@ const useAuth = () => {
     if (error) console.error("Signout Error", error)
   }
 
-  const user: {
-    name: string
-    email: string | undefined
-    image: string
-  } = {
-    name: session?.user.user_metadata.name ?? "",
+  const user: User = {
+    name: session?.user.user_metadata.name,
     email: session?.user.email,
-    image: session?.user.user_metadata.picture ?? "",
+    image: session?.user.user_metadata.picture,
+    joined_at: session?.user.created_at,
   }
 
   return { session, signOut, user }
