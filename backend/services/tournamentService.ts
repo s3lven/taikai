@@ -60,10 +60,26 @@ export class TournamentService {
           "tournaments.id",
           "tournament_editors.tournament_id"
         )
+        .leftJoin("brackets", "tournaments.id", "brackets.tournament_id")
         .where("tournaments.creator_id", userId)
         .orWhere("tournament_editors.user_id", userId)
-        .select("tournaments.*")
-        .distinct()
+        .select(
+          "tournaments.id",
+          "tournaments.name",
+          "tournaments.status",
+          "tournaments.location",
+          "tournaments.date",
+          pool.raw(`COALESCE(
+            JSON_AGG(json_build_object(
+              'id', brackets.id,
+              'name', brackets.name,
+              'status', brackets.status,
+              'type', brackets.type
+            ) ORDER BY brackets.id) FILTER (WHERE brackets.id IS NOT NULL),
+            '[]'
+          ) AS brackets`)
+        )
+        .groupBy("tournaments.id")
 
       // if (error) throw new AppError(error.message)
       // If there are no tournaments (returns null) then return an empty array instead
