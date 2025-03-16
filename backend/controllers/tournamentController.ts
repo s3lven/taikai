@@ -1,16 +1,33 @@
-import { NextFunction, Request, Response } from "express";
-import { tournamentService } from "../services/tournamentService";
-import { AppError } from "../utils/AppError";
-import { Tournament } from "../models/tournamentModel";
+import { NextFunction, Request, Response } from "express"
+import { tournamentService } from "../services/tournamentService"
+import { AppError } from "../utils/AppError"
+import { Tournament } from "../models/tournamentModel"
 
 export class TournamentController {
   async getTournaments(req: Request, res: Response, next: NextFunction) {
-    console.info("[INFO]: Getting all tournaments");
+    console.info("[INFO]: Getting all tournaments")
     try {
-      const tournaments = await tournamentService.getTournaments();
-      res.json({ message: "Getting Tournaments", payload: tournaments });
+      const supabase = req.supabase
+
+      const tournaments = await tournamentService.getTournaments(supabase)
+      res.json({ message: "Getting Tournaments", payload: tournaments })
     } catch (error) {
-      next(error);
+      next(error)
+    }
+  }
+
+  async getUserTournaments(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = req.user
+      if (!user) {
+        throw new AppError("Authentication required", 401)
+      }
+      console.info(`[INFO]: Getting all of the user ${req.user?.id} tournaments`)
+
+      const tournaments = await tournamentService.getUserTournaments(user.id)
+      res.json({ message: "Getting Tournaments", payload: tournaments })
+    } catch (error) {
+      next(error)
     }
   }
 

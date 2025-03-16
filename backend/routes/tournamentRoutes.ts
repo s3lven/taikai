@@ -1,14 +1,15 @@
 import express from "express";
 import { tournamentController } from "../controllers/tournamentController";
+import authenticateToken from "../middleware/authenticateSupabaseToken";
 
 const router = express.Router();
 
-router.get("/", async (req, res, next) => {
+router.get("/", authenticateToken, async (req, res, next) => {
   tournamentController.getTournaments(req, res, next);
 });
 
-router.get("/:id/brackets", async (req, res, next) => {
-  tournamentController.getBracketsByTournamentID(req, res, next);
+router.get("/user-tournaments", authenticateToken, async (req, res, next) => {
+  tournamentController.getUserTournaments(req, res, next);
 });
 
 router.post("/", async (req, res, next) => {

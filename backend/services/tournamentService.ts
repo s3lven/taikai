@@ -2,15 +2,20 @@ import { Tournament } from "../models/tournamentModel"
 import { BracketDTO, TournamentDTO } from "../types"
 import { AppError } from "../utils/AppError"
 import supabase from "../utils/supabase"
+import { Supabase } from "../types/express"
+import pool from "../db"
 
 export class TournamentService {
-  async getTournaments(): Promise<
+  async getTournaments(
+    supabase: Supabase
+  ): Promise<
     (TournamentDTO & { brackets: Omit<BracketDTO, "tournamentID">[] })[]
   > {
-    const { data: tournaments, error } = await supabase
-      .from("tournaments")
-      .select(
-        `
+    try {
+      const { data: tournaments, error } = await supabase
+        .from("tournaments")
+        .select(
+          `
           id,
           name,
           status,
@@ -23,16 +28,55 @@ export class TournamentService {
             type
           )
         `
-      )
-      .order("id", { ascending: false })
+        )
+        .order("id", { ascending: false })
 
-    if (error) throw new AppError(error.message)
-    if (!tournaments) throw new AppError("No tournaments found", 404)
+      if (error) throw new AppError(error.message)
+      if (!tournaments) throw new AppError("No tournaments found", 404)
 
-    return tournaments
+      console.log(tournaments)
+
+      return tournaments
+    } catch (error: any) {
+      throw error instanceof AppError ? error : new AppError()
+    }
   }
-  catch(error: any) {
-    throw error instanceof AppError ? error : new AppError()
+
+  async getUserTournaments(
+    userId: string
+  ): Promise<
+    (TournamentDTO & { brackets: Omit<BracketDTO, "tournamentID">[] })[]
+  > {
+    try {
+      // Supabase RPC -- b/c Supabase has limits but RPC is complicated imo
+      // const { data: tournaments, error } = await supabase.rpc(
+      //   "get_user_tournaments"
+      // )
+
+      // Knex.js equivalent if needed
+      const tournaments = await pool("tournaments")
+        .leftJoin(
+          "tournament_editors",
+          "tournaments.id",
+          "tournament_editors.tournament_id"
+        )
+        .where("tournaments.creator_id", userId)
+        .orWhere("tournament_editors.user_id", userId)
+        .select("tournaments.*")
+        .distinct()
+
+      // if (error) throw new AppError(error.message)
+      // If there are no tournaments (returns null) then return an empty array instead
+      if (!tournaments) return []
+
+      // The RPC call should return that type, however generating the types returns type JSON[]
+      return tournaments as unknown as (TournamentDTO & {
+        brackets: Omit<BracketDTO, "tournamentID">[]
+      })[]
+    } catch (error: any) {
+      console.error(`[ERROR]: ${error}`)
+      throw error instanceof AppError ? error : new AppError()
+    }
   }
 
   async createTournament(data: Partial<Tournament>): Promise<TournamentDTO> {

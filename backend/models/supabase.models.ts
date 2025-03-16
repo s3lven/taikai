@@ -36,21 +36,21 @@ export type Database = {
     Tables: {
       bracket_participants: {
         Row: {
-          bracket_id: number | null
+          bracket_id: number
           id: number
-          participant_id: number | null
+          participant_id: number
           sequence: number
         }
         Insert: {
-          bracket_id?: number | null
+          bracket_id: number
           id?: number
-          participant_id?: number | null
+          participant_id: number
           sequence: number
         }
         Update: {
-          bracket_id?: number | null
+          bracket_id?: number
           id?: number
-          participant_id?: number | null
+          participant_id?: number
           sequence?: number
         }
         Relationships: [
@@ -105,7 +105,7 @@ export type Database = {
       matches: {
         Row: {
           bracket_id: number
-          bye_match: boolean
+          bye_match: boolean | null
           created_at: string | null
           id: number
           match: number
@@ -119,7 +119,7 @@ export type Database = {
         }
         Insert: {
           bracket_id: number
-          bye_match?: boolean
+          bye_match?: boolean | null
           created_at?: string | null
           id?: number
           match: number
@@ -133,7 +133,7 @@ export type Database = {
         }
         Update: {
           bracket_id?: number
-          bye_match?: boolean
+          bye_match?: boolean | null
           created_at?: string | null
           id?: number
           match?: number
@@ -191,8 +191,35 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_editors: {
+        Row: {
+          added_at: string | null
+          tournament_id: number
+          user_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          tournament_id: number
+          user_id: string
+        }
+        Update: {
+          added_at?: string | null
+          tournament_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_editors_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournaments: {
         Row: {
+          creator_id: string
           date: string
           id: number
           location: string
@@ -200,6 +227,7 @@ export type Database = {
           status: Database["public"]["Enums"]["tournament_status"]
         }
         Insert: {
+          creator_id: string
           date: string
           id?: number
           location: string
@@ -207,6 +235,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["tournament_status"]
         }
         Update: {
+          creator_id?: string
           date?: string
           id?: number
           location?: string
@@ -220,6 +249,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_tournaments: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       reset_bracket: {
         Args: {
           reset_bracket_id: number
