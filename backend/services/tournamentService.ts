@@ -79,15 +79,23 @@ export class TournamentService {
     }
   }
 
-  async createTournament(data: Partial<Tournament>): Promise<TournamentDTO> {
-    if (!data.name || !data.location || !data.date) {
+  async createTournament(
+    data: Partial<Tournament>,
+    supabase: Supabase
+  ): Promise<TournamentDTO> {
+    if (!data.name || !data.location || !data.date || !data.creator_id) {
       throw new AppError("Missing required fields", 400)
     }
 
     try {
       const { data: tournament, error } = await supabase
         .from("tournaments")
-        .insert({ name: data.name, location: data.location, date: data.date })
+        .insert({
+          name: data.name,
+          location: data.location,
+          date: data.date,
+          creator_id: data.creator_id,
+        })
         .select()
         .single()
 
@@ -96,6 +104,42 @@ export class TournamentService {
 
       return tournament
     } catch (error: any) {
+      throw error instanceof AppError ? error : new AppError()
+    }
+  }
+
+  async addTournamentEditor(
+    userId: string,
+    editorId: string,
+    tournamentId: number,
+    supabase: Supabase
+  ) {
+    try {
+      if (!editorId || !tournamentId)
+        throw new AppError("Missing required fields", 400)
+
+      // Check to see if tournament exists, else error
+      const { data: tournament, error: tournamentError } = await supabase
+        .from("tournaments")
+        .select("creator_id")
+        .eq("id", tournamentId)
+        .single()
+
+      if (tournamentError) throw new AppError(tournamentError.message)
+
+      // Check if they are a creator, else they shouldn't have permissions to edit
+      if (tournament.creator_id !== userId)
+        throw new AppError("Only the creator can add editors", 403)
+
+      // Add the editor
+      const { data, error } = await supabase
+        .from("tournament_editors")
+        .insert({ tournament_id: tournamentId, user_id: editorId })
+
+      console.log(data)
+      if (error) throw new AppError(error.message)
+    } catch (error) {
+      console.error(`[ERROR]:`, error)
       throw error instanceof AppError ? error : new AppError()
     }
   }
