@@ -5,6 +5,7 @@ import {
   deleteBracket,
   deleteTournament,
   getTournaments,
+  getUserTournaments,
   updateTournament,
 } from "../api"
 import {
@@ -27,7 +28,7 @@ const useTournamentData = () => {
     refetch,
   } = useQuery({
     queryKey: ["tournaments"],
-    queryFn: getTournaments,
+    queryFn: getUserTournaments,
   })
 
   const getFilteredTournaments = (status: TournamentStatusType) => {
