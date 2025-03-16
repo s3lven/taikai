@@ -7,9 +7,7 @@ export class TournamentController {
   async getTournaments(req: Request, res: Response, next: NextFunction) {
     console.info("[INFO]: Getting all tournaments")
     try {
-      const supabase = req.supabase
-
-      const tournaments = await tournamentService.getTournaments(supabase)
+      const tournaments = await tournamentService.getTournaments()
       res.json({ message: "Getting Tournaments", payload: tournaments })
     } catch (error) {
       next(error)
@@ -22,7 +20,9 @@ export class TournamentController {
       if (!user) {
         throw new AppError("Authentication required", 401)
       }
-      console.info(`[INFO]: Getting all of the user ${req.user?.id} tournaments`)
+      console.info(
+        `[INFO]: Getting all of the user ${req.user?.id} tournaments`
+      )
 
       const tournaments = await tournamentService.getUserTournaments(user.id)
       res.json({ message: "Getting Tournaments", payload: tournaments })

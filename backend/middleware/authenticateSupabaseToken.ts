@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
 import { NextFunction, Request, Response } from "express"
-import { Database } from "../models/supabase.models"
 import { AppError } from "../utils/AppError"
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? ""
@@ -9,7 +8,7 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? ""
 // Middleware to verify JWT from the client
 const authenticateToken = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   const authHeader = req.headers["authorization"]
@@ -42,8 +41,7 @@ const authenticateToken = async (
     req.user = user
     next()
   } catch (error) {
-    console.error(error)
-    throw error instanceof AppError ? error : new AppError()
+    next(error)
   }
 }
 

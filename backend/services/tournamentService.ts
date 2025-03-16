@@ -6,9 +6,7 @@ import { Supabase } from "../types/express"
 import pool from "../db"
 
 export class TournamentService {
-  async getTournaments(
-    supabase: Supabase
-  ): Promise<
+  async getTournaments(): Promise<
     (TournamentDTO & { brackets: Omit<BracketDTO, "tournamentID">[] })[]
   > {
     try {
