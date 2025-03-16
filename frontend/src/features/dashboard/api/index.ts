@@ -7,8 +7,8 @@ import {
   TournamentForm,
 } from "@/types"
 
-const API_URL_TOURNAMENT = "/api/tournaments"
-const API_URL_BRACKET = "/api/brackets"
+const API_URL_TOURNAMENT = import.meta.env.PROD ? `${import.meta.env.VITE_BACKEND_URL}/api/tournaments` : "/api/tournaments"
+const API_URL_BRACKET = import.meta.env.PROD ? `${import.meta.env.VITE_BACKEND_URL}/api/brackets` : "/api/brackets"
 
 type ResponsePayload<T> = {
   message: string
