@@ -1,7 +1,7 @@
 import { Bracket, Match, Participant, Tournament } from "@/types";
 import { Change } from "@/types/changes";
 
-const API_URL = "/api/brackets";
+const API_URL = import.meta.env.PROD ? `${import.meta.env.VITE_BACKEND_URL}/api/brackets` : "/api/brackets";
 
 type ResponsePayload<T> = {
   message: string;
