@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx watch --env-file .env index.ts",
     "build": "tsc",
-    "start": "node --env-file dist/index.js",
+    "start": "node --env-file .env dist/index.js",
     "migrate:make": "knex --knexfile ./db/knexfile.ts migrate:make",
     "migrate:latest": "knex --knexfile ./db/knexfile.ts migrate:latest",
     "migrate:rollback": "knex --knexfile ./db/knexfile.ts migrate:rollback"
