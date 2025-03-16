@@ -16,14 +16,13 @@ jobs:
         with:
           node-version: "20"
       
-      - name: Go to backend folder
-        run: cd backend
-      
       - name: Install dependencies
         run: npm install
+        working-directory: ./backend
 
       - name: Generate deployment package
         run: zip -r deploy.zip .
+        working-directory: ./backend
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
