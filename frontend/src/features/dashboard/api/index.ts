@@ -66,6 +66,7 @@ export const updateTournament = async ({
     method: `PUT`,
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${await getSupabaseUser()}`,
     },
     body: JSON.stringify(tournament),
   })
@@ -79,6 +80,9 @@ export const updateTournament = async ({
 export const deleteTournament = async (id: number): Promise<void> => {
   const response = await fetch(`${API_URL_TOURNAMENT}/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${await getSupabaseUser()}`,
+    },
   })
   if (!response.ok) {
     throw new Error("Failed to delete tournament")

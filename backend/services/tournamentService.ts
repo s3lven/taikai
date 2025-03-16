@@ -158,14 +158,17 @@ export class TournamentService {
     }
   }
 
-  async editTournament(id: number, data: Partial<Tournament>) {
+  async editTournament(
+    supabase: Supabase,
+    id: number,
+    data: Partial<Tournament>
+  ) {
     try {
-      const { data: tournament, error } = await supabase
+      const { data: updatedTournament, error } = await supabase
         .from("tournaments")
         .update(data)
         .eq("id", id)
         .select()
-        .single()
 
       if (error) {
         console.error(error)
@@ -181,17 +184,32 @@ export class TournamentService {
         throw new AppError(error.message, 400)
       }
 
-      return tournament
+      // For some reason, there is no RLS error message sent so I'm just assuming this is how it works
+      if (!updatedTournament.length)
+        throw new AppError(
+          "You are not authorized to edit this tournament",
+          403
+        )
+
+      return updatedTournament
     } catch (error: any) {
       throw error instanceof AppError ? error : new AppError()
     }
   }
 
-  async deleteTournament(id: number): Promise<void> {
+  async deleteTournament(id: number, supabase: Supabase): Promise<Tournament> {
     try {
-      const { error } = await supabase.from("tournaments").delete().eq("id", id)
+      const { data, error } = await supabase
+        .from("tournaments")
+        .delete()
+        .eq("id", id)
+        .select()
 
+      console.log(data)
       if (error) throw new AppError(error.message)
+      if (!data.length) throw new AppError("Only creators are authorized to delete this tournament", 403)
+
+      return data[0]
     } catch (error: any) {
       throw error instanceof AppError ? error : new AppError()
     }

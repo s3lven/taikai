@@ -99,6 +99,11 @@ export class TournamentController {
 
   async editTournament(req: Request, res: Response, next: NextFunction) {
     try {
+      const supabase = req.supabase
+      const user = req.user
+
+      if (!user) throw new AppError("Authentication Required", 401)
+
       const tournamentID = parseInt(req.params.id)
       if (isNaN(tournamentID)) {
         throw new AppError(`Invalid tournament ID ${tournamentID}`)
@@ -118,11 +123,12 @@ export class TournamentController {
       }
 
       const updatedTournament = await tournamentService.editTournament(
+        supabase,
         tournamentID,
         tournament
       )
       res.json({
-        message: `Updated test ${tournamentID}`,
+        message: `Updated tournament ${tournamentID}`,
         payload: updatedTournament,
       })
     } catch (error) {
@@ -133,9 +139,15 @@ export class TournamentController {
   async deleteTournament(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id)
+      const user = req.user
+      const supabase = req.supabase
       console.info(`[INFO]: Deleting tourament ${id}`)
-      await tournamentService.deleteTournament(id)
-      res.status(204).json({ message: `Deleted tournament ${id}` })
+      if (!user) throw new AppError("Authentication Requred", 401)
+      const deletedTournament = await tournamentService.deleteTournament(
+        id,
+        supabase
+      )
+      res.json({ message: `Deleted tournament ${deletedTournament.name}` })
     } catch (error) {
       next(error)
     }
