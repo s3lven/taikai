@@ -105,7 +105,7 @@ export type Database = {
       matches: {
         Row: {
           bracket_id: number
-          bye_match: boolean | null
+          bye_match: boolean
           created_at: string | null
           id: number
           match: number
@@ -119,7 +119,7 @@ export type Database = {
         }
         Insert: {
           bracket_id: number
-          bye_match?: boolean | null
+          bye_match?: boolean
           created_at?: string | null
           id?: number
           match: number
@@ -133,7 +133,7 @@ export type Database = {
         }
         Update: {
           bracket_id?: number
-          bye_match?: boolean | null
+          bye_match?: boolean
           created_at?: string | null
           id?: number
           match?: number
