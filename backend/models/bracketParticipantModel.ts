@@ -1,6 +1,4 @@
-export interface BracketParticipant {
-  id: number;
-  bracket_id: number;
-  participant_id: number;
-  sequence: number;
-}
+import { Database } from "./supabase.models";
+
+export type BracketParticipant = Database["public"]["Tables"]["bracket_participants"]["Row"]
+

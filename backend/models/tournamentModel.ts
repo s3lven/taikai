@@ -1,9 +1,4 @@
-export type TournamentStatusType = "Active" | "Upcoming" | "Past";
+import { Database } from "./supabase.models"
 
-export interface Tournament {
-  id: number;
-  name: string;
-  status: TournamentStatusType;
-  location: string;
-  date: string;
-}
+export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"]
+export type TournamentStatusType = Database["public"]["Enums"]["tournament_status"]

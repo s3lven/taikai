@@ -1,22 +1,7 @@
+import { Database } from "./supabase.models";
 
-export type IpponType =
-  | "Men"
-  | "Kote"
-  | "Do"
-  | "Tsuki"
-  | "Hantei"
-  | "Hansoku"
-  | "None";
+export type IpponType = Database["public"]["Enums"]["ippon_type"]
 
-export interface Match {
-  id: number;
-  bracket_id: number;
-  player1_id: number | null;
-  player2_id: number | null;
-  player1_score: IpponType[];
-  player2_score: IpponType[];
-  winner_id: number | null;
-  round: number;
-  match: number;
-  bye_match: boolean
-}
+export type Match = Database["public"]["Tables"]["matches"]["Row"]
+
+export type NewMatch = Database["public"]["Tables"]["matches"]["Insert"]

@@ -1,27 +1,41 @@
+import { getSupabaseUser } from "@/lib/supabase"
 import {
   Bracket,
   CreateBracketForm,
   CreateTournamentForm,
   Tournament,
   TournamentForm,
-} from "@/types";
+} from "@/types"
 
-const API_URL_TOURNAMENT = "/api/tournaments";
-const API_URL_BRACKET = "/api/brackets";
+const API_URL_TOURNAMENT = "/api/tournaments"
+const API_URL_BRACKET = "/api/brackets"
 
 type ResponsePayload<T> = {
-  message: string;
-  payload: T;
-};
+  message: string
+  payload: T
+}
 
 export const getTournaments = async (): Promise<Tournament[]> => {
-  const response = await fetch(`${API_URL_TOURNAMENT}`);
+  const response = await fetch(`${API_URL_TOURNAMENT}`)
   if (!response.ok) {
-    throw new Error("Failed to fetch tournaments");
+    throw new Error("Failed to fetch tournaments")
   }
-  const data: ResponsePayload<Tournament[]> = await response.json();
-  return data.payload;
-};
+  const data: ResponsePayload<Tournament[]> = await response.json()
+  return data.payload
+}
+
+export const getUserTournaments = async (): Promise<Tournament[]> => {
+  const response = await fetch(`${API_URL_TOURNAMENT}/user-tournaments`, {
+    headers: {
+      Authorization: `Bearer ${await getSupabaseUser()}`,
+    },
+  })
+  if (!response.ok) {
+    throw new Error("Failed to fetch tournaments")
+  }
+  const data: ResponsePayload<Tournament[]> = await response.json()
+  return data.payload
+}
 
 export const createTournament = async (
   tournament: CreateTournamentForm
@@ -30,46 +44,51 @@ export const createTournament = async (
     method: `POST`,
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${await getSupabaseUser()}`,
     },
     body: JSON.stringify(tournament),
-  });
+  })
   if (!response.ok) {
-    throw new Error("Failed to create tournament");
+    throw new Error("Failed to create tournament")
   }
-  const data: ResponsePayload<Tournament> = await response.json();
-  return data.payload;
-};
+  const data: ResponsePayload<Tournament> = await response.json()
+  return data.payload
+}
 
 export const updateTournament = async ({
   id,
   tournament,
 }: {
-  id: number;
-  tournament: TournamentForm;
+  id: number
+  tournament: TournamentForm
 }) => {
   const response = await fetch(`${API_URL_TOURNAMENT}/${id}`, {
     method: `PUT`,
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${await getSupabaseUser()}`,
     },
     body: JSON.stringify(tournament),
-  });
+  })
   if (!response.ok) {
-    throw new Error("Failed to update tournament");
+    throw new Error("Failed to update tournament")
   }
-  const data: ResponsePayload<Tournament> = await response.json();
-  return data.payload;
-};
+  const data: ResponsePayload<Tournament> = await response.json()
+  return data.payload
+}
 
 export const deleteTournament = async (id: number): Promise<void> => {
   const response = await fetch(`${API_URL_TOURNAMENT}/${id}`, {
     method: "DELETE",
-  });
+    headers: {
+      Authorization: `Bearer ${await getSupabaseUser()}`,
+    },
+  })
   if (!response.ok) {
-    throw new Error("Failed to delete tournament");
+    throw new Error("Failed to delete tournament")
   }
-  return;
-};
+  return
+}
 
 export const createBracket = async (bracket: CreateBracketForm) => {
   const response = await fetch(`${API_URL_BRACKET}`, {
@@ -78,25 +97,25 @@ export const createBracket = async (bracket: CreateBracketForm) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(bracket),
-  });
+  })
   if (!response.ok) {
-    throw new Error("Failed to create tournament");
+    throw new Error("Failed to create tournament")
   }
-  const data: ResponsePayload<Bracket> = await response.json();
-  return data.payload;
-};
+  const data: ResponsePayload<Bracket> = await response.json()
+  return data.payload
+}
 
 export const deleteBracket = async ({
   bracketID,
 }: {
-  tournamentID: number;
-  bracketID: number;
+  tournamentID: number
+  bracketID: number
 }): Promise<void> => {
   const response = await fetch(`${API_URL_BRACKET}/${bracketID}`, {
     method: "DELETE",
-  });
+  })
   if (!response.ok) {
-    throw new Error("Failed to delete bracket");
+    throw new Error("Failed to delete bracket")
   }
-  return;
-};
+  return
+}

@@ -1,125 +1,219 @@
-import pool from "../db";
-import { Bracket } from "../models/bracketModel";
-import { Tournament } from "../models/tournamentModel";
-import { BracketDTO, TournamentDTO } from "../types";
-import { AppError } from "../utils/AppError";
+import { Tournament } from "../models/tournamentModel"
+import { BracketDTO, TournamentDTO } from "../types"
+import { AppError } from "../utils/AppError"
+import supabase from "../utils/supabase"
+import { Supabase } from "../types/express"
+import pool from "../db"
 
 export class TournamentService {
   async getTournaments(): Promise<
-    (TournamentDTO & { bracket: Omit<BracketDTO, "tournamentID">[] })[]
+    (TournamentDTO & { brackets: Omit<BracketDTO, "tournamentID">[] })[]
   > {
     try {
-      // Grabs the tournament and bracket data such that bracket is an object in the tournament results
+      const { data: tournaments, error } = await supabase
+        .from("tournaments")
+        .select(
+          `
+          id,
+          name,
+          status,
+          location,
+          date,
+          brackets (
+            id,
+            name,
+            status,
+            type
+          )
+        `
+        )
+        .order("id", { ascending: false })
+
+      if (error) throw new AppError(error.message)
+      if (!tournaments) throw new AppError("No tournaments found", 404)
+
+      console.log(tournaments)
+
+      return tournaments
+    } catch (error: any) {
+      throw error instanceof AppError ? error : new AppError()
+    }
+  }
+
+  async getUserTournaments(
+    userId: string
+  ): Promise<
+    (TournamentDTO & { brackets: Omit<BracketDTO, "tournamentID">[] })[]
+  > {
+    try {
+      // Supabase RPC -- b/c Supabase has limits but RPC is complicated imo
+      // const { data: tournaments, error } = await supabase.rpc(
+      //   "get_user_tournaments"
+      // )
+
+      // Knex.js equivalent if needed
       const tournaments = await pool("tournaments")
+        .leftJoin(
+          "tournament_editors",
+          "tournaments.id",
+          "tournament_editors.tournament_id"
+        )
+        .leftJoin("brackets", "tournaments.id", "brackets.tournament_id")
+        .where("tournaments.creator_id", userId)
+        .orWhere("tournament_editors.user_id", userId)
         .select(
           "tournaments.id",
           "tournaments.name",
           "tournaments.status",
           "tournaments.location",
           "tournaments.date",
-          pool.raw(`COALESCE(JSON_AGG(json_build_object(
-          'id', brackets.id,
-          'name', brackets.name,
-          'status', brackets.status,
-          'type', brackets.type
-          ) ORDER BY brackets.id
-          ) FILTER (WHERE brackets.id IS NOT NULL),
-          '[]'
-          ) AS brackets
-          `)
+          pool.raw(`COALESCE(
+            JSON_AGG(json_build_object(
+              'id', brackets.id,
+              'name', brackets.name,
+              'status', brackets.status,
+              'type', brackets.type
+            ) ORDER BY brackets.id) FILTER (WHERE brackets.id IS NOT NULL),
+            '[]'
+          ) AS brackets`)
         )
-        .leftJoin("brackets", "tournaments.id", "brackets.tournament_id")
-        .groupBy("tournaments.id");
-      return tournaments;
+        .groupBy("tournaments.id")
+
+      // if (error) throw new AppError(error.message)
+      // If there are no tournaments (returns null) then return an empty array instead
+      if (!tournaments) return []
+
+      // The RPC call should return that type, however generating the types returns type JSON[]
+      return tournaments as unknown as (TournamentDTO & {
+        brackets: Omit<BracketDTO, "tournamentID">[]
+      })[]
     } catch (error: any) {
-      throw new AppError();
+      console.error(`[ERROR]: ${error}`)
+      throw error instanceof AppError ? error : new AppError()
     }
   }
 
-  async getBracketsByTournamentID(id: number): Promise<BracketDTO[]> {
+  async createTournament(
+    data: Partial<Tournament>,
+    supabase: Supabase
+  ): Promise<TournamentDTO> {
+    if (!data.name || !data.location || !data.date || !data.creator_id) {
+      throw new AppError("Missing required fields", 400)
+    }
+
     try {
-      // Check if tournament id exists
-      const tournamentExists = await pool<Tournament>("tournaments")
-        .select("*")
-        .where("id", id)
-        .first();
+      const { data: tournament, error } = await supabase
+        .from("tournaments")
+        .insert({
+          name: data.name,
+          location: data.location,
+          date: data.date,
+          creator_id: data.creator_id,
+        })
+        .select()
+        .single()
 
-      if (!tournamentExists)
-        throw new AppError(`Tournament ${id} does not exist`, 404);
+      if (error) throw new AppError(error.message, 400)
+      if (!tournament) throw new AppError("Failed to create tournament")
 
-      // Get the brackets
-      const result = await pool<Bracket>("brackets")
-        .where("tournament_id", id)
-        .select("id", "tournament_id", "name", "type", "status")
-        .orderBy("id", "desc");
-      if (!result)
-        throw new AppError(`There are no bracktes for tournament ${id}`, 404);
-
-      // Format brackets
-      const brackets: BracketDTO[] = result.map((bracket) => ({
-        id: bracket.id,
-        tournamentID: bracket.tournament_id,
-        name: bracket.name,
-        type: bracket.type,
-        status: bracket.status,
-      }));
-      return brackets;
+      return tournament
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      else throw new AppError();
+      throw error instanceof AppError ? error : new AppError()
     }
   }
 
-  async createTournament(data: Partial<Tournament>): Promise<TournamentDTO> {
-    if (!data.name || !data.location || !data.date)
-      throw new AppError("Missing required fields", 400);
-    const result = await pool<Tournament>("tournaments")
-      .insert(data)
-      .returning(["id", "name", "location", "date", "status"]);
-    const newTask: TournamentDTO = {
-      id: result[0].id,
-      name: result[0].name,
-      location: result[0].location,
-      date: result[0].date,
-      status: result[0].status,
-    };
-    return newTask;
+  async addTournamentEditor(
+    userId: string,
+    editorId: string,
+    tournamentId: number,
+    supabase: Supabase
+  ) {
+    try {
+      if (!editorId || !tournamentId)
+        throw new AppError("Missing required fields", 400)
+
+      // Check to see if tournament exists, else error
+      const { data: tournament, error: tournamentError } = await supabase
+        .from("tournaments")
+        .select("creator_id")
+        .eq("id", tournamentId)
+        .single()
+
+      if (tournamentError) throw new AppError(tournamentError.message)
+
+      // Check if they are a creator, else they shouldn't have permissions to edit
+      if (tournament.creator_id !== userId)
+        throw new AppError("Only the creator can add editors", 403)
+
+      // Add the editor
+      const { data, error } = await supabase
+        .from("tournament_editors")
+        .insert({ tournament_id: tournamentId, user_id: editorId })
+
+      console.log(data)
+      if (error) throw new AppError(error.message)
+    } catch (error) {
+      console.error(`[ERROR]:`, error)
+      throw error instanceof AppError ? error : new AppError()
+    }
   }
 
-  async editTournament(id: number, data: Partial<Tournament>) {
+  async editTournament(
+    supabase: Supabase,
+    id: number,
+    data: Partial<Tournament>
+  ) {
     try {
-      const result = await pool<Tournament>("tournaments")
-        .where("id", id)
+      const { data: updatedTournament, error } = await supabase
+        .from("tournaments")
         .update(data)
-        .returning("*");
-      if (!result) throw new AppError(`Tournament ${id} not found`, 404);
-      const updatedTournament: TournamentDTO = {
-        ...result[0],
-      };
-      return updatedTournament;
-    } catch (error: any) {
-      console.log(error, typeof error);
-      if (error instanceof AppError) throw error;
-      else if (error.code === "22008")
-        throw new AppError(`Date ${data.date} is invalid`, 400);
-      else if (error.code === "23514")
+        .eq("id", id)
+        .select()
+
+      if (error) {
+        console.error(error)
+        if (error.code === "22008") {
+          throw new AppError(`Date ${data.date} is invalid`, 400)
+        }
+        if (error.code === "PGRST116") {
+          throw new AppError(`Tournament ${id} not found`, 404)
+        }
+        if (error.code === "22P02") {
+          throw new AppError(`Status '${data.status}' is invalid`, 400)
+        }
+        throw new AppError(error.message, 400)
+      }
+
+      // For some reason, there is no RLS error message sent so I'm just assuming this is how it works
+      if (!updatedTournament.length)
         throw new AppError(
-          `Tournament status ${data.status} is not valid`,
-          400
-        );
-      else throw new AppError("Internal sever error", 500);
+          "You are not authorized to edit this tournament",
+          403
+        )
+
+      return updatedTournament
+    } catch (error: any) {
+      throw error instanceof AppError ? error : new AppError()
     }
   }
 
-  async deleteTournament(id: number): Promise<void> {
+  async deleteTournament(id: number, supabase: Supabase): Promise<Tournament> {
     try {
-      const deleted = await pool("tournaments").where({ id }).del();
-      if (!deleted) throw new AppError(`Tournament ${id} not found`, 404);
+      const { data, error } = await supabase
+        .from("tournaments")
+        .delete()
+        .eq("id", id)
+        .select()
+
+      console.log(data)
+      if (error) throw new AppError(error.message)
+      if (!data.length) throw new AppError("Only creators are authorized to delete this tournament", 403)
+
+      return data[0]
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      else throw new AppError();
+      throw error instanceof AppError ? error : new AppError()
     }
   }
 }
 
-export const tournamentService = new TournamentService();
+export const tournamentService = new TournamentService()

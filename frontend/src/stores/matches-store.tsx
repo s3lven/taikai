@@ -83,28 +83,10 @@ export const useMatchesStore = create<MatchesStore>()(
             }
           }
         }
-
-        // Calculate and Update the progress
-        let totalMatches = 0;
-        let completedMatches = 0;
-
-        state.rounds.forEach((round) => {
-          round.forEach((match) => {
-            // Check if the match is not a bye round
-            if (match.id !== -1) {
-              totalMatches++;
-              if (match.winner) completedMatches++;
-            }
-          });
-        });
-
-        // Don't divide by 0
-        const progress =
-          totalMatches > 0
-            ? Math.round((completedMatches / totalMatches) * 100)
-            : 0;
-        useBracketStore.getState().updateProgress(progress);
       });
+
+      // Calculate and Update the progress
+      useBracketStore.getState().updateProgress();
 
       // Reflect changes in the change tracking store
       const mat = get()
@@ -191,7 +173,7 @@ export const useMatchesStore = create<MatchesStore>()(
                 player1_id: null,
                 player1_score: [],
                 player2_score: [],
-                winner: null,
+                winner_id: null,
               },
             });
           } else {
@@ -205,7 +187,7 @@ export const useMatchesStore = create<MatchesStore>()(
                 player2_id: null,
                 player1_score: [],
                 player2_score: [],
-                winner: null,
+                winner_id: null,
               },
             });
           }
@@ -236,6 +218,8 @@ export const useMatchesStore = create<MatchesStore>()(
         // Reset all dependent matches recursively
         resetDependentMatches(roundIndex, matchIndex);
       });
+
+      useBracketStore.getState().updateProgress()
     },
   }))
 );

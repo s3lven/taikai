@@ -33,7 +33,6 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
   const { submitScore: submitScoreQuery } = useSubmitScoreQuery();
 
   const handleSubmitScore = async () => {
-    console.log(`Submitting winner for match`, match.id);
     submitScore(match.id, winner);
     submitScoreQuery();
   };
@@ -45,17 +44,11 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
   // Used to reset the winner state and styles when clicking on reset bracket
   useEffect(() => {
     if (matchFromStore) {
-      // console.group("Match", matchFromStore.id);
-      // console.log("Winner:", matchFromStore.winner);
-      // console.log(redPlayer);
-      // console.log(whitePlayer);
-      // console.groupEnd();
       setWinner(matchFromStore.winner);
     }
   }, [matchFromStore]);
 
   const handleResetMatch = () => {
-    console.log("Resetting match", match.id);
     resetMatch(match.id);
   };
 
