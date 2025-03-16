@@ -22,7 +22,7 @@ import {
 import { Button } from "../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { LogOut, User } from "lucide-react"
-import { DarkModeToggle } from "../dark-mode/dark-toggle"
+// import { DarkModeToggle } from "../dark-mode/dark-toggle"
 
 interface NavLinkType {
   name: string

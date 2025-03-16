@@ -9,7 +9,7 @@ import { BracketType } from "@/types";
 import { useShallow } from "zustand/react/shallow";
 
 const BracketTypeInput = () => {
-	const [type, setBracketType, status] = useBracketStore(useShallow((state) => [state.bracket.type, state.setBracketType, state.bracket.status]));
+	const [type, setBracketType] = useBracketStore(useShallow((state) => [state.bracket.type, state.setBracketType, state.bracket.status]));
 
 	return (
 		<div className="w-full h-full flex flex-col gap-1">

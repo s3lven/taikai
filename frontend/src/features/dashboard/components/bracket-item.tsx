@@ -1,5 +1,5 @@
 import { Bracket } from "@/types";
-import { User } from "lucide-react";
+// import { User } from "lucide-react";
 import BracketSettings from "./bracket-settings";
 import { useNavigate } from "react-router-dom";
 

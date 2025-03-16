@@ -4,7 +4,7 @@ import {
   createTournament,
   deleteBracket,
   deleteTournament,
-  getTournaments,
+  // getTournaments,
   getUserTournaments,
   updateTournament,
 } from "../api"
@@ -114,7 +114,7 @@ const useTournamentData = () => {
   const addBracket = useCallback(
     async (bracket: CreateBracketForm) => {
       const result = await addBracketMutation.mutateAsync(bracket, {
-        onSuccess: (bracket) => {},
+        onSuccess: () => {},
         onError: (error: Error) => {
           console.error(error.message)
         },
