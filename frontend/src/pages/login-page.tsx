@@ -1,4 +1,4 @@
-import supabase from "@/lib/supabase"
+import supabase, { redirectURL } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -13,6 +13,9 @@ const LoginPage = () => {
   const handleGoogleSignUp = () => {
     supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: redirectURL
+      }
     })
   }
 
