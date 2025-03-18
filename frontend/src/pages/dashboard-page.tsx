@@ -14,7 +14,7 @@ const DashboardPage = () => {
   } = useTournamentStore();
 
   return (
-    <div className="pb-8 max-w-screen-2xl px-[60px] mx-auto w-full flex-1 flex flex-col ">
+    <div className="pb-8 container px-4 mx-auto w-full flex-1 flex flex-col ">
       <div className="w-full pt-6 pb-2 border-b border-figma_neutral5 flex justify-between items-center">
         <h1 className="text-figma_dark text-title">Dashboard</h1>
         <Button
