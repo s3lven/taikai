@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -12,32 +12,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
-import { TournamentForm, TournamentStatusType } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import useTournamentData from "../../hooks/useTournamentData";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store"
+import { TournamentForm, TournamentStatusType } from "@/types"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import useTournamentData from "../../hooks/useTournamentData"
 
 const formSchema = z.object({
   name: z
     .string()
     .min(2, { message: "Name must be longer than 2 characters" })
     .max(50, { message: "Name must be shorter than 50 characters" }),
-});
+})
 
 const TournamentEditDialog = () => {
-  const { editingTournament, setEditingTournament } = useTournamentStore();
-  const { editTournament, isEditingTournament } = useTournamentData();
+  const { editingTournament, setEditingTournament } = useTournamentStore()
+  const { editTournament, isEditingTournament } = useTournamentData()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: editingTournament
       ? { name: editingTournament.name }
       : { name: "" },
-  });
+  })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const newTournament: TournamentForm & { status: TournamentStatusType } = {
@@ -45,10 +45,10 @@ const TournamentEditDialog = () => {
       status: "Upcoming",
       location: "here",
       date: "2024-02-29",
-    };
-    editTournament(editingTournament!.id, newTournament);
-    setEditingTournament(null);
-  };
+    }
+    editTournament(editingTournament!.id, newTournament)
+    setEditingTournament(null)
+  }
 
   return (
     <Dialog
@@ -56,7 +56,7 @@ const TournamentEditDialog = () => {
       onOpenChange={() => setEditingTournament(null)}
     >
       <DialogContent
-        className=" max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
+        className="container w-full max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
         aria-describedby={undefined}
       >
         <DialogHeader className="border-b border-white pb-2 space-y-4">
@@ -97,7 +97,7 @@ const TournamentEditDialog = () => {
         </Form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default TournamentEditDialog;
+export default TournamentEditDialog

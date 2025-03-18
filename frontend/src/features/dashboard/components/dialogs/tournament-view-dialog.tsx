@@ -4,15 +4,15 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 
-import BracketItem from "../bracket-item";
-import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
-import BracketAddButton from "../bracket-add-button";
+import BracketItem from "../bracket-item"
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store"
+import BracketAddButton from "../bracket-add-button"
 
 const TournamentViewDialog = () => {
-  const order = ["Active", "Upcoming", "Past"];
-  const { viewingTournament, setViewingTournament } = useTournamentStore();
+  const order = ["Active", "Upcoming", "Past"]
+  const { viewingTournament, setViewingTournament } = useTournamentStore()
 
   return (
     <Dialog
@@ -20,7 +20,7 @@ const TournamentViewDialog = () => {
       onOpenChange={() => setViewingTournament(null)}
     >
       <DialogContent
-        className="max-w-3xl w-full max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
+        className="container w-full max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
         aria-describedby={undefined}
       >
         <DialogHeader className="border-b border-white pb-2 space-y-4">
@@ -45,7 +45,7 @@ const TournamentViewDialog = () => {
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default TournamentViewDialog;
+export default TournamentViewDialog
