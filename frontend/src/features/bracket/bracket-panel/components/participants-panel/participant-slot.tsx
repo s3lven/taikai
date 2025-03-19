@@ -75,9 +75,9 @@ const ParticipantSlot = ({
 						{participant.sequence}
 					</p>
 				</div>
-				<div className="flex justify-between items-center gap-2">
+				<div className="flex-1 flex justify-between items-center gap-2">
 					<Input
-						className="w-[215px] h-full border border-figma_grey bg-figma_neutral8 text-figma_grey px-1"
+						className="w-full h-full border border-figma_grey bg-figma_neutral8 text-figma_grey px-1"
 						value={inputValue}
 						onChange={handleChangeName}
 					/>
