@@ -14,7 +14,7 @@ const HomePage = () => {
               Welcome to Taikai
             </p>
           </div>
-          <p className="lg:text-xl lg:leading-8 text-center text-base tracking-[0.5px] text-white text-balance">
+          <p className="lg:text-xl lg:leading-8 text-center text-base tracking-[0.5px] text-white text-balance lg:w-1/2 mx-auto">
             Taikai provides intuitive bracket creation, real-time match updates,
             and easy navigation to ensure your taikai runs smoothly.
           </p>

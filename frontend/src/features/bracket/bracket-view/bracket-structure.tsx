@@ -58,7 +58,7 @@ const BracketStructure = () => {
   const { width: svgWidth, height: svgHeight } = calculateRequiredDimensions();
 
   return (
-    <div ref={containerRef} className="w-full h-full relative overflow-auto">
+    <div ref={containerRef} className="w-full h-fit relative overflow-auto">
       {/* SVG layer for connectors */}
       <svg
         className="absolute top-0 left-0 w-full h-full pointer-events-none"
