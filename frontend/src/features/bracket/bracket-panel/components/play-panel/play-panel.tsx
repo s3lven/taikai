@@ -1,6 +1,6 @@
 // import EditorButton from "../../../components/editor-button";
 import PlayProgress from "./play-progress"
-import SaveChangeButton from "../save-changes-button"
+import SaveChangesPanel from "./save-changes-panel"
 
 interface PlayPanelProps {
   isTitleVisible?: boolean
@@ -23,20 +23,7 @@ const PlayPanel = ({ isTitleVisible = true }: PlayPanelProps) => {
       </div>
 
       {/* Changes */}
-      {/* TODO: Hook up this feature to save on a database */}
-      <div className="w-full flex flex-col gap-8 px-2 py-4 bg-figma_shade2_30 shadow rounded-sm">
-        <div className="w-full pb-2 border-b border-figma_neutral8 ">
-          <p className="text-desc text-center text-figma_grey">
-            Changes Unsaved
-          </p>
-        </div>
-        <p className="text-desc text-center text-figma_grey">
-          Save your changes to make sure your work doesn&apos;t disappear!
-        </p>
-        <div className="flex justify-center items-center">
-          <SaveChangeButton />
-        </div>
-      </div>
+      <SaveChangesPanel />
 
       {/* Bracket Status */}
       {/* <div className="w-full flex flex-col gap-4 px-2 py-4 bg-figma_shade2_30 shadow rounded-sm">
