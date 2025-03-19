@@ -60,7 +60,7 @@ const ParticipantSlot = ({
 	};
 
 	return (
-		<div ref={setNodeRef} style={style} className="w-full h-6">
+		<div ref={setNodeRef} style={style} className="w-full h-6 touch-none">
 			<div
 				className={`${
 					isDragging || forceDragging ? "cursor-grabbing" : "cursor-grab"
