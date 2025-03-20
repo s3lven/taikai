@@ -126,6 +126,12 @@ const Profile = () => {
 
 const Navbar = () => {
   const { session, signOut, user } = useAuth()
+  const [navbarOpen, setNavbarOpen] = useState(false)
+
+  const handleLogout = () => {
+    setNavbarOpen(false)
+    signOut()
+  }
 
   return (
     <nav className="bg-figma_dark h-[60px] w-full">
@@ -146,7 +152,7 @@ const Navbar = () => {
             <Profile />
           </NavigationMenuList>
 
-          <Dialog>
+          <Dialog open={navbarOpen} onOpenChange={setNavbarOpen}>
             <DialogTrigger className="bg-transparent hover:bg-figma_secondary text-white sm:hidden">
               <Menu />
             </DialogTrigger>
@@ -171,41 +177,53 @@ const Navbar = () => {
                   </DialogPrimitive.Close>
                 </div>
                 <ul className="flex flex-col gap-4 text-white/90 transition-colors font-semibold">
-                  <Link
-                    to={"/dashboard"}
-                    className="hover:text-white hover:bg-figma_secondary rounded py-1 px-1"
-                  >
-                    Dashboard
-                  </Link>
-                  {/* <Link
-                    to={"/explore"}
-                    className="hover:text-white hover:bg-figma_secondary rounded py-1 px-1"
-                  >
-                    Explore
-                  </Link> */}
-                  <Separator className="bg-slate-300 px-" />
                   {session ? (
-                    <div className="flex items-center justify-between px-1">
-                      <div className="flex flex-col space-y-1 ">
-                        <p className="text-sm leading-none font-semibold">
-                          {user.name || "User"}
-                        </p>
-                        <p
-                          className="text-xs font-medium leading-none text-slate-4
-                        00"
-                        >
-                          {user.email || "user@example.com"}
-                        </p>
-                      </div>
-                      <button
-                        className="flex items-center gap-2 hover:text-white text-white/70"
-                        onClick={signOut}
+                    <>
+                      <Link
+                        to={"/dashboard"}
+                        onClick={() => setNavbarOpen(false)}
+                        className="hover:text-white hover:bg-figma_secondary rounded py-1 px-1"
                       >
-                        <LogOut className="h-4 w-4" />
-                      </button>
-                    </div>
+                        Dashboard
+                      </Link>
+
+                      {/* <Link
+                        to={"/explore"}
+                        onClick={() => setNavbarOpen(false)}
+                        className="hover:text-white hover:bg-figma_secondary rounded py-1 px-1"
+                      >
+                        Explore
+                      </Link> */}
+
+                      <Separator className="bg-slate-300 px-" />
+                      <div className="flex items-center justify-between px-1">
+                        <div className="flex flex-col space-y-1 ">
+                          <p className="text-sm leading-none font-semibold">
+                            {user.name || "User"}
+                          </p>
+                          <p
+                            className="text-xs font-medium leading-none text-slate-4
+                        00"
+                          >
+                            {user.email || "user@example.com"}
+                          </p>
+                        </div>
+                        <button
+                          className="flex items-center gap-2 hover:text-white text-white/70"
+                          onClick={handleLogout}
+                        >
+                          <LogOut className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </>
                   ) : (
-                    <p>Login</p>
+                    <Link
+                      className="px-1 hover:cursor-pointer"
+                      to={"/login"}
+                      onClick={() => setNavbarOpen(false)}
+                    >
+                      Login
+                    </Link>
                   )}
                 </ul>
               </DialogPrimitive.Content>
