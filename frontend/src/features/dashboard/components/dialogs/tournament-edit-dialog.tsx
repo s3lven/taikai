@@ -56,7 +56,7 @@ const TournamentEditDialog = () => {
       onOpenChange={() => setEditingTournament(null)}
     >
       <DialogContent
-        className="container w-full max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
+        className="container w-11/12 max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
         aria-describedby={undefined}
       >
         <DialogHeader className="border-b border-white pb-2 space-y-4">

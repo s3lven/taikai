@@ -23,7 +23,7 @@ import {
 import { Button } from "../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { LogOut, Menu, User, X } from "lucide-react"
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
+import { Dialog, DialogTrigger } from "../ui/dialog"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { cn } from "@/lib/utils"
 import { Separator } from "../ui/separator"
