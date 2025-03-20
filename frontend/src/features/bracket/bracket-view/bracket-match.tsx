@@ -97,7 +97,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
       </Dialog.Close>
       {/* Reset Button */}
       <Dialog.Close asChild>
-        <div className="absolute bottom-4 right-4">
+        <div className="md:absolute bottom-4 right-4">
           <EditorButton
             text={"reset match"}
             variant="no-outline"
@@ -200,7 +200,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
         <Dialog.Overlay className="bg-figma_shade2/80 data-[state=open]:animate-overlayShow fixed inset-0" />
         <Dialog.Content
           className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] focus:outline-none
-          max-w-[680px] max-h-[425px] flex flex-col justify-between items-center p-4 gap-[10px] bg-figma_neutral8 w-full h-full font-poppins"
+          max-w-[680px] max-h-[425px] flex flex-col justify-between items-center p-4 gap-[10px] bg-figma_neutral8 h-full font-poppins w-11/12"
           aria-describedby={undefined}
         >
           <Dialog.Title asChild>

@@ -153,7 +153,7 @@ const Navbar = () => {
             <DialogPrimitive.DialogPortal>
               <DialogPrimitive.Overlay
                 className={cn(
-                  "fixed inset-0 z-50 bg-[#1c1060]/90 backdrop-blur data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+                  "fixed inset-0 z-50 bg-figma_shade2/90 backdrop-blur data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
                 )}
               />
               <DialogPrimitive.Content

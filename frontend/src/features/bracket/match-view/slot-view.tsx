@@ -41,12 +41,12 @@ const SlotView = ({
 				</p>
 			</div>
 			<div
-				className={`w-full h-full flex justify-between items-center px-2 bg-figma_shade2_30 ${
+				className={`overflow-hidden w-full flex-1 h-full flex justify-between items-center px-2 bg-figma_shade2_30 ${
 					color === "Red" ? "rounded-tr" : "rounded-br"
 				}`}
 			>
-				<div className="flex items-center justify-center">
-					<p className="text-desc text-white">
+				<div className="flex items-centero overflow-hidden">
+					<p className="text-desc text-white line-clamp-2">
 						{player ? player?.name : "To be determined"}
 					</p>
 				</div>
