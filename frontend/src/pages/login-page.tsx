@@ -20,7 +20,7 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-background">
+    <div className="flex flex-1 items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md shadow-lg bg-white border-gray-50">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-foreground">
