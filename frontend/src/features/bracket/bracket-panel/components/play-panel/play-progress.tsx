@@ -1,9 +1,10 @@
-import { useBracketStore } from "@/stores/bracket-store";
-import EditorButton from "../../../components/editor-button";
-import { useShallow } from "zustand/react/shallow";
-import { Progress } from "@/components/ui/progress";
-import { useSaveAllChanges } from "@/features/bracket/hooks/useSaveAllChanges";
-import { useBracketMutations } from "@/features/bracket/hooks/useBracketMutations";
+import { useBracketStore } from "@/stores/bracket-store"
+import EditorButton from "../../../components/editor-button"
+import { useShallow } from "zustand/react/shallow"
+import { Progress } from "@/components/ui/progress"
+import { useSaveAllChanges } from "@/features/bracket/hooks/useSaveAllChanges"
+import { useBracketMutations } from "@/features/bracket/hooks/useBracketMutations"
+import { useParticipantStore } from "@/stores/participant-store"
 
 const PlayProgress = () => {
   const [
@@ -24,47 +25,51 @@ const PlayProgress = () => {
       state.resetBracket,
       state.bracket.id,
     ])
-  );
+  )
 
-  const { saveAllChanges, isSaving } = useSaveAllChanges();
+  const [participantCount] = useParticipantStore(
+    useShallow((state) => [state.participants.length])
+  )
+
+  const { saveAllChanges, isSaving } = useSaveAllChanges()
   const {
     runBracketMutation,
     completeBracketMutation,
     openBracketMutation,
     resetBracketMutation,
-  } = useBracketMutations();
+  } = useBracketMutations()
   const handleRunBracket = async () => {
     // Client Side
-    runBracket();
+    runBracket()
 
     // Server Side
-    saveAllChanges();
-    runBracketMutation.mutate(bracketId);
-  };
+    saveAllChanges()
+    runBracketMutation.mutate(bracketId)
+  }
 
   const handleCompleteBracket = async () => {
     // Client Side
-    completeBracket();
+    completeBracket()
 
     // Server Side
-    completeBracketMutation.mutate(bracketId);
-  };
+    completeBracketMutation.mutate(bracketId)
+  }
 
   const handleReopenBracket = async () => {
     // Client Side
-    reopenBracket();
+    reopenBracket()
 
     // Server Side
-    openBracketMutation.mutate(bracketId);
-  };
+    openBracketMutation.mutate(bracketId)
+  }
 
   const handleResetBracket = async () => {
     // Client Side
-    resetBracket();
+    resetBracket()
 
     // Server Side
-    resetBracketMutation.mutate(bracketId);
-  };
+    resetBracketMutation.mutate(bracketId)
+  }
 
   return (
     <>
@@ -85,7 +90,7 @@ const PlayProgress = () => {
           <EditorButton
             text="start tournament"
             onClickHandler={handleRunBracket}
-            disabled={isSaving || runBracketMutation.isPending}
+            disabled={isSaving || runBracketMutation.isPending || participantCount < 2}
           />
         ) : (
           <>
@@ -115,7 +120,7 @@ const PlayProgress = () => {
         )}
       </div>
     </>
-  );
-};
+  )
+}
 
-export default PlayProgress;
+export default PlayProgress
