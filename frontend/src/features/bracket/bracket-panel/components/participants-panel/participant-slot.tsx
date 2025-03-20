@@ -83,7 +83,7 @@ const ParticipantSlot = ({
 					/>
 					<Button
 						className="flex items-center justify-center text-figma_grey
-                opacity-0 transition-opacity ease-in-out duration-300 group-hover:opacity-100"
+                opacity-100 md:opacity-0 transition-opacity ease-in-out duration-300 group-hover:opacity-100"
 						onMouseDown={handleRemoveSlot}
 					>
 						<X size={"1rem"} />

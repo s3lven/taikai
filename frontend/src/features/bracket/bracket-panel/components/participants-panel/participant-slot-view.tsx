@@ -15,7 +15,7 @@ const ParticipantSlotView = ({ participant }: ParticipantSlotViewProps) => {
 						{participant.sequence}
 					</p>
 				</div>
-				<div className="flex justify-between items-center gap-2">
+				<div className="flex flex-1 w-full justify-between items-center gap-2">
 					<Input
 						className="w-full h-full border border-figma_grey bg-figma_neutral8 text-figma_grey px-1"
 						value={participant.name}
