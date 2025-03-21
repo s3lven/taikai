@@ -28,7 +28,7 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
   const { completeBracketMutation } = useBracketMutations()
 
   // If there are not enough rounds, return null
-  if (rounds.length < 3) {
+  if (rounds.length < 2) {
     return null
   }
 
