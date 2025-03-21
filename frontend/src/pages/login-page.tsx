@@ -14,8 +14,8 @@ const LoginPage = () => {
     supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: redirectURL
-      }
+        redirectTo: redirectURL,
+      },
     })
   }
 
@@ -26,7 +26,9 @@ const LoginPage = () => {
           <CardTitle className="text-2xl font-bold text-foreground">
             Sign in
           </CardTitle>
-          <CardDescription>We only have Google sign-in!</CardDescription>
+          <CardDescription>
+            <p className="sr-only">Sign in with Google</p>
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pb-5">
           <Button

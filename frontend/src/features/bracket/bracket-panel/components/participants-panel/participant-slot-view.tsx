@@ -20,6 +20,7 @@ const ParticipantSlotView = ({ participant }: ParticipantSlotViewProps) => {
 						className="w-full h-full border border-figma_grey bg-figma_neutral8 text-figma_grey px-1"
 						value={participant.name}
 						readOnly
+						disabled
 					/>
 				</div>
 			</div>

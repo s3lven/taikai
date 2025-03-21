@@ -18,10 +18,10 @@ const BracketItem = ({ bracket }: BracketItemProps) => {
 		>
 			<div className="flex justify-between w-[90%]">
 				<div className="flex flex-col justify-center flex-1">
-					<p className="">{bracket.name}</p>
+					<p className="truncate max-w-[160px]">{bracket.name}</p>
 					<p className="">{bracket.type}</p>
 				</div>
-				<div className="flex items-center text-right justify-end w-1/4">
+				<div className="flex items-center text-right justify-end">
 					<p className="w-full">{bracket.status}</p>
 				</div>
 				{/* <div className="flex gap-4 justify-end items-center w-1/4">
