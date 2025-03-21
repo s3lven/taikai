@@ -60,7 +60,7 @@ const ParticipantSlot = ({
 	};
 
 	return (
-		<div ref={setNodeRef} style={style} className="w-full h-6">
+		<div ref={setNodeRef} style={style} className="w-full h-6 touch-none">
 			<div
 				className={`${
 					isDragging || forceDragging ? "cursor-grabbing" : "cursor-grab"
@@ -75,15 +75,15 @@ const ParticipantSlot = ({
 						{participant.sequence}
 					</p>
 				</div>
-				<div className="flex justify-between items-center gap-2">
+				<div className="flex-1 flex justify-between items-center gap-2">
 					<Input
-						className="w-[215px] h-full border border-figma_grey bg-figma_neutral8 text-figma_grey px-1"
+						className="w-full h-full border border-figma_grey bg-figma_neutral8 text-figma_grey px-1"
 						value={inputValue}
 						onChange={handleChangeName}
 					/>
 					<Button
 						className="flex items-center justify-center text-figma_grey
-                opacity-0 transition-opacity ease-in-out duration-300 group-hover:opacity-100"
+                opacity-100 md:opacity-0 transition-opacity ease-in-out duration-300 group-hover:opacity-100"
 						onMouseDown={handleRemoveSlot}
 					>
 						<X size={"1rem"} />

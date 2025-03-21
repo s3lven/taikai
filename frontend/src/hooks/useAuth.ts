@@ -8,18 +8,33 @@ const useAuth = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setLoading(false)
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        setSession(session)
+        setLoading(false)
+      })
+      .catch(() => {
+        setSession(null)
+      })
 
-    })
-
+    // Subscribe to Auth State Changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        console.log("Signing Out", session)
+
+        // clear local and session storage
+
+        Object.keys(window.localStorage).forEach((key: string) => {
+          if (key.includes("auth-token")) window.localStorage.removeItem(key)
+        })
+      }
+
+      // This assumes that the user is signed in
       setSession(session)
       setLoading(false)
-
     })
 
     return () => subscription.unsubscribe()
@@ -36,7 +51,6 @@ const useAuth = () => {
     image: session?.user.user_metadata.picture,
     joined_at: session?.user.created_at,
   }
-  
   return { session, loading, signOut, user }
 }
 
