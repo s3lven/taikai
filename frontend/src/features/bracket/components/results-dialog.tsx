@@ -13,6 +13,7 @@ import EditorButton from "./editor-button"
 import { Match, Participant } from "@/types"
 
 import JSConfetti from "js-confetti"
+import { useBracketMutations } from "../hooks/useBracketMutations"
 
 interface ResultsDialogProps {
   isOpen: boolean
@@ -20,10 +21,11 @@ interface ResultsDialogProps {
 }
 
 const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
-  const [completeBracket] = useBracketStore(
-    useShallow((state) => [state.completeBracket])
+  const [completeBracket, bracketId] = useBracketStore(
+    useShallow((state) => [state.completeBracket, state.bracket.id])
   )
   const rounds = useMatchesStore(useShallow((state) => state.rounds))
+  const { completeBracketMutation } = useBracketMutations()
 
   // If there are not enough rounds, return null
   if (rounds.length < 3) {
@@ -117,6 +119,7 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
 
   const handleComplete = () => {
     completeBracket()
+    completeBracketMutation.mutate(bracketId)
     setIsOpen(false)
   }
 
@@ -137,10 +140,7 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
         <div className="min-w-0 py-8 flex flex-col items-center gap-8">
           <div className="w-full flex flex-col items-center gap-2">
             {results.map((player) => (
-              <div
-                key={player.participant.id}
-                className="w-full h-[70px] flex"
-              >
+              <div key={player.participant.id} className="w-full h-[70px] flex">
                 <div
                   className={`w-6 flex-none h-full flex items-center justify-center rounded-tl rounded-bl
 									${rankStyles[player.rank]}`}
