@@ -34,20 +34,20 @@ const TournamentList = ({ status }: TournamentListProps) => {
           {filteredTournaments.map((tournament) => (
             <Card
               className="w-full shadow-md cursor-pointer font-poppins 
-						hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center"
+						hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center min-w-0"
               onClick={() => setViewingTournament(tournament)}
               key={tournament.id}
             >
-              <CardContent className="relative flex items-center justify-between w-full gap-6">
+              <CardContent className="relative flex items-center justify-between w-full gap-6 ">
                 <Avatar className="size-16">
                   <AvatarImage src="" />
                   <AvatarFallback className="text-white bg-figma_shade2">
                     CN
                   </AvatarFallback>
                 </Avatar>
-                <CardHeader className="flex flex-col justify-stretch px-0 flex-1 mr-10">
+                <CardHeader className="px-0 flex-1 mr-10 min-w-0">
                   <CardTitle className="text-xl font-bold">
-                    {tournament.name}
+                    <p className="truncate">{tournament.name}</p>
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-500 flex items-center gap-1">
                     <span className="flex items-center h-full">

@@ -127,19 +127,19 @@ const ResultDialog = ({ isOpen, setIsOpen }: ResultsDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-full max-w-xs md:max-w-md max-h-[75vh] bg-figma_neutral8 font-poppins text-white overflow-hidden">
+      <DialogContent className="w-11/12 max-h-[75vh] bg-figma_neutral8 font-poppins text-white overflow-hidden">
         <DialogHeader className="border-b border-white pb-2 space-y-4">
           <DialogTitle>Taikai Results</DialogTitle>
           <DialogDescription>
             Please report these results to the head shinpan!
           </DialogDescription>
         </DialogHeader>
-        <div className="w-full py-8 flex flex-col items-center gap-8">
+        <div className="min-w-0 py-8 flex flex-col items-center gap-8">
           <div className="w-full flex flex-col items-center gap-2">
             {results.map((player) => (
               <div
                 key={player.participant.id}
-                className="w-full max-w-[280px] md:max-w-sm h-[70px] flex"
+                className="w-full h-[70px] flex"
               >
                 <div
                   className={`w-6 flex-none h-full flex items-center justify-center rounded-tl rounded-bl

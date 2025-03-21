@@ -45,7 +45,7 @@ const SlotView = ({
 					color === "Red" ? "rounded-tr" : "rounded-br"
 				}`}
 			>
-				<div className="flex items-centero overflow-hidden">
+				<div className="flex items-center overflow-hidden">
 					<p className="text-desc text-white line-clamp-2">
 						{player ? player?.name : "To be determined"}
 					</p>

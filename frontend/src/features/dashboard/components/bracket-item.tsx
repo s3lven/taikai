@@ -17,8 +17,8 @@ const BracketItem = ({ bracket }: BracketItemProps) => {
 			onClick={() => void navigate(`/bracket/${bracket.id}`)}
 		>
 			<div className="flex justify-between w-[90%]">
-				<div className="flex flex-col justify-center flex-1">
-					<p className="truncate max-w-[160px]">{bracket.name}</p>
+				<div className="flex flex-col justify-center flex-1 min-w-0">
+					<p className="truncate ">{bracket.name}</p>
 					<p className="">{bracket.type}</p>
 				</div>
 				<div className="flex items-center text-right justify-end">
