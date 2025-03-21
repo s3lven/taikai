@@ -37,7 +37,7 @@ export const batchUpdateBracket = async (changes: Change[]) => {
   if (!response.ok) throw new Error("Failed to save changes to bracket");
 };
 
-export const runBracket = async (id: number, changes?: []) => {
+export const runBracket = async (id: number, changes?: Change[]) => {
   const response = await fetch(`${API_URL}/${id}/run`, {
     method: "PATCH",
     headers: {
