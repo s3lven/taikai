@@ -4,8 +4,7 @@ import BracketView from "@/features/bracket/bracket-view/bracket-view"
 import BracketDialogManager from "@/features/bracket/components/bracket-dialog-manager"
 import useBracketQuery from "@/features/bracket/hooks/useBracketQuery"
 
-import { useParams } from "react-router-dom"
-
+import { useNavigate, useParams } from "react-router-dom"
 
 const BracketPage = () => {
   // Extract the bracket id from the URL and check if it exists
@@ -15,9 +14,17 @@ const BracketPage = () => {
   }
   const bracketId = parseInt(params.bracketId!)
 
-  const query = useBracketQuery(bracketId)
+  const navigate = useNavigate()
 
-  if (query?.isLoading) return <>Loading...</>
+  const { isLoading, isError } = useBracketQuery(bracketId)
+
+  if (isLoading) return <>Loading...</>
+
+  if (isError) {
+    // Throw a toast
+    console.error("Failed to fetch bracket information")
+    navigate("/dashboard")
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-figma_shade2">
