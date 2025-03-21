@@ -187,6 +187,8 @@ export class BracketService {
 
   async deleteBracket(id: number): Promise<void> {
     try {
+      // Handles deletion from bracket and bracket_participants
+      // Database trigger handles participants deletion
       const { error } = await supabase.from("brackets").delete().eq("id", id)
 
       if (error) throw new AppError()
