@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import TournamentEditDialog from "../features/dashboard/components/dialogs/tournament-edit-dialog"
 import DashboardContent from "../features/dashboard/components/dashboard-content"
 import { Plus } from "lucide-react"
+import { useEffect } from "react"
 
 const DashboardPage = () => {
   const {
@@ -12,7 +13,18 @@ const DashboardPage = () => {
     viewingTournament,
     isAddingDialogOpen,
     setIsAddingDialogOpen,
+    setEditingTournament,
+    setViewingTournament
   } = useTournamentStore()
+
+  // Close all dialogs when the page is unmounted
+  useEffect(() => {
+    return () => {
+      setIsAddingDialogOpen(false)
+      setEditingTournament(null)
+      setViewingTournament(null)
+    }
+  }, [])
 
   return (
     <div className="pb-8 container px-4 mx-auto w-full flex-1 flex flex-col">

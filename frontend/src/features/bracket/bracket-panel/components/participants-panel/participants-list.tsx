@@ -69,7 +69,7 @@ const ParticipantsList = () => {
 	);
 
 	return (
-		participants && (
+		participants.length ? (
 			<div className="flex flex-col gap-2">
 				{bracketStatus === "Editing" ? (
 					<DndContext
@@ -100,6 +100,8 @@ const ParticipantsList = () => {
 					))
 				)}
 			</div>
+		) : (
+			<p className="text-center">No participants!</p>
 		)
 	);
 };

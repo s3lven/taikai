@@ -198,6 +198,8 @@ export class TournamentService {
   }
 
   async deleteTournament(id: number, supabase: Supabase): Promise<Tournament> {
+    // Deletes tournaments, brackets, and bracket_participants.
+    // Database trigger handles deleting participants
     try {
       const { data, error } = await supabase
         .from("tournaments")

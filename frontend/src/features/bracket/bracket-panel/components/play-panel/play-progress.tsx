@@ -31,9 +31,10 @@ const PlayProgress = () => {
     useShallow((state) => [state.participants.length])
   )
 
-  const { saveAllChanges, isSaving } = useSaveAllChanges()
+  const { isSaving } = useSaveAllChanges()
   const {
-    runBracketMutation,
+    saveRunBracket,
+    isSavingRunBracket,
     completeBracketMutation,
     openBracketMutation,
     resetBracketMutation,
@@ -43,8 +44,7 @@ const PlayProgress = () => {
     runBracket()
 
     // Server Side
-    saveAllChanges()
-    runBracketMutation.mutate(bracketId)
+    saveRunBracket()
   }
 
   const handleCompleteBracket = async () => {
@@ -90,7 +90,9 @@ const PlayProgress = () => {
           <EditorButton
             text="start tournament"
             onClickHandler={handleRunBracket}
-            disabled={isSaving || runBracketMutation.isPending || participantCount < 2}
+            disabled={
+              isSaving || isSavingRunBracket || participantCount < 2
+            }
           />
         ) : (
           <>
