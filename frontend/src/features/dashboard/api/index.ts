@@ -73,8 +73,8 @@ export const updateTournament = async ({
   if (!response.ok) {
     throw new Error("Failed to update tournament")
   }
-  const data: ResponsePayload<Tournament> = await response.json()
-  return data.payload
+  const data: ResponsePayload<Tournament[]> = await response.json()
+  return data.payload[0]
 }
 
 export const deleteTournament = async (id: number): Promise<void> => {

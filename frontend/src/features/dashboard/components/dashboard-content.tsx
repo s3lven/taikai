@@ -1,14 +1,14 @@
-import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
-import TournamentList from "./tournament-list";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import useTournamentData from "../hooks/useTournamentData";
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store"
+import TournamentList from "./tournament-list"
+import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
+import useTournamentData from "../hooks/useTournamentData"
 
 const EmptyDashboard = () => {
-  const { setIsAddingDialogOpen } = useTournamentStore();
+  const { setIsAddingDialogOpen } = useTournamentStore()
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 h-full flex-1">
+    <div className="flex flex-col items-center justify-center gap-4 h-full flex-1 text-center">
       <h1 className="text-figma_dark text-title">There&apos;s nothing here!</h1>
       <h1 className="text-figma_dark text-title">Let&apos;s fix that.</h1>
       <Button
@@ -19,8 +19,8 @@ const EmptyDashboard = () => {
         Create New Taikai
       </Button>
     </div>
-  );
-};
+  )
+}
 
 const DashboardLoading = () => {
   return (
@@ -36,8 +36,8 @@ const DashboardLoading = () => {
         <span className="sr-only">Loading...</span>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const DashboardError = () => {
   return (
@@ -47,18 +47,17 @@ const DashboardError = () => {
         again later.
       </h1>
     </div>
-  );
-};
+  )
+}
 
 const DashboardContent = () => {
-  const { tournaments, isLoading, isError, error } =
-    useTournamentData();
+  const { tournaments, isLoading, isError, error } = useTournamentData()
 
-  if (isLoading) return <DashboardLoading />;
+  if (isLoading) return <DashboardLoading />
 
   if (isError || !tournaments) {
-    console.error(error?.message);
-    return <DashboardError />;
+    console.error(error?.message)
+    return <DashboardError />
   }
 
   return tournaments.length > 0 ? (
@@ -69,7 +68,7 @@ const DashboardContent = () => {
     </div>
   ) : (
     <EmptyDashboard />
-  );
-};
+  )
+}
 
-export default DashboardContent;
+export default DashboardContent

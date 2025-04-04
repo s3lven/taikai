@@ -1,4 +1,4 @@
-import supabase from "@/lib/supabase"
+import supabase, { redirectURL } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -13,17 +13,22 @@ const LoginPage = () => {
   const handleGoogleSignUp = () => {
     supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: redirectURL,
+      },
     })
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-background">
+    <div className="flex flex-1 items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md shadow-lg bg-white border-gray-50">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-foreground">
             Sign in
           </CardTitle>
-          <CardDescription>We only have Google sign-in!</CardDescription>
+          <CardDescription>
+            <p className="sr-only">Sign in with Google</p>
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pb-5">
           <Button

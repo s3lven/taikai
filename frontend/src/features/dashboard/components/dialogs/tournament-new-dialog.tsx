@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+} from "@/components/ui/dialog"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 import {
   Form,
   FormControl,
@@ -15,18 +15,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store";
-import { TournamentForm } from "@/types";
-import useTournamentData from "../../hooks/useTournamentData";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { useTournamentStore } from "@/features/dashboard/hooks/tournament-store"
+import { TournamentForm } from "@/types"
+import useTournamentData from "../../hooks/useTournamentData"
 
 const formSchema = z.object({
   name: z
     .string()
     .min(2, { message: "Name is required" })
     .max(50, { message: "Name must be shorter than 50 characters" }),
-});
+})
 
 const TournamentNewDialog = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -34,11 +34,11 @@ const TournamentNewDialog = () => {
     defaultValues: {
       name: "",
     },
-  });
+  })
 
-  const { isAddingDialogOpen, setIsAddingDialogOpen } = useTournamentStore();
+  const { isAddingDialogOpen, setIsAddingDialogOpen } = useTournamentStore()
 
-  const { addTournament, isAddingTournament } = useTournamentData();
+  const { addTournament, isAddingTournament } = useTournamentData()
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // TODO: Expand dialog to add more fields
@@ -46,17 +46,17 @@ const TournamentNewDialog = () => {
       name: values.name,
       location: "here",
       date: new Date().toLocaleDateString(),
-      status: "Active"
-    };
+      status: "Active",
+    }
 
-    addTournament(newTournament);
-    setIsAddingDialogOpen(false);
-  };
+    addTournament(newTournament)
+    setIsAddingDialogOpen(false)
+  }
 
   return (
     <Dialog open={isAddingDialogOpen} onOpenChange={setIsAddingDialogOpen}>
       <DialogContent
-        className=" max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
+        className="container w-11/12 max-h-[75vh] bg-figma_neutral8 font-poppins text-white"
         aria-describedby={undefined}
       >
         <DialogHeader className="border-b border-white pb-2 space-y-4">
@@ -97,7 +97,7 @@ const TournamentNewDialog = () => {
         </Form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default TournamentNewDialog;
+export default TournamentNewDialog

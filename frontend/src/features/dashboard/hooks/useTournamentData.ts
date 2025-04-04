@@ -126,9 +126,9 @@ const useTournamentData = () => {
 
   const removeBracketMutation = useMutation({
     mutationFn: deleteBracket,
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       const { tournamentID, bracketID } = variables
-      // await queryClient.invalidateQueries({ queryKey: ["tournaments"] });
+      await queryClient.invalidateQueries({ queryKey: ["tournaments"] });
       queryClient.setQueryData<Tournament[]>(["tournaments"], (oldData) => {
         if (!oldData) return oldData
 
