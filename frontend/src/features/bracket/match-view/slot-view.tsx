@@ -25,6 +25,7 @@ const SlotView = ({ isWinner, player, color, score }: SlotProps) => {
 				return option.charAt(0)
 		}
 	}
+
 	return (
 		<div className="w-full flex flex-col gap-[2px]">
 			{/* Seed */}
@@ -32,10 +33,10 @@ const SlotView = ({ isWinner, player, color, score }: SlotProps) => {
 				className={
 					"text-label " +
 					cn(
-						"px-2 h-[26px]",
+						"px-2 h-[26px] ",
 						color === "Red"
-							? "bg-figma_error text-white rounded-tl"
-							: "bg-white text-figma_shade2 rounded-tr"
+							? "bg-figma_error text-white rounded-t md:rounded-tr-none"
+							: "bg-white text-figma_shade2 rounded-t md:rounded-tl-none"
 					)
 				}
 			>
@@ -71,9 +72,12 @@ const SlotView = ({ isWinner, player, color, score }: SlotProps) => {
 				))}
 			</div>
 			{/* Point Options 2 */}
-			<div className={cn("bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px]",
-				color === "Red" ? "rounded-bl" : "rounded-br"
-			)}>
+			<div
+				className={cn(
+					"bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px] rounded-b",
+					color === "Red" ? "md:rounded-br-none" : "md:rounded-bl-none"
+				)}
+			>
 				{secondRowOptions.map((option) => {
 					return (
 						<div className="flex items-center justify-center text-white text-label">

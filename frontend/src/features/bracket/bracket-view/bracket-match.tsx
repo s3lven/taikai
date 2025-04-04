@@ -231,7 +231,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 				</div>
 			</DialogTrigger>
 			<DialogContent
-				className="bg-figma_neutral8 rounded-lg text-white w-full min-w-[330px] p-4 md:p-6"
+				className="bg-figma_neutral8 rounded-lg text-white w-full min-w-[330px] max-w-[360px] md:max-w-lg p-4 md:p-6"
 				aria-describedby={undefined}
 			>
 				<DialogHeader className="w-fit flex-row items-center gap-3 space-y-0">
@@ -246,7 +246,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 					</Button>
 				</DialogHeader>
 				{/* Slots */}
-				<div className="w-full flex gap-[2px] font-poppins">
+				<div className="w-full flex flex-col gap-[4px] font-poppins md:flex-row md:gap-[2px]">
 					{/* Red */}
 					<SlotView
 						color="Red"
@@ -269,7 +269,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 					{/* Reset */}
 					<Button
 						className="w-full uppercase text-[14px] tracking-[2px] font-bold leading-[26px] rounded px-4 py-3
-           text-white bg-figma_neutral7 hover:bg-figma_neutral8"
+           text-white bg-figma_neutral7 hover:bg-figma_shade2_30"
 					>
 						Reset
 					</Button>
@@ -278,7 +278,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 						className="w-full uppercase text-[14px] tracking-[2px] font-bold leading-[26px] rounded px-4 py-3
            text-white bg-figma_secondary hover:bg-figma_dark"
 					>
-						Reset
+						Submit
 					</Button>
 				</div>
 			</DialogContent>
