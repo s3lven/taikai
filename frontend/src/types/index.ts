@@ -12,7 +12,6 @@ export type IpponType =
   | "Tsuki"
   | "Hantei"
   | "Hansoku"
-  | "None";
 export const hitMap: Record<IpponType, string> = {
   Men: "M",
   Kote: "K",
@@ -20,7 +19,6 @@ export const hitMap: Record<IpponType, string> = {
   Tsuki: "T",
   Hantei: "HT",
   Hansoku: "HS",
-  None: "",
 };
 export type BracketType =
   | "Single Elimination"
