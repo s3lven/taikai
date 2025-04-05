@@ -1,4 +1,10 @@
-import { IpponType, Match, Participant, PlayerColorType } from "@/types"
+import {
+	BracketStatusType,
+	IpponType,
+	Match,
+	Participant,
+	PlayerColorType,
+} from "@/types"
 import { Triangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -9,13 +15,19 @@ interface SlotProps {
 	isWinner: boolean
 	match: Match
 	color: PlayerColorType
+	status: BracketStatusType
 }
 
-const SlotView = ({ isWinner, color, match }: SlotProps) => {
+const SlotView = ({
+	isWinner,
+	color,
+	match,
+	status,
+}: SlotProps) => {
 	const player = color === "Red" ? match.player1 : match.player2
 	const score = color === "Red" ? match.player1Score : match.player2Score
 
-	const firstRowOptions: IpponType[]  = ["Men", "Kote", "Do"]
+	const firstRowOptions: IpponType[] = ["Men", "Kote", "Do"]
 	const secondRowOptions: IpponType[] = ["Tsuki", "Hansoku", "Hantei"]
 
 	// Formatting options to single character for button
@@ -30,7 +42,9 @@ const SlotView = ({ isWinner, color, match }: SlotProps) => {
 		}
 	}
 
-	const [setScore] = useMatchesStore(useShallow((state) => [state.setScore, state.rounds]))
+	const [setScore] = useMatchesStore(
+		useShallow((state) => [state.setScore, state.rounds])
+	)
 
 	const handleSetScore = (option: IpponType) => {
 		setScore(match.id, color, option)
@@ -64,52 +78,59 @@ const SlotView = ({ isWinner, color, match }: SlotProps) => {
 				)}
 			>
 				{score.map((s) => (
-					<p key={`${player}-${s}`} className="text-white">{s}</p>
+					<p key={`${player}-${s}`} className="text-white">
+						{s}
+					</p>
 				))}
 			</div>
-			{/* Point Options 1 */}
-			<div className="bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px]">
-				{firstRowOptions.map((option) => (
-					<div
-						key={option}
-						className="flex items-center justify-center text-white text-label"
-					>
-						<Button
-							variant={"ghost"}
-							size={"icon"}
-							className="hover:bg-figma_shade2_30 hover:text-white"
-							onClick={() => handleSetScore(option)}
-						>
-							{renderChar(option)}
-						</Button>
-					</div>
-				))}
-			</div>
-			{/* Point Options 2 */}
-			<div
-				className={cn(
-					"bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px] rounded-b",
-					color === "Red" ? "md:rounded-br-none" : "md:rounded-bl-none"
-				)}
-			>
-				{secondRowOptions.map((option) => {
-					return (
-						<div
-							key={option}
-							className="flex items-center justify-center text-white text-label"
-						>
-							<Button
-								variant={"ghost"}
-								size={"icon"}
-								className="hover:bg-figma_shade2_30 hover:text-white "
-								onClick={() => handleSetScore(option)}
+
+			{status === "In Progress" && (
+				<>
+					{/* Point Options 1 */}
+					<div className="bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px]">
+						{firstRowOptions.map((option) => (
+							<div
+								key={option}
+								className="flex items-center justify-center text-white text-label"
 							>
-								{renderChar(option)}
-							</Button>
-						</div>
-					)
-				})}
-			</div>
+								<Button
+									variant={"ghost"}
+									size={"icon"}
+									className="hover:bg-figma_shade2_30 hover:text-white"
+									onClick={() => handleSetScore(option)}
+								>
+									{renderChar(option)}
+								</Button>
+							</div>
+						))}
+					</div>
+					{/* Point Options 2 */}
+					<div
+						className={cn(
+							"bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px] rounded-b",
+							color === "Red" ? "md:rounded-br-none" : "md:rounded-bl-none"
+						)}
+					>
+						{secondRowOptions.map((option) => {
+							return (
+								<div
+									key={option}
+									className="flex items-center justify-center text-white text-label"
+								>
+									<Button
+										variant={"ghost"}
+										size={"icon"}
+										className="hover:bg-figma_shade2_30 hover:text-white "
+										onClick={() => handleSetScore(option)}
+									>
+										{renderChar(option)}
+									</Button>
+								</div>
+							)
+						})}
+					</div>
+				</>
+			)}
 		</div>
 	)
 }
