@@ -61,10 +61,10 @@ const BracketSlot = ({
 							className="w-full h-full flex items-center justify-center"
 						>
 							<p
-								className={cn(
-									"`text-desc w-5",
-									isWinner ? "text-figma_green" : "text-white"
-								)}
+								className={
+									"text-desc " +
+									cn("`w-5", isWinner ? "text-figma_green" : "text-white")
+								}
 							>
 								{hitMap[score]}
 							</p>

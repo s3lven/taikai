@@ -1,10 +1,10 @@
-import { Match } from "@/types"
+import { Match, Participant } from "@/types"
 import { Info } from "lucide-react"
 import { useMatchesStore } from "@/stores/matches-store"
 import { useShallow } from "zustand/react/shallow"
 import { useBracketStore } from "@/stores/bracket-store"
 import BracketSlot from "./bracket-slot"
-import SlotView from "../match-view/slot-view"
+import SlotView from "./slot-view"
 import { useSubmitScoreQuery } from "../hooks/useSubmitScoreQuery"
 import {
 	Dialog,
@@ -14,6 +14,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
 
 interface BracketMatchProps {
 	match: Match
@@ -23,24 +24,40 @@ interface BracketMatchProps {
 const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	const redPlayer = match.player1
 	const whitePlayer = match.player2
-	const winner = match.winner
-	const handleWinner = () => {}
+
+	const [dialogOpen, setDialogOpen] = useState(false)
+	const [winner, setWinner] = useState<Participant | null>(match.winner)
 
 	const bracketStatus = useBracketStore(
 		useShallow((state) => state.bracket.status)
 	)
+
 	const [submitScore, resetMatch] = useMatchesStore(
 		useShallow((state) => [state.submitScore, state.resetMatch])
 	)
 	const { submitScore: submitScoreQuery } = useSubmitScoreQuery()
-
 	const handleSubmitScore = async () => {
-		submitScore(match.id, winner)
-		submitScoreQuery()
+		const submittedWinner = submitScore(match.id)
+
+		if (!submittedWinner) return
+		setWinner(submittedWinner)
+
+		// Uncomment when score submission is fully ready
+		// submitScoreQuery()
+
+		setDialogOpen(false)
 	}
 	const handleResetMatch = () => {
 		resetMatch(match.id)
+		setDialogOpen(false)
 	}
+	useEffect(() => {
+		if (match) {
+			setWinner(match.winner)
+		}
+	}, [match])
+
+	console.log(winner)
 
 	// const InProgressMatchView = () => (
 	//   <div
@@ -164,52 +181,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 	// );
 
 	return (
-		// <Dialog.Root>
-		//   <Dialog.Trigger asChild>
-		//     <div
-		//       className="absolute w-[220px] h-[56px] flex flex-col justify-center gap-[2px] hover:outline-primary hover:outline cursor-pointer"
-		//       style={style}
-		//     >
-		//       Opem
-		//     </div>
-		//   </Dialog.Trigger>
-		//   <Dialog.Portal>
-		//     <Dialog.Overlay className="bg-figma_shade2/80 data-[state=open]:animate-overlayShow fixed inset-0" />
-		//     <Dialog.Content
-		//       className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] focus:outline-none
-		//       max-w-[680px] max-h-[425px] flex flex-col justify-between items-center p-4 gap-[10px] bg-figma_neutral8 h-full font-poppins w-11/12"
-		//       aria-describedby={undefined}
-		//     >
-		//       <Dialog.Title asChild>
-		//         {/* Title */}
-		//         <div className="w-full px-4 py-2 border-b border-white ">
-		//           <p className="text-lead text-white">Report Scores</p>
-		//         </div>
-		//       </Dialog.Title>
-		//       {/* Overlay Content -- Render based on different scenarios */}
-		//       {/* If we are in progress and both players are present */}
-		//       {bracketStatus === "In Progress" && redPlayer && whitePlayer && (
-		//         <InProgressMatchView />
-		//       )}
-		//       {/* If we are in progress, but the match isnt ready to score because there aren't enough players */}
-		//       {bracketStatus === "In Progress" && (!redPlayer || !whitePlayer) && (
-		//         <EditMatchView />
-		//       )}
-		//       {/* If we are editting the details/participants list, we should not be able to edit match status */}
-		//       {bracketStatus === "Editing" && <EditMatchView />}
-		//       {/* If we completed the tournament, we should see the current scores and not be able to edit */}
-		//       {bracketStatus === "Completed" && <CompletedView />}
-		//       <Dialog.Close className="absolute top-4 right-4">
-		//         <X
-		//           size={"1.5rem"}
-		//           className="hover:bg-figma_shade2_30 rounded-full text-figma_shade1"
-		//         />
-		//       </Dialog.Close>
-		//     </Dialog.Content>
-		//   </Dialog.Portal>
-		// </Dialog.Root>
-
-		<Dialog>
+		<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 			<DialogTrigger asChild>
 				<div
 					className=" text-white absolute w-[220px] h-[56px] flex flex-col justify-center gap-[2px]
@@ -218,13 +190,13 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 				>
 					<BracketSlot
 						variant="Red"
-						player={match.player1}
+						player={redPlayer}
 						isWinner={JSON.stringify(winner) === JSON.stringify(redPlayer)}
 						scores={match.player1Score ?? []}
 					/>
 					<BracketSlot
 						variant="White"
-						player={match.player2}
+						player={whitePlayer}
 						isWinner={JSON.stringify(winner) === JSON.stringify(whitePlayer)}
 						scores={match.player2Score ?? []}
 					/>
@@ -245,21 +217,33 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 						<Info className="text-white" />
 					</Button>
 				</DialogHeader>
+				{/* Overlay Content -- Render based on different scenarios
+		       	If we are in progress and both players are present
+		       	{bracketStatus === "In Progress" && redPlayer && whitePlayer && (
+		        	<InProgressMatchView />
+				)}
+				If we are in progress, but the match isnt ready to score because there aren't enough players
+				{bracketStatus === "In Progress" && (!redPlayer || !whitePlayer) && (
+					<EditMatchView />
+				)}
+				If we are editting the details/participants list, we should not be able to edit match status
+				{bracketStatus === "Editing" && <EditMatchView />}
+				If we completed the tournament, we should see the current scores and not be able to edit
+				{bracketStatus === "Completed" && <CompletedView />} */}
+
 				{/* Slots */}
 				<div className="w-full flex flex-col gap-[4px] font-poppins md:flex-row md:gap-[2px]">
 					{/* Red */}
 					<SlotView
 						color="Red"
-						player={match.player1}
-						score={match.player1Score}
+						match={match}
 						isWinner={JSON.stringify(winner) === JSON.stringify(redPlayer)}
 					/>
 
 					{/* White */}
 					<SlotView
 						color="White"
-						player={match.player2}
-						score={match.player2Score}
+						match={match}
 						isWinner={JSON.stringify(winner) === JSON.stringify(whitePlayer)}
 					/>
 				</div>
@@ -268,6 +252,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 				<div className="w-full flex gap-[2px] font-poppins">
 					{/* Reset */}
 					<Button
+						onClick={handleResetMatch}
 						className="w-full uppercase text-[14px] tracking-[2px] font-bold leading-[26px] rounded px-4 py-3
            text-white bg-figma_neutral7 hover:bg-figma_shade2_30"
 					>
@@ -275,6 +260,7 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 					</Button>
 					{/* Submit */}
 					<Button
+						onClick={handleSubmitScore}
 						className="w-full uppercase text-[14px] tracking-[2px] font-bold leading-[26px] rounded px-4 py-3
            text-white bg-figma_secondary hover:bg-figma_dark"
 					>

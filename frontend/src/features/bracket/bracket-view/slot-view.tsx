@@ -1,18 +1,22 @@
-import { IpponType, Participant, PlayerColorType } from "@/types"
+import { IpponType, Match, Participant, PlayerColorType } from "@/types"
 import { Triangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useMatchesStore } from "@/stores/matches-store"
+import { useShallow } from "zustand/react/shallow"
 
 interface SlotProps {
 	isWinner: boolean
-	player: Participant | null
-	score: IpponType[]
+	match: Match
 	color: PlayerColorType
 }
 
-const SlotView = ({ isWinner, player, color, score }: SlotProps) => {
-	const firstRowOptions = ["Men", "Kote", "Do"]
-	const secondRowOptions = ["Tsuki", "Hansoku", "Hantei"]
+const SlotView = ({ isWinner, color, match }: SlotProps) => {
+	const player = color === "Red" ? match.player1 : match.player2
+	const score = color === "Red" ? match.player1Score : match.player2Score
+
+	const firstRowOptions: IpponType[]  = ["Men", "Kote", "Do"]
+	const secondRowOptions: IpponType[] = ["Tsuki", "Hansoku", "Hantei"]
 
 	// Formatting options to single character for button
 	const renderChar = (option: string) => {
@@ -24,6 +28,12 @@ const SlotView = ({ isWinner, player, color, score }: SlotProps) => {
 			default:
 				return option.charAt(0)
 		}
+	}
+
+	const [setScore] = useMatchesStore(useShallow((state) => [state.setScore, state.rounds]))
+
+	const handleSetScore = (option: IpponType) => {
+		setScore(match.id, color, option)
 	}
 
 	return (
@@ -54,19 +64,23 @@ const SlotView = ({ isWinner, player, color, score }: SlotProps) => {
 				)}
 			>
 				{score.map((s) => (
-					<p className="text-white">{s}</p>
+					<p key={`${player}-${s}`} className="text-white">{s}</p>
 				))}
 			</div>
 			{/* Point Options 1 */}
 			<div className="bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px]">
 				{firstRowOptions.map((option) => (
-					<div className="flex items-center justify-center text-white text-label">
+					<div
+						key={option}
+						className="flex items-center justify-center text-white text-label"
+					>
 						<Button
 							variant={"ghost"}
 							size={"icon"}
-							className="hover:bg-figma_shade2_30 hover:text-white "
+							className="hover:bg-figma_shade2_30 hover:text-white"
+							onClick={() => handleSetScore(option)}
 						>
-							{option.charAt(0)}
+							{renderChar(option)}
 						</Button>
 					</div>
 				))}
@@ -80,11 +94,15 @@ const SlotView = ({ isWinner, player, color, score }: SlotProps) => {
 			>
 				{secondRowOptions.map((option) => {
 					return (
-						<div className="flex items-center justify-center text-white text-label">
+						<div
+							key={option}
+							className="flex items-center justify-center text-white text-label"
+						>
 							<Button
 								variant={"ghost"}
 								size={"icon"}
 								className="hover:bg-figma_shade2_30 hover:text-white "
+								onClick={() => handleSetScore(option)}
 							>
 								{renderChar(option)}
 							</Button>
