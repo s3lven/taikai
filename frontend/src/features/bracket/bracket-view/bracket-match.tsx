@@ -17,11 +17,18 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 
 interface BracketMatchProps {
-	match: Match
+	matchId: number
 	style: React.CSSProperties
 }
 
-const BracketMatch = ({ match, style }: BracketMatchProps) => {
+const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
+	const [submitScore, resetMatch, match] = useMatchesStore(
+		useShallow((state) => [
+			state.submitScore,
+			state.resetMatch,
+			state.rounds.flat().find((m) => m.id === matchId)!,
+		])
+	)
 	const redPlayer = match.player1
 	const whitePlayer = match.player2
 
@@ -32,9 +39,6 @@ const BracketMatch = ({ match, style }: BracketMatchProps) => {
 		useShallow((state) => state.bracket.status)
 	)
 
-	const [submitScore, resetMatch] = useMatchesStore(
-		useShallow((state) => [state.submitScore, state.resetMatch])
-	)
 	const { submitScore: submitScoreQuery } = useSubmitScoreQuery()
 	const handleSubmitScore = async () => {
 		const submittedWinner = submitScore(match.id)

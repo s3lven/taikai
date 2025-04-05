@@ -62,6 +62,13 @@ export const useMatchesStore = create<MatchesStore>()(
 			if (!winner) return null
 
 			set((state) => {
+				const mat = state.rounds.flat().find((m) => m.id === matchId)
+				if (!mat) {
+					throw new Error("There is no match")
+				}
+
+				mat.winner = winner
+
 				// Get match index and round index of next round to set the winner to new players
 				const roundIndex = state.rounds.findIndex((round) =>
 					round.find((match) => match.id === matchId)
@@ -94,15 +101,7 @@ export const useMatchesStore = create<MatchesStore>()(
 
 			// Calculate and Update the progress
 			useBracketStore.getState().updateProgress()
-
-			// Reflect changes in the change tracking store
-			const mat = get()
-				.rounds.flat()
-				.find((m) => m.id === matchId)
-
-			if (!mat) {
-				throw new Error("Match not found")
-			}
+			console.log("Updating the progress")
 
 			// Reflect change in the change tracking store
 			useChangeTrackingStore.getState().addChange({
@@ -112,8 +111,8 @@ export const useMatchesStore = create<MatchesStore>()(
 				payload: {
 					id: matchId,
 					winner_id: winner.id,
-					player1_score: mat.player1Score,
-					player2_score: mat.player2Score,
+					player1_score: match.player1Score,
+					player2_score: match.player2Score,
 				},
 			})
 

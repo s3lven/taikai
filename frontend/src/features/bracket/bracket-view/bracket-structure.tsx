@@ -124,7 +124,7 @@ const BracketStructure = () => {
               !match.byeMatch && (
                 <BracketMatch
                   key={`R${roundIndex}-M${matchIndex}`}
-                  match={match}
+                  matchId={match.id}
                   style={{
                     transform: `translate(${pos.x}px, ${pos.y}px)`,
                   }}
