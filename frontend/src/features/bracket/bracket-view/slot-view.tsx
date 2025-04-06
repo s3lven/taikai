@@ -72,8 +72,9 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 						<div
 							key={`${player}-${s}`}
 							className={cn(
-								"text-white size-8 text-center pt-[2px]",
-								isFirstScore && "rounded-full border-white border-2"
+								"size-8 inline-flex justify-center items-center",
+								isFirstScore && "rounded-full border-2",
+								isWinner && "border-figma_green"
 							)}
 						>
 							{renderChar(s)}

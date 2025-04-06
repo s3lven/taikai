@@ -1,19 +1,15 @@
 import { cn } from "@/lib/utils"
-import { hitMap, IpponType, Participant, PlayerColorType } from "@/types"
+import { hitMap, Match, PlayerColorType } from "@/types"
 
 interface BracketSlotProps {
 	variant: PlayerColorType
-	player: Participant | null
 	isWinner: boolean
-	scores: IpponType[]
+	match: Match
 }
 
-const BracketSlot = ({
-	variant,
-	player,
-	isWinner,
-	scores,
-}: BracketSlotProps) => {
+const BracketSlot = ({ variant, match, isWinner }: BracketSlotProps) => {
+	const player = variant === "Red" ? match.player1 : match.player2
+	const scores = variant === "Red" ? match.player1Score : match.player2Score
 	return (
 		<div className="w-[220px] h-[27px] flex items-center">
 			<div
@@ -54,22 +50,33 @@ const BracketSlot = ({
 						{player?.name}
 					</p>
 				</div>
-				<div className="w-9 h-full gap-1 flex items-center justify-center">
-					{scores.map((score, index) => (
-						<div
-							key={index}
-							className="w-full h-full flex items-center justify-center"
-						>
-							<p
-								className={
-									"text-desc " +
-									cn("`w-5", isWinner ? "text-figma_green" : "text-white")
-								}
+				<div className="w-full h-full gap-1 flex items-center justify-center">
+					{scores.map((score, index) => {
+						const isFirstScore = index === 0 && match.firstScorer === player
+
+						return (
+							<div
+								key={index}
+								className={cn(
+									"w-full h-full flex items-center justify-center",
+									isFirstScore && "rounded-full w-fit border-white border-2",
+									isWinner && "border-figma_green"
+								)}
 							>
-								{hitMap[score]}
-							</p>
-						</div>
-					))}
+								<p
+									className={
+										"text-desc " +
+										cn(
+											"size-6 inline-flex justify-center items-center",
+											isWinner ? "text-figma_green" : "text-white"
+										)
+									}
+								>
+									{hitMap[score]}
+								</p>
+							</div>
+						)
+					})}
 				</div>
 			</div>
 		</div>

@@ -137,15 +137,13 @@ const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
 				>
 					<BracketSlot
 						variant="Red"
-						player={redPlayer}
 						isWinner={JSON.stringify(winner) === JSON.stringify(redPlayer)}
-						scores={match.player1Score ?? []}
+						match={match}
 					/>
 					<BracketSlot
 						variant="White"
-						player={whitePlayer}
 						isWinner={JSON.stringify(winner) === JSON.stringify(whitePlayer)}
-						scores={match.player2Score ?? []}
+						match={match}
 					/>
 				</div>
 			</DialogTrigger>
