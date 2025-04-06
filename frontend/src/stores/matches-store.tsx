@@ -180,7 +180,7 @@ export const useMatchesStore = create<MatchesStore>()(
 					player2_score: match.player2Score,
 					has_player1_hansoku: match.hasPlayer1Hansoku,
 					has_player2_hansoku: match.hasPlayer2Hansoku,
-					first_scorer: match.firstScorer,
+					first_scorer_id: match.firstScorer?.id,
 				},
 			})
 
@@ -255,7 +255,7 @@ export const useMatchesStore = create<MatchesStore>()(
 								winner_id: null,
 								has_player1_hansoku: false,
 								has_player2_hansoku: false,
-								first_scorer: null,
+								first_scorer_id: null,
 							},
 						})
 					} else {
@@ -272,7 +272,7 @@ export const useMatchesStore = create<MatchesStore>()(
 								winner_id: null,
 								has_player1_hansoku: false,
 								has_player2_hansoku: false,
-								first_scorer: null,
+								first_scorer_id: null,
 							},
 						})
 					}
