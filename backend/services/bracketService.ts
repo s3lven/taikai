@@ -716,7 +716,8 @@ export class BracketService {
 					round: 0,
 					match: matchIndex,
 					bye_match: false,
-					has_hansoku: false,
+					has_player1_hansoku: false,
+					has_player2_hansoku: false,
 				}))
 				return bracket
 			}
