@@ -114,6 +114,9 @@ export const useMatchesStore = create<MatchesStore>()(
 				throw new Error("Match not found")
 			}
 
+			// Reset all of the dependent matches before submitting new score
+			get().resetMatch(match.id)
+
 			// Determine the winner
 			if (match.player1Score.length > match.player2Score.length) {
 				winner = match.player1
@@ -177,7 +180,7 @@ export const useMatchesStore = create<MatchesStore>()(
 					player2_score: match.player2Score,
 					has_player1_hansoku: match.hasPlayer1Hansoku,
 					has_player2_hansoku: match.hasPlayer2Hansoku,
-					first_scorer: match.firstScorer
+					first_scorer: match.firstScorer,
 				},
 			})
 
@@ -252,7 +255,7 @@ export const useMatchesStore = create<MatchesStore>()(
 								winner_id: null,
 								has_player1_hansoku: false,
 								has_player2_hansoku: false,
-								first_scorer: null
+								first_scorer: null,
 							},
 						})
 					} else {
@@ -269,7 +272,7 @@ export const useMatchesStore = create<MatchesStore>()(
 								winner_id: null,
 								has_player1_hansoku: false,
 								has_player2_hansoku: false,
-								first_scorer: null
+								first_scorer: null,
 							},
 						})
 					}
@@ -278,30 +281,30 @@ export const useMatchesStore = create<MatchesStore>()(
 					resetDependentMatches(currentRoundIndex + 1, dependentMatchIndex)
 				}
 
-				// Reset the initial match
-				const match = state.rounds[roundIndex][matchIndex]
-				match.player1Score = []
-				match.player2Score = []
-				match.winner = null
-				match.hasPlayer1Hansoku = false
-				match.hasPlayer2Hansoku = false
-				match.firstScorer = null
+				// // Reset the initial match
+				// const match = state.rounds[roundIndex][matchIndex]
+				// match.player1Score = []
+				// match.player2Score = []
+				// match.winner = null
+				// match.hasPlayer1Hansoku = false
+				// match.hasPlayer2Hansoku = false
+				// match.firstScorer = null
 
-				// Change tracking of initial match
-				useChangeTrackingStore.getState().addChange({
-					entityType: "match",
-					changeType: "update",
-					entityId: bracketId,
-					payload: {
-						id: matchId,
-						player1_score: [],
-						player2_score: [],
-						winner_id: null,
-						has_player1_hansoku: false,
-						has_player2_hansoku: false,
-						first_scorer: null
-					},
-				})
+				// // Change tracking of initial match
+				// useChangeTrackingStore.getState().addChange({
+				// 	entityType: "match",
+				// 	changeType: "update",
+				// 	entityId: bracketId,
+				// 	payload: {
+				// 		id: matchId,
+				// 		player1_score: [],
+				// 		player2_score: [],
+				// 		winner_id: null,
+				// 		has_player1_hansoku: false,
+				// 		has_player2_hansoku: false,
+				// 		first_scorer: null,
+				// 	},
+				// })
 
 				// Reset all dependent matches recursively
 				resetDependentMatches(roundIndex, matchIndex)
