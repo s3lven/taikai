@@ -12,15 +12,13 @@ export type IpponType =
   | "Tsuki"
   | "Hantei"
   | "Hansoku"
-  | "None";
 export const hitMap: Record<IpponType, string> = {
   Men: "M",
   Kote: "K",
   Do: "D",
   Tsuki: "T",
-  Hantei: "HT",
-  Hansoku: "HS",
-  None: "",
+  Hantei: "Ht",
+  Hansoku: "H",
 };
 export type BracketType =
   | "Single Elimination"
@@ -69,9 +67,12 @@ export interface Match {
   player1Score: IpponType[];
   player2Score: IpponType[];
   winner: Participant | null;
+  firstScorer: Participant | null
   round: number;
   match: number;
   byeMatch: boolean;
+  hasPlayer1Hansoku: boolean
+  hasPlayer2Hansoku: boolean
 }
 
 export interface Participant {

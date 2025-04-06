@@ -7,9 +7,9 @@ const BracketStructure = () => {
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Constants for layout
-  const MATCH_WIDTH = 220
+  const MATCH_WIDTH = 224
   const MATCH_HEIGHT = 56
-  const LEVEL_SPACING = 14
+  const LEVEL_SPACING = 12
   const PADDING = 0
   const VERTICAL_SPACING = 60
   const MIN_WIDTH = MATCH_WIDTH + PADDING * 2 // Minimum width to show one match
@@ -58,7 +58,7 @@ const BracketStructure = () => {
   const { width: svgWidth, height: svgHeight } = calculateRequiredDimensions()
 
   return (
-    <div ref={containerRef} className="w-full h-fit relative overflow-auto">
+    <div ref={containerRef} className="w-full h-fit relative overflow-auto ml-1">
       {/* SVG layer for connectors */}
       <svg
         className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -110,7 +110,7 @@ const BracketStructure = () => {
       </svg>
 
       {/* Match nodes layer */}
-      <div className="relative" style={{ width: svgWidth, height: svgHeight }}>
+      <div className="relative ml-1" style={{ width: svgWidth, height: svgHeight }}>
         {matches.map((round, roundIndex) =>
           round.map((match, matchIndex) => {
             const pos = calculateNodePosition(
@@ -124,7 +124,7 @@ const BracketStructure = () => {
               !match.byeMatch && (
                 <BracketMatch
                   key={`R${roundIndex}-M${matchIndex}`}
-                  match={match}
+                  matchId={match.id}
                   style={{
                     transform: `translate(${pos.x}px, ${pos.y}px)`,
                   }}

@@ -8,7 +8,7 @@ interface BracketRoundTitleProps {
 
 const BracketRoundTitle = ({ roundTitle }: BracketRoundTitleProps) => {
 	return (
-		<div className="w-full h-full max-w-[230px] flex items-center justify-center bg-figma_neutral7">
+		<div className="w-full h-full flex items-center justify-center bg-figma_neutral7">
 			<p className="text-white text-label uppercase">{roundTitle}</p>
 		</div>
 	);
@@ -46,7 +46,7 @@ const BracketRoundsList = () => {
 		return roundTitles;
 	};
 	return (
-		<div className="w-full max-h-[25px] flex gap-1">
+		<div className="w-full max-h-[25px] flex gap-1 ml-1">
 			{determineRoundTitles(length).map((title) => (
 				<BracketRoundTitle roundTitle={title} key={title} />
 			))}

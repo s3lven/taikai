@@ -1,70 +1,86 @@
-import { hitMap, IpponType, PlayerColorType } from "@/types";
+import { cn } from "@/lib/utils"
+import { hitMap, Match, PlayerColorType } from "@/types"
 
 interface BracketSlotProps {
-	variant: PlayerColorType;
-	sequence?: number | string;
-	name?: string;
-	isWinner: boolean;
-	scores: IpponType[];
+	variant: PlayerColorType
+	isWinner: boolean
+	match: Match
 }
 
-const BracketSlot = ({
-	variant,
-	sequence = "-1",
-	name = "-1",
-	isWinner,
-	scores,
-}: BracketSlotProps) => {
+const BracketSlot = ({ variant, match, isWinner }: BracketSlotProps) => {
+	const player = variant === "Red" ? match.player1 : match.player2
+	const scores = variant === "Red" ? match.player1Score : match.player2Score
 	return (
-		<div className="w-[220px] h-[27px] flex items-center font-poppins">
+		<div className="w-[220px] h-[27px] flex items-center">
 			<div
-				className={`size-[27px] flex items-center justify-center 
-              ${
-								variant === "Red"
-									? "bg-figma_error rounded-tl text-white"
-									: "bg-white text-black rounded-bl"
-							}`}
+				className={cn(
+					"size-[27px] flex items-center justify-center",
+					variant === "Red"
+						? "bg-figma_error rounded-tl text-white"
+						: "bg-white text-black rounded-bl"
+				)}
 			>
 				<p
-					className={`text-label uppercase text-center
-                  ${sequence == -1 && "opacity-0"}`}
+					className={cn(
+						"text-label uppercase text-center",
+						player?.sequence == -1 && "opacity-0"
+					)}
 				>
-					{sequence}
+					{player?.sequence}
 				</p>
 			</div>
 			<div
-				className={`w-full h-[27px] flex items-center justify-center px-1 bg-figma_neutral8
-              ${variant === "Red" ? "rounded-tr " : "rounded-br"}`}
+				className={cn(
+					"w-full h-[27px] flex items-center justify-center px-1 bg-figma_neutral8",
+					variant === "Red" ? "rounded-tr " : "rounded-br"
+				)}
 			>
 				<div className="w-full h-full flex items-center flex-1">
 					<p
-						className={`w-[128px] text-desc truncate
-							${sequence == -1 && "opacity-0"}
-              				${isWinner ? "text-figma_green" : "text-white"}
-						`}
+						className={
+							// Need this here instead of inside cn() because the style won't show
+							"text-desc " +
+							cn(
+								"w-[128px] truncate",
+								player?.sequence == -1 && "opacity-0",
+								isWinner ? "text-figma_green" : "text-white "
+							)
+						}
 					>
-						{name}
+						{player?.name}
 					</p>
 				</div>
-				<div className="w-9 h-full gap-1 flex items-center justify-center">
-					{scores.map((score, index) => (
-						<div
-							key={index}
-							className="w-full h-full flex items-center justify-center"
-						>
-							<p
-								className={`text-desc w-5 ${
-									isWinner ? "text-figma_green" : "text-white"
-								}`}
+				<div className="w-full h-full gap-1 flex items-center justify-between">
+					{scores.map((score, index) => {
+						const isFirstScore = index === 0 && match.firstScorer === player
+
+						return (
+							<div
+								key={index}
+								className={cn(
+									"w-full h-full flex items-center justify-center",
+									isFirstScore && "rounded-full w-fit border-white border-2",
+									isWinner && "border-figma_green"
+								)}
 							>
-								{hitMap[score]}
-							</p>
-						</div>
-					))}
+								<p
+									className={
+										"text-desc " +
+										cn(
+											"size-6 inline-flex justify-center items-center",
+											isWinner ? "text-figma_green" : "text-white"
+										)
+									}
+								>
+									{hitMap[score]}
+								</p>
+							</div>
+						)
+					})}
 				</div>
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export default BracketSlot;
+export default BracketSlot
