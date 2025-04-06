@@ -1,5 +1,4 @@
-import { Match, Participant } from "@/types"
-import { Info } from "lucide-react"
+import { Participant } from "@/types"
 import { useMatchesStore } from "@/stores/matches-store"
 import { useShallow } from "zustand/react/shallow"
 import { useBracketStore } from "@/stores/bracket-store"
@@ -44,8 +43,7 @@ const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
 		const submittedWinner = submitScore(match.id)
 		setWinner(submittedWinner)
 
-		// Uncomment when score submission is fully ready
-		// submitScoreQuery()
+		submitScoreQuery()
 
 		setDialogOpen(false)
 	}
