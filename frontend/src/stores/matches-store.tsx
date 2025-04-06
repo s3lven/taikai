@@ -12,6 +12,7 @@ interface MatchesState {
 interface MatchesActions {
 	setMatches: (rounds: Match[][]) => void
 	setScore: (matchId: number, color: PlayerColorType, value: IpponType) => void
+	clearScore: (matchId: number) => void
 	submitScore: (matchId: number) => Participant | null
 	resetBracket: () => void
 	isBracketCompleted: () => boolean
@@ -88,6 +89,20 @@ export const useMatchesStore = create<MatchesStore>()(
 
 				return state
 			}),
+		clearScore: (matchId) => {
+			set((state) => {
+				// Find match
+				const match = state.rounds.flat().find((m) => m.id === matchId)
+				if (!match) return state
+
+				match.player1Score = []
+				match.player2Score = []
+				match.firstScorer = null
+				match.winner = null
+				match.hasPlayer1Hansoku = false
+				match.hasPlayer2Hansoku = false
+			})
+		},
 		submitScore: (matchId) => {
 			const bracketId = useBracketStore.getState().bracket.id
 			let winner: Participant | null = null

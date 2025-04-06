@@ -22,10 +22,10 @@ interface BracketMatchProps {
 }
 
 const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
-	const [submitScore, resetMatch, match] = useMatchesStore(
+	const [submitScore, clearScore, match] = useMatchesStore(
 		useShallow((state) => [
 			state.submitScore,
-			state.resetMatch,
+			state.clearScore,
 			state.rounds.flat().find((m) => m.id === matchId)!,
 		])
 	)
@@ -42,8 +42,6 @@ const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
 	const { submitScore: submitScoreQuery } = useSubmitScoreQuery()
 	const handleSubmitScore = async () => {
 		const submittedWinner = submitScore(match.id)
-
-		if (!submittedWinner) return
 		setWinner(submittedWinner)
 
 		// Uncomment when score submission is fully ready
@@ -51,9 +49,8 @@ const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
 
 		setDialogOpen(false)
 	}
-	const handleResetMatch = () => {
-		resetMatch(match.id)
-		setDialogOpen(false)
+	const handleClearMatch = () => {
+		clearScore(matchId)
 	}
 	useEffect(() => {
 		if (match) {
@@ -84,13 +81,13 @@ const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
 
 			{/* Buttons */}
 			<div className="w-full flex gap-[2px] font-poppins">
-				{/* Reset */}
+				{/* Clear */}
 				<Button
-					onClick={handleResetMatch}
+					onClick={handleClearMatch}
 					className="w-full uppercase text-[14px] tracking-[2px] font-bold leading-[26px] rounded px-4 py-3
            text-white bg-figma_neutral7 hover:bg-figma_shade2_30"
 				>
-					Reset
+					Clear
 				</Button>
 				{/* Submit */}
 				<Button
