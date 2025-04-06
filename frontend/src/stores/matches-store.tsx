@@ -58,9 +58,9 @@ export const useMatchesStore = create<MatchesStore>()(
 			}
 
 			// Determine the winner
-			if (match.player1Score > match.player2Score) {
+			if (match.player1Score.length > match.player2Score.length) {
 				winner = match.player1
-			} else if (match.player2Score > match.player1Score) {
+			} else if (match.player2Score.length > match.player1Score.length) {
 				winner = match.player2
 			}
 
