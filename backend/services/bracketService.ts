@@ -115,7 +115,8 @@ export class BracketService {
 				round: match.round,
 				match: match.match,
 				byeMatch: match.bye_match,
-				hasHansoku: match.has_hansoku,
+				hasPlayer1Hansoku: match.has_player1_hansoku,
+				hasPlayer2Hansoku: match.has_player2_hansoku,
 			}))
 
 			const rounds = Math.log2(matchesWithParticipants.length + 1)
@@ -740,7 +741,8 @@ export class BracketService {
 						round,
 						match,
 						bye_match: false,
-						has_hansoku: false,
+						has_player1_hansoku: false,
+						has_player2_hansoku: false,
 					})
 				}
 			}

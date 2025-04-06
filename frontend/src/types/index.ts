@@ -71,7 +71,8 @@ export interface Match {
   round: number;
   match: number;
   byeMatch: boolean;
-  hasHansoku: boolean
+  hasPlayer1Hansoku: boolean
+  hasPlayer2Hansoku: boolean
 }
 
 export interface Participant {

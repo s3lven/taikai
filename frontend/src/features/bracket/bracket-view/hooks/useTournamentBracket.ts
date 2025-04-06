@@ -70,7 +70,8 @@ const useTournamentBracket = () => {
         firstScorer: null,
         bracketID: bracketId,
         byeMatch: false,
-        hasHansoku: false,
+        hasPlayer1Hansoku: false,
+        hasPlayer2Hansoku: false,
         match: matchIndex,
         round: 0,
       }));
@@ -108,7 +109,8 @@ const useTournamentBracket = () => {
               firstScorer: null,
               bracketID: bracketId,
               byeMatch: false,
-              hasHansoku: false,
+              hasPlayer1Hansoku: false,
+              hasPlayer2Hansoku: false,
               match: matchIndex,
               round: roundIndex,
             };
