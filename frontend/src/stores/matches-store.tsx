@@ -30,21 +30,63 @@ export const useMatchesStore = create<MatchesStore>()(
 			set((state) => {
 				// Find the match
 				const match = state.rounds.flat().find((m) => m.id === matchId)
+				if (!match) return state // Return current state if no match found
 
-				if (match) {
-					// If there are three points on the board, then dont do anything
-					if (match.player1Score.length + match.player2Score.length === 3) return
+				// If the scoreboard has Hantei, there shouldn't be any other points
+				if (
+					match.player1Score.includes("Hantei") ||
+					match.player2Score.includes("Hantei")
+				)
+					return state
 
+				if (value === "Hansoku") {
 					if (color === "Red") {
-						if (!match.firstScorer) match.firstScorer = match.player1
-						if (match.player1Score.length === 2) return
-						match.player1Score.push(value)
+						if (match.hasPlayer1Hansoku) {
+							// If there are three points on the board, then dont do anything
+							if (
+								match.player1Score.length + match.player2Score.length === 3 ||
+								match.player2Score.length >= 2
+							)
+								return state
+
+							match.player2Score.push("Hansoku")
+							match.hasPlayer1Hansoku = false
+						} else {
+							match.hasPlayer1Hansoku = true
+						}
 					} else {
-						if (!match.firstScorer) match.firstScorer = match.player2
-						if (match.player2Score.length === 2) return
-						match.player2Score.push(value)
+						if (match.hasPlayer2Hansoku) {
+							// If there are three points on the board, then dont do anything
+							if (
+								match.player1Score.length + match.player2Score.length === 3 ||
+								match.player1Score.length >= 2
+							)
+								return state
+
+							match.player1Score.push("Hansoku")
+							match.hasPlayer2Hansoku = false
+						} else {
+							match.hasPlayer2Hansoku = true
+						}
 					}
+					return state
 				}
+
+				// Regular score handling
+				if (match.player1Score.length + match.player2Score.length === 3)
+					return state
+
+				if (!match.firstScorer) {
+					match.firstScorer = color === "Red" ? match.player1 : match.player2
+				}
+
+				if (color === "Red" && match.player1Score.length < 2) {
+					match.player1Score.push(value)
+				} else if (color === "White" && match.player2Score.length < 2) {
+					match.player2Score.push(value)
+				}
+
+				return state
 			}),
 		submitScore: (matchId) => {
 			const bracketId = useBracketStore.getState().bracket.id
