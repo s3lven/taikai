@@ -50,7 +50,7 @@ const BracketSlot = ({ variant, match, isWinner }: BracketSlotProps) => {
 						{player?.name}
 					</p>
 				</div>
-				<div className="w-full h-full gap-1 flex items-center justify-center">
+				<div className="w-full h-full gap-1 flex items-center justify-between">
 					{scores.map((score, index) => {
 						const isFirstScore = index === 0 && match.firstScorer === player
 

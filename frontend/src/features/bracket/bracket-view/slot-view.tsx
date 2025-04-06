@@ -15,6 +15,7 @@ interface SlotProps {
 const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 	const player = color === "Red" ? match.player1 : match.player2
 	const score = color === "Red" ? match.player1Score : match.player2Score
+	const hasHansoku = color === "Red" ? match.hasPlayer1Hansoku : match.hasPlayer2Hansoku
 
 	const firstRowOptions: IpponType[] = ["Men", "Kote", "Do"]
 	const secondRowOptions: IpponType[] = ["Tsuki", "Hansoku", "Hantei"]
@@ -22,8 +23,6 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 	// Formatting options to single character for button
 	const renderChar = (option: string) => {
 		switch (option) {
-			case "Hansoku":
-				return <Triangle className="text-white" />
 			case "Hantei":
 				return "Ht"
 			default:
@@ -62,7 +61,7 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 			{/* Scoreboard */}
 			<div
 				className={cn(
-					"bg-figma_shade2_30 h-20 flex justify-center items-center gap-4",
+					"relative bg-figma_shade2_30 h-20 flex justify-center items-center gap-4",
 					isWinner && "text-figma_green"
 				)}
 			>
@@ -70,17 +69,22 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 					const isFirstScore = index === 0 && match.firstScorer === player
 					return (
 						<div
-							key={`${player}-${s}`}
+							key={`${player}-${s}-${index}`}
 							className={cn(
 								"size-8 inline-flex justify-center items-center",
 								isFirstScore && "rounded-full border-2",
-								isWinner && "border-figma_green"
+								isWinner ? "border-figma_green" : "border-white"
 							)}
 						>
 							{renderChar(s)}
 						</div>
 					)
 				})}
+
+				{/* Hansoku */}
+				<div className={cn("absolute bottom-4 ", color === "Red" ? "left-4": "right-4")}>
+					{hasHansoku && <Triangle className="text-red-500 size-4" />}
+				</div>
 			</div>
 
 			{status === "In Progress" && (
@@ -122,7 +126,7 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 										className="hover:bg-figma_shade2_30 hover:text-white "
 										onClick={() => handleSetScore(option)}
 									>
-										{renderChar(option)}
+										{option === "Hansoku" ? (<Triangle className="text-white" />) : renderChar(option)}
 									</Button>
 								</div>
 							)
