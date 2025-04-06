@@ -107,6 +107,8 @@ export type Database = {
           bracket_id: number
           bye_match: boolean
           created_at: string | null
+          first_scorer_id: number | null
+          has_hansoku: boolean
           id: number
           match: number
           player1_id: number | null
@@ -121,6 +123,8 @@ export type Database = {
           bracket_id: number
           bye_match?: boolean
           created_at?: string | null
+          first_scorer_id?: number | null
+          has_hansoku?: boolean
           id?: number
           match: number
           player1_id?: number | null
@@ -135,6 +139,8 @@ export type Database = {
           bracket_id?: number
           bye_match?: boolean
           created_at?: string | null
+          first_scorer_id?: number | null
+          has_hansoku?: boolean
           id?: number
           match?: number
           player1_id?: number | null

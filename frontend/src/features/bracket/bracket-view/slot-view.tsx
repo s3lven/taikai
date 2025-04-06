@@ -39,10 +39,6 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 		setScore(match.id, color, option)
 	}
 
-	const [firstScorer] = useMatchesStore(
-		useShallow((state) => [state.firstScorer])
-	)
-
 	return (
 		<div className="w-full flex flex-col gap-[2px]">
 			{/* Seed */}
@@ -71,7 +67,7 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 				)}
 			>
 				{score.map((s, index) => {
-					const isFirstScore = index === 0 && firstScorer === player
+					const isFirstScore = index === 0 && match.firstScorer === player
 					return (
 						<div
 							key={`${player}-${s}`}

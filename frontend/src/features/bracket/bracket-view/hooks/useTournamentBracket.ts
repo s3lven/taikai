@@ -67,8 +67,10 @@ const useTournamentBracket = () => {
         player1Score: [],
         player2Score: [],
         winner: null,
+        firstScorer: null,
         bracketID: bracketId,
         byeMatch: false,
+        hasHansoku: false,
         match: matchIndex,
         round: 0,
       }));
@@ -93,7 +95,7 @@ const useTournamentBracket = () => {
         );
       }
 
-      const filledBracket = initialBracket.map((round, roundIndex) => {
+      const filledBracket: Match[][] = initialBracket.map((round, roundIndex) => {
         return round.map((match, matchIndex) => {
           if (match === null) {
             return {
@@ -103,8 +105,10 @@ const useTournamentBracket = () => {
               player1Score: [],
               player2Score: [],
               winner: null,
+              firstScorer: null,
               bracketID: bracketId,
               byeMatch: false,
+              hasHansoku: false,
               match: matchIndex,
               round: roundIndex,
             };

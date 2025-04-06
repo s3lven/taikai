@@ -67,9 +67,11 @@ export interface Match {
   player1Score: IpponType[];
   player2Score: IpponType[];
   winner: Participant | null;
+  firstScorer: Participant | null
   round: number;
   match: number;
   byeMatch: boolean;
+  hasHansoku: boolean
 }
 
 export interface Participant {
