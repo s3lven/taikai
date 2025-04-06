@@ -118,6 +118,9 @@ export const useMatchesStore = create<MatchesStore>()(
 					winner_id: winner.id,
 					player1_score: match.player1Score,
 					player2_score: match.player2Score,
+					has_player1_hansoku: match.hasPlayer1Hansoku,
+					has_player2_hansoku: match.hasPlayer2Hansoku,
+					first_scorer: match.firstScorer
 				},
 			})
 
@@ -174,6 +177,9 @@ export const useMatchesStore = create<MatchesStore>()(
 					dependentMatch.player1Score = []
 					dependentMatch.player2Score = []
 					dependentMatch.winner = null
+					dependentMatch.hasPlayer1Hansoku = false
+					dependentMatch.hasPlayer2Hansoku = false
+					dependentMatch.firstScorer = null
 
 					if (currentMatchIndex % 2 === 0) {
 						dependentMatch.player1 = null
@@ -187,6 +193,9 @@ export const useMatchesStore = create<MatchesStore>()(
 								player1_score: [],
 								player2_score: [],
 								winner_id: null,
+								has_player1_hansoku: false,
+								has_player2_hansoku: false,
+								first_scorer: null
 							},
 						})
 					} else {
@@ -201,6 +210,9 @@ export const useMatchesStore = create<MatchesStore>()(
 								player1_score: [],
 								player2_score: [],
 								winner_id: null,
+								has_player1_hansoku: false,
+								has_player2_hansoku: false,
+								first_scorer: null
 							},
 						})
 					}
@@ -214,6 +226,9 @@ export const useMatchesStore = create<MatchesStore>()(
 				match.player1Score = []
 				match.player2Score = []
 				match.winner = null
+				match.hasPlayer1Hansoku = false
+				match.hasPlayer2Hansoku = false
+				match.firstScorer = null
 
 				// Change tracking of initial match
 				useChangeTrackingStore.getState().addChange({
@@ -225,6 +240,9 @@ export const useMatchesStore = create<MatchesStore>()(
 						player1_score: [],
 						player2_score: [],
 						winner_id: null,
+						has_player1_hansoku: false,
+						has_player2_hansoku: false,
+						first_scorer: null
 					},
 				})
 
