@@ -1,10 +1,4 @@
-import {
-	BracketStatusType,
-	IpponType,
-	Match,
-	Participant,
-	PlayerColorType,
-} from "@/types"
+import { BracketStatusType, IpponType, Match, PlayerColorType } from "@/types"
 import { Triangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -18,12 +12,7 @@ interface SlotProps {
 	status: BracketStatusType
 }
 
-const SlotView = ({
-	isWinner,
-	color,
-	match,
-	status,
-}: SlotProps) => {
+const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 	const player = color === "Red" ? match.player1 : match.player2
 	const score = color === "Red" ? match.player1Score : match.player2Score
 
@@ -49,6 +38,10 @@ const SlotView = ({
 	const handleSetScore = (option: IpponType) => {
 		setScore(match.id, color, option)
 	}
+
+	const [firstScorer] = useMatchesStore(
+		useShallow((state) => [state.firstScorer])
+	)
 
 	return (
 		<div className="w-full flex flex-col gap-[2px]">
@@ -77,11 +70,20 @@ const SlotView = ({
 					isWinner && "text-figma_green"
 				)}
 			>
-				{score.map((s) => (
-					<p key={`${player}-${s}`} className="text-white">
-						{s}
-					</p>
-				))}
+				{score.map((s, index) => {
+					const isFirstScore = index === 0 && firstScorer === player
+					return (
+						<div
+							key={`${player}-${s}`}
+							className={cn(
+								"text-white size-8 text-center pt-[2px]",
+								isFirstScore && "rounded-full border-white border-2"
+							)}
+						>
+							{renderChar(s)}
+						</div>
+					)
+				})}
 			</div>
 
 			{status === "In Progress" && (

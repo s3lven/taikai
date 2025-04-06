@@ -7,6 +7,7 @@ import { useChangeTrackingStore } from "./change-tracking-store"
 interface MatchesState {
 	rounds: Match[][]
 	initialRounds: Match[][] | null
+	firstScorer: Participant | null
 }
 
 interface MatchesActions {
@@ -24,6 +25,7 @@ export const useMatchesStore = create<MatchesStore>()(
 	immer((set, get) => ({
 		rounds: [],
 		initialRounds: null,
+		firstScorer: null,
 
 		setMatches: (rounds) => set({ rounds: rounds, initialRounds: rounds }),
 		setScore: (matchId, color, value) =>
@@ -32,10 +34,15 @@ export const useMatchesStore = create<MatchesStore>()(
 				const match = state.rounds.flat().find((m) => m.id === matchId)
 
 				if (match) {
+					// If there are three points on the board, then dont do anything
+					if (match.player1Score.length + match.player2Score.length === 3) return
+
 					if (color === "Red") {
+						if (!state.firstScorer) state.firstScorer = match.player1
 						if (match.player1Score.length === 2) return
 						match.player1Score.push(value)
 					} else {
+						if (!state.firstScorer) state.firstScorer = match.player2
 						if (match.player2Score.length === 2) return
 						match.player2Score.push(value)
 					}
