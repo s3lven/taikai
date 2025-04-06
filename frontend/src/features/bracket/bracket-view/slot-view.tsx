@@ -15,7 +15,8 @@ interface SlotProps {
 const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 	const player = color === "Red" ? match.player1 : match.player2
 	const score = color === "Red" ? match.player1Score : match.player2Score
-	const hasHansoku = color === "Red" ? match.hasPlayer1Hansoku : match.hasPlayer2Hansoku
+	const hasHansoku =
+		color === "Red" ? match.hasPlayer1Hansoku : match.hasPlayer2Hansoku
 
 	const firstRowOptions: IpponType[] = ["Men", "Kote", "Do"]
 	const secondRowOptions: IpponType[] = ["Tsuki", "Hansoku", "Hantei"]
@@ -61,8 +62,9 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 			{/* Scoreboard */}
 			<div
 				className={cn(
-					"relative bg-figma_shade2_30 h-20 flex justify-center items-center gap-4",
-					isWinner && "text-figma_green"
+					"relative bg-figma_shade2_30 h-20 flex justify-center items-center gap-4 rounded-b",
+					isWinner && "text-figma_green",
+					color === "Red" ? "md:rounded-br-none" : "md:rounded-bl-none"
 				)}
 			>
 				{score.map((s, index) => {
@@ -82,7 +84,12 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 				})}
 
 				{/* Hansoku */}
-				<div className={cn("absolute bottom-4 ", color === "Red" ? "left-4": "right-4")}>
+				<div
+					className={cn(
+						"absolute bottom-4 ",
+						color === "Red" ? "left-4" : "right-4"
+					)}
+				>
 					{hasHansoku && <Triangle className="text-red-500 size-4" />}
 				</div>
 			</div>
@@ -90,47 +97,40 @@ const SlotView = ({ isWinner, color, match, status }: SlotProps) => {
 			{status === "In Progress" && (
 				<>
 					{/* Point Options 1 */}
-					<div className="bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px]">
+					<div className="grid grid-cols-3 justify-between items-center h-[42px] gap-[1px] ">
 						{firstRowOptions.map((option) => (
-							<div
+							<Button
 								key={option}
-								className="flex items-center justify-center text-white text-label"
+								variant={"ghost"}
+								size={"icon"}
+								className="bg-figma_shade2_30 w-full hover:bg-figma_shade2_30/80 text-white hover:text-white rounded-md text-sm font-normal"
+								onClick={() => handleSetScore(option)}
 							>
-								<Button
-									variant={"ghost"}
-									size={"icon"}
-									className="hover:bg-figma_shade2_30 hover:text-white"
-									onClick={() => handleSetScore(option)}
-								>
-									{renderChar(option)}
-								</Button>
-							</div>
+								{option}
+							</Button>
 						))}
 					</div>
 					{/* Point Options 2 */}
 					<div
 						className={cn(
-							"bg-figma_shade2_30 flex justify-between items-center px-2 h-[42px] rounded-b",
-							color === "Red" ? "md:rounded-br-none" : "md:rounded-bl-none"
+							"grid grid-cols-3 justify-between items-center h-[42px] gap-[1px] rounded-b"
 						)}
 					>
-						{secondRowOptions.map((option) => {
-							return (
-								<div
-									key={option}
-									className="flex items-center justify-center text-white text-label"
-								>
-									<Button
-										variant={"ghost"}
-										size={"icon"}
-										className="hover:bg-figma_shade2_30 hover:text-white "
-										onClick={() => handleSetScore(option)}
-									>
-										{option === "Hansoku" ? (<Triangle className="text-white" />) : renderChar(option)}
-									</Button>
-								</div>
-							)
-						})}
+						{secondRowOptions.map((option) => (
+							<Button
+								key={option}
+								variant={"ghost"}
+								size={"icon"}
+								className="bg-figma_shade2_30 w-full hover:bg-figma_shade2_30/80 text-white hover:text-white rounded-md text-sm font-normal"
+								onClick={() => handleSetScore(option)}
+							>
+								{option === "Hansoku" ? (
+									<Triangle className="text-white" />
+								) : (
+									option
+								)}
+							</Button>
+						))}
 					</div>
 				</>
 			)}

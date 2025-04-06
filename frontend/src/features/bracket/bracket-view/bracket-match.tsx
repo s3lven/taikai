@@ -155,12 +155,6 @@ const BracketMatch = ({ matchId, style }: BracketMatchProps) => {
 					<DialogTitle className="font-poppins text-paragraph md:text-lead">
 						Report Scores
 					</DialogTitle>
-					<Button
-						variant={"outline"}
-						className="border-none bg-figma_shade2_5 hover:bg-figma_shade2_30 p-0 size-8"
-					>
-						<Info className="text-white" />
-					</Button>
 				</DialogHeader>
 				<>
 					{/* Overlay Content -- Render based on different scenarios */}
